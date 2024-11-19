@@ -1,19 +1,25 @@
 import setup
-import utils
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-print("-- Funkyscout Setup Utility --")
-print("(1) Setup Supabase Project")
-print("(2) Setup Supabase DB")
+from rich import print
+from rich.panel import Panel
 
 def selectAction():
-   match input("Perform an action (1-2)"):
-      case 1:
-         print("Creating Supabase Project")
-         setup.create_project()
-      case 2:
-         print("Loading Supabase Tables")
-         setup.create_database()
+    print(
+        Panel.fit(
+            "[red](1) [white]Setup Supabase Project \n[red](2) [white]Setup Supabase DB\n[red](3) [white]Quit",
+            title="Funkyscout Setup Utility",
+            padding=(1, 3),
+        )
+    )
+
+    match input("Perform an action (1-2): "):
+        case "1":
+            setup.create_project()
+            selectAction()
+        case "2":
+            setup.create_database()
+            selectAction()
+        case "3":
+            exit()
+
+
+selectAction()

@@ -8,9 +8,27 @@ begin
       create type public.role as enum ('user', 'scouter', 'admin');
    end if;
    if not exists (select 1 from pg_type where typname = 'perm') then
-      create type public.perm as enum ('data.view', 'data.write', 'schedule.view', 'schedule.write', 'event.write');
+      create type public.perm as enum ('data.view', 'data.write', 'schedule.view', 'schedule.write', 'event.write', 'profiles.view');
    end if;
 end $$;
+
+create table if not exists
+   user_profiles (
+      uid      uuid     default auth.uid() not null,
+      name     text     default 'user'     not null,
+      role     role     default 'user'     not null,
+
+      scouted  integer  default 0          not null,
+      missed   integer  default 0          not null,
+      accuracy float    default 1          not null,
+
+      constraint user_profiles_pkey primary key (uid),
+      constraint user_profiles_uid_fkey foreign key (uid) 
+         references auth.users (id) 
+         on update cascade 
+         on delete cascade
+   );
+comment on table user_profiles is 'Details about each user';
 
 create table if not exists
    event_list (
@@ -44,8 +62,8 @@ create table if not exists
          on update cascade 
          on delete cascade,
 
-      constraint event_schedule_uid_fkey foreign key (uid) 
-         references auth.users (id) 
+      constraint event_pit_data_uid_fkey foreign key (uid) 
+         references user_profiles (uid) 
          on update cascade 
          on delete cascade
    );
@@ -66,6 +84,10 @@ create table if not exists
       --user info--
       name     text     not null,
       uid      uuid     default auth.uid (),
+      timestamp timestamp 
+         with time zone 
+         not null 
+         default (now() at time zone 'utc'::text),
 
       constraint event_match_data_pkey primary key (event, match, team),
       constraint event_match_data_key  unique (event, match, team),
@@ -75,8 +97,8 @@ create table if not exists
          on update cascade 
          on delete restrict,
 
-      constraint event_match_data_uid_fkey foreign key (uid) 
-         references auth.users (id) 
+      constraint event_pit_data_uid_fkey foreign key (uid) 
+         references user_profiles (uid) 
          on update cascade 
          on delete cascade
    );
@@ -91,37 +113,23 @@ create table if not exists
       --data--
       data     jsonb    not null,
 
-      --user info--
+      --data info--
       name     text     not null,
       uid      uuid     default auth.uid (),
+      timestamp timestamp 
+         with time zone 
+         not null 
+         default (now() at time zone 'utc'::text),
 
-      constraint event_match_data_pkey primary key (event, team),
-      constraint event_match_data_key  unique (event, team),
+      constraint event_pit_data_pkey primary key (event, team),
+      constraint event_pit_data_key  unique (event, team),
 
-      constraint event_match_data_uid_fkey foreign key (uid) 
-         references auth.users (id) 
+      constraint event_pit_data_uid_fkey foreign key (uid) 
+         references user_profiles (uid) 
          on update cascade 
          on delete cascade
    );
-comment on table event_match_data is 'Match data received from scouters';
-
-create table if not exists
-   user_profiles (
-      uid      uuid     default auth.uid() not null,
-      name     text     default 'user'     not null,
-      role     role     default 'user'     not null,
-
-      scouted  integer  default 0          not null,
-      missed   integer  default 0          not null,
-      accuracy float    default 1          not null,
-
-      constraint user_profiles_pkey primary key (uid),
-      constraint user_profiles_uid_fkey foreign key (uid) 
-         references auth.users (id) 
-         on update cascade 
-         on delete cascade
-   );
-comment on table user_profiles is 'Details about each user';
+comment on table event_match_data is 'Pit scouting data received from scouters';
 
 create table if not exists
    user_roles (
@@ -141,7 +149,7 @@ stable
 as $$
    declare
       claims jsonb;
-       user_role public.role;
+      user_role public.role;
    begin
       -- Fetch the user role in the user_profiles table
       select role into user_role from public.user_profiles where uid = (event->>'uid')::uuid;
@@ -200,11 +208,12 @@ $$ language plpgsql stable security definer set search_path = '';
 
 -- Create RLS Policies --
 alter table event_match_data enable row level security;
-alter table event_list enable row level security;
-alter table event_schedule enable row level security;
+alter table event_pit_data   enable row level security;
+alter table event_list       enable row level security;
+alter table event_schedule   enable row level security;
 
-alter table user_profiles enable row level security;
-alter table user_roles enable row level security;
+alter table user_profiles    enable row level security;
+alter table user_roles       enable row level security;
 
 create policy "Allow auth admin to read user profiles" 
    on user_profiles 
@@ -212,6 +221,33 @@ create policy "Allow auth admin to read user profiles"
    for SELECT 
    to supabase_auth_admin 
    using (true);
+
+create policy "Enable insert for users based on uid"
+   on user_profiles
+   as permissive
+   for UPDATE
+   to public
+   with check (
+      (select auth.uid()) = uid
+   );
+
+create policy "Enable select for users based on uid"
+   on user_profiles
+   as permissive
+   for SELECT
+   to public
+   using (
+      (select auth.uid()) = uid
+   );
+
+create policy "Enable select for authorized users"
+   on user_profiles
+   as permissive
+   for SELECT
+   to public
+   using (
+      authorize('profiles.view')
+   );
 
   -- Schedule Access Policies --
 create policy "Allow authorized delete access" 
@@ -251,6 +287,24 @@ create policy "Allow authorized select access (data)"
    to authenticated 
    using (authorize('data.view'));
 
+create policy "Allow authorized delete access (data)" 
+  on event_pit_data
+  for DELETE
+  to authenticated
+  using (authorize('data.write'));
+
+create policy "Allow authorized insert access (data)" 
+   on event_pit_data
+   for INSERT 
+   to authenticated 
+   with check (authorize('data.write'));
+
+create policy "Allow authorized select access (data)" 
+   on event_pit_data
+   for SELECT
+   to authenticated 
+   using (authorize('data.view'));
+
   -- Event Access Policies --
 create policy "Allow authorized delete access (event)" 
    on event_list
@@ -276,6 +330,7 @@ insert into user_roles (role, permission) values ('admin', 'data.write');
 insert into user_roles (role, permission) values ('admin', 'schedule.view');
 insert into user_roles (role, permission) values ('admin', 'schedule.write');
 insert into user_roles (role, permission) values ('admin', 'event.write');
+insert into user_roles (role, permission) values ('admin', 'profiles.view');
 
 insert into user_roles (role, permission) values ('scouter', 'data.view');
 insert into user_roles (role, permission) values ('scouter', 'data.write');
@@ -287,10 +342,12 @@ insert into user_roles (role, permission) values ('user', 'schedule.view');
 -- Create User Insert Function --
 drop trigger if exists on_auth_user_created on auth.users;
 
+create sequence if not exists user_number_seq;
+
 create or replace function public.handle_new_user () returns trigger as $$
 begin
-   insert into public.user_profiles (uid)
-   values (new.id);
+   insert into public.user_profiles (uid, name)
+   values (new.id, 'User' || upper(substring(new.id::text from '.{4}$')));
    return new;
 end;
 $$ language plpgsql security definer;
@@ -298,6 +355,3 @@ $$ language plpgsql security definer;
 create trigger on_auth_user_created
 after insert on auth.users for each row
 execute procedure public.handle_new_user ();
-
--- TOOD: Add RLS for each user to write to own row and view any row in user_profile --
-

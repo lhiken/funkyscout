@@ -1,10 +1,12 @@
+import os
+
 def confirm(message):
     response = input(f"{message}").strip().lower()
     if response in ("y"):
         return True
-    elif response in ("n"):
-        return False
     else:
-        confirm(message)
+        return False
         
+def clear():
+    os.system('cls||echo -e \\\\033c')
         
