@@ -1,0 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+   font-family: Outfit;
+   background-color: var(--background);
+   color: var(--text-primary);
+
+   height: 100vh;
+   width: 100vw;
+   overflow: hidden;
+   margin: 0;
+   padding: 0;
+
+   display: flex;
+   justify-content: center;
+   align-items: center;
+}
+
+button {
+   background-color: unset;
+   border: unset;
+   box-shadow: unset;
+}
+
+.theme-dark {
+   /* UI Elements 1 */
+   --background: #090909;
+   --primary: #cda745;
+   --primary-variant: #dcbe73;
+   --error: #bf4141;
+   --surface: #131313;
+   --text-primary: #bbbbbb;
+   --text-secondary: #515151;
+   --text-background: #1e1e1e;
+   --text-surface: #c3c3c3;
+   --text-error: #ffa9a9;
+   --inset: #0d0d0d;
+}
+
+.theme-light {
+   /* UI Elements 1 */
+   --background: #090909;
+   --primary: #cda745;
+   --primary-variant: #dcbe73;
+   --error: #bf4141;
+   --surface: #131313;
+   --text-primary: #bbbbbb;
+   --text-secondary: #515151;
+   --text-background: #1e1e1e;
+   --text-surface: #c3c3c3;
+   --text-error: #ffa9a9;
+   --inset: #0d0d0d;
+}

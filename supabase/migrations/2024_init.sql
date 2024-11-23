@@ -22,6 +22,8 @@ create table if not exists
       missed   integer  default 0          not null,
       accuracy float    default 1          not null,
 
+      settings jsonb    default '[]'         not null,
+
       constraint user_profiles_pkey primary key (uid),
       constraint user_profiles_uid_fkey foreign key (uid) 
          references auth.users (id) 
@@ -62,7 +64,7 @@ create table if not exists
          on update cascade 
          on delete cascade,
 
-      constraint event_pit_data_uid_fkey foreign key (uid) 
+      constraint event_schedule_uid_fkey foreign key (uid) 
          references user_profiles (uid) 
          on update cascade 
          on delete cascade
@@ -97,7 +99,7 @@ create table if not exists
          on update cascade 
          on delete restrict,
 
-      constraint event_pit_data_uid_fkey foreign key (uid) 
+      constraint event_match_data_uid_fkey foreign key (uid) 
          references user_profiles (uid) 
          on update cascade 
          on delete cascade
@@ -141,11 +143,16 @@ create table if not exists
    );
 comment on table user_roles is 'Permissions for each role';
 
+-- create index if not exists event_match_data_uid_index on event_match_data(uid);
+-- create index if not exists event_schedule_uid_index on event_schedule(uid);
+-- create index if not exists event_pit_data_uid_index on event_pit_data(uid);
+
 -- Auth Hook Function --
 create or replace function public.custom_access_token_hook(event jsonb)
 returns jsonb
 language plpgsql
 stable
+set search_path = public, pg_catalog
 as $$
    declare
       claims jsonb;
@@ -215,39 +222,34 @@ alter table event_schedule   enable row level security;
 alter table user_profiles    enable row level security;
 alter table user_roles       enable row level security;
 
-create policy "Allow auth admin to read user profiles" 
-   on user_profiles 
-   as permissive 
-   for SELECT 
-   to supabase_auth_admin 
-   using (true);
+-- Allow the auth admin role to read all user profiles and users to select/update their own profiles
+create policy "Allow access to user profiles"
+   on user_profiles
+   as permissive
+   for select
+   to public
+   using (
+      ((select auth.role()) = 'supabase_auth_admin') 
+      or ((select auth.uid()) = uid)
+      or ((select authorize('profiles.view')))
+   );
 
+-- Ensure users can only update their own profile
 create policy "Enable insert for users based on uid"
    on user_profiles
    as permissive
-   for UPDATE
+   for update
    to public
    with check (
-      (select auth.uid()) = uid
+      ((select auth.role()) = 'supabase_auth_admin') 
+      or ((select auth.uid()) = uid)
    );
 
-create policy "Enable select for users based on uid"
-   on user_profiles
-   as permissive
-   for SELECT
-   to public
-   using (
-      (select auth.uid()) = uid
-   );
-
-create policy "Enable select for authorized users"
-   on user_profiles
-   as permissive
-   for SELECT
-   to public
-   using (
-      authorize('profiles.view')
-   );
+create policy "Allow authorized select access" 
+   on user_roles
+   for SELECT 
+   to authenticated 
+   using (authorize('schedule.view'));
 
   -- Schedule Access Policies --
 create policy "Allow authorized delete access" 
@@ -350,7 +352,7 @@ begin
    values (new.id, 'User' || upper(substring(new.id::text from '.{4}$')));
    return new;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = public;
 
 create trigger on_auth_user_created
 after insert on auth.users for each row
