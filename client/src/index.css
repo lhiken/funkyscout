@@ -4,33 +4,57 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+   /*react-tooltip styles*/
+   --rt-color-white: var(--text-primary);
+   --rt-color-dark: var(--text-secondary);
+   --rt-color-success: var(--primary);
+   --rt-color-error: var(--error);
+   --rt-color-warning: var(--primary);
+   --rt-color-info: var(--text-primary);
+   --rt-opacity: 0.2;
+   --rt-transition-show-delay: 0.1s;
+   --rt-transition-closing-delay: 0.1s;
+}
 body {
    font-family: Outfit;
    background-color: var(--background);
    color: var(--text-primary);
 
+   margin: 0;
+   padding: 0;
+}
+
+button, input {
+   all: unset;
+}
+
+* {
+   box-sizing: border-box;
+}
+
+input:-webkit-autofill, 
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+   transition: all 5000s ease-in-out 0s !important;
+}
+
+.app {
    height: 100vh;
    width: 100vw;
    overflow: hidden;
-   margin: 0;
-   padding: 0;
 
    display: flex;
    justify-content: center;
    align-items: center;
 }
 
-button {
-   background-color: unset;
-   border: unset;
-   box-shadow: unset;
-}
-
 .theme-dark {
    /* UI Elements 1 */
    --background: #090909;
    --primary: #cda745;
-   --primary-variant: #dcbe73;
+   --primary-variant: #cda74566;
    --error: #bf4141;
    --surface: #131313;
    --text-primary: #bbbbbb;
@@ -55,3 +79,4 @@ button {
    --text-error: #ffa9a9;
    --inset: #0d0d0d;
 }
+
