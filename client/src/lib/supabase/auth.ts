@@ -166,6 +166,7 @@ async function logout(): Promise<boolean> {
       }
 
       localStorage.removeItem("userData");
+      localStorage.removeItem("event");
 
       return true;
    } catch (error) {

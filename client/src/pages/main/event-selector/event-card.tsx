@@ -15,7 +15,7 @@ function EventCard({
       return `${Number(month)}/${Number(day)}`;
    }
 
-   function handleCardClick() {
+   function handleCardClick () {
       handleEventChange(event);
       if (isMobile()) {
          navigate("/dashboard");

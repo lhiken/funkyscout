@@ -63,10 +63,12 @@
    background-color: var(--surface);
    color: var(--primary, #CDA745);
    font-family: inherit;
+   cursor: pointer;
 }
 
 .modeButton.inactive {
    background-color: var(--inset);
    color: var(--text-secondary, #CDA745);
    font-family: inherit;
+   cursor: pointer;
 }

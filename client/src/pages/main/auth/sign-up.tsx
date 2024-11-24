@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion } from "motion/react";
 import styles from "./mode.module.css";
 import authStyles from "./auth.module.css";
 import { signupWithPassword } from "../../../lib/supabase/auth";
@@ -41,7 +42,13 @@ function SignupPage() {
 
    return (
       <>
-         <div
+         <motion.div
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -20, opacity: 0 }}
+            transition={{
+               duration: 0.2,
+            }}
             className={styles.container}
          >
             {!passwordMode
@@ -172,14 +179,16 @@ function SignupPage() {
                      </>
                   )
                   : (
-                     <div style={{
-                        margin: "1rem"
-                     }}>
+                     <div
+                        style={{
+                           margin: "1rem",
+                        }}
+                     >
                         Please check your inbox and verify your account!
                      </div>
                   )}
             </div>
-         </div>
+         </motion.div>
       </>
    );
 }

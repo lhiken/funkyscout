@@ -5,10 +5,11 @@ async function fetchEvents() {
    try {
       const { data: event_list, error } = await supabase
          .from("event_list")
-         .select("*");
+         .select("*")
+         .order("date", { ascending: true });
 
       if (error) {
-         throw new Error(error.message)
+         throw new Error(error.message);
       }
 
       return event_list;

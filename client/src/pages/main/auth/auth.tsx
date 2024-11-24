@@ -1,9 +1,9 @@
 import { useState } from "react";
+import { Tooltip } from "react-tooltip";
+import { toggleTheme } from "../../../utils/theme";
 import styles from "./auth.module.css";
 import SigninPage from "./sign-in";
 import SignupPage from "./sign-up";
-import { Tooltip } from "react-tooltip";
-import { toggleTheme } from "../../../utils/theme";
 
 enum AuthMode {
    SignIn = "signin",
@@ -15,7 +15,9 @@ function AuthPage() {
 
    return (
       <>
-         <div className={styles.authRoot}>
+         <div
+            className={styles.authRoot}
+         >
             <div className={styles.container}>
                <div className={styles.header}>
                   <div>

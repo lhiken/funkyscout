@@ -1,11 +1,12 @@
-import isMobile from "../../../utils/device";
-import { useEffect, useState } from "react";
-import { useLocation, useRoute } from "wouter";
-import styles from "./selector.module.css";
 import { toggleTheme } from "../../../utils/theme";
 import { useQuery } from "@tanstack/react-query";
 import { fetchEvents } from "../../../lib/supabase/data";
+import { useEffect, useState } from "react";
+import { useLocation, useRoute } from "wouter";
+import { motion } from "motion/react";
 import EventCard from "./event-card";
+import isMobile from "../../../utils/device";
+import styles from "./selector.module.css";
 
 function EventSelector() {
    const [, setLocation] = useLocation();
@@ -33,13 +34,20 @@ function EventSelector() {
 
    const [eventQuery, setEventQuery] = useState("");
 
+   const queriedEvents = eventQuery == ""
+      ? data
+      : data && data.filter((event) =>
+         event.alias.toLowerCase().includes(eventQuery.toLowerCase()) ||
+         event.event.toLowerCase().includes(eventQuery.toLowerCase())
+      );
+
    return (
       <>
          <div className={styles.frame}>
             <div className={styles.header}>
                <div>
                   <i className="fa-regular fa-compass"></i>
-                  &nbsp;Select an event
+                  &nbsp;&nbsp;Select an event
                </div>
                <button
                   className="theme-selector"
@@ -61,7 +69,7 @@ function EventSelector() {
                      onChange={(input) => setEventQuery(input.target.value)}
                      className={styles.input}
                      placeholder="Search events..."
-                     autoComplete="none"
+                     autoComplete="off"
                   />
                   <span className={styles.icon}>
                      <i className="fa-solid fa-magnifying-glass" />
@@ -69,29 +77,54 @@ function EventSelector() {
                </div>
             </div>
             <div className={styles.eventsContainer}>
-               <div className={styles.eventScrollContainer}>
-                  {error && (
-                     <div className={styles.errorMessage}>
-                        Could not load events
-                     </div>
+               {error && (
+                  <div className={styles.errorMessage}>
+                     Could not load events
+                  </div>
+               )}
+               {queriedEvents &&
+                  (
+                     <motion.div
+                        initial={{ y: -20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: -20, opacity: 0 }}
+                        transition={{
+                           type: "spring",
+                           stiffness: 400,
+                           damping: 20,
+                        }}
+                        className={styles.eventScrollContainer}
+                     >
+                        {queriedEvents.map((event, index) => {
+                           return (
+                              <EventCard
+                                 event={event.event}
+                                 alias={event.alias}
+                                 date={event.date}
+                                 key={index}
+                              />
+                           );
+                        })}
+                     </motion.div>
                   )}
-                  {data &&
-                     data.map((event, index) => {
-                        return (
-                           <EventCard
-                              event={event.event}
-                              alias={event.alias}
-                              date={event.date}
-                              key={index}
-                           />
-                        );
-                     })}
-                  {isPending && (
-                     <div className={styles.errorMessage}>
-                        Loading...
-                     </div>
+               {isPending &&
+                  (
+                     <motion.div
+                        initial={{ y: -20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: -20, opacity: 0 }}
+                        transition={{
+                           type: "spring",
+                           stiffness: 400,
+                           damping: 20,
+                        }}
+                        className={styles.eventScrollContainer}
+                     >
+                        <div className={styles.skeleton} />
+                        <div className={styles.skeleton} />
+                        <div className={styles.skeleton} />
+                     </motion.div>
                   )}
-               </div>
             </div>
          </div>
       </>

@@ -54,6 +54,7 @@
 
 .submitButton.active {
    background-color: var(--primary);
+   cursor: pointer;
 }
 
 .submitButton.inactive {

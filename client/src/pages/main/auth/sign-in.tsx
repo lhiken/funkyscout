@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { loginWithPassword } from "../../../lib/supabase/auth";
 import { useLocation, useRoute } from "wouter";
+import { motion } from "motion/react";
 import styles from "./mode.module.css";
 import throwNotification from "../../../components/toast/toast";
 
@@ -14,7 +15,11 @@ function SigninPage() {
       throwNotification("info", "Signing you in...");
       loginWithPassword(email, password).then((res) => {
          if (res) {
-            throwNotification("success", `Signed in with ${res.user.email}`, 1000);
+            throwNotification(
+               "success",
+               `Signed in with ${res.user.email}`,
+               1000,
+            );
             setLocation("/events");
             return true;
          } else {
@@ -27,13 +32,25 @@ function SigninPage() {
 
    useEffect(() => {
       if (verified) {
-         throwNotification('success', 'Email verified! You may now sign in.', 2500);
+         throwNotification(
+            "success",
+            "Email verified! You may now sign in.",
+            2500,
+         );
       }
-   }, [verified])
+   }, [verified]);
 
    return (
       <>
-         <div className={styles.container}>
+         <motion.div
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -20, opacity: 0 }}
+            transition={{
+               duration: 0.2,
+            }}
+            className={styles.container}
+         >
             <input
                name="email"
                value={email}
@@ -61,7 +78,7 @@ function SigninPage() {
                   <i className="fa-solid fa-arrow-right" />
                </button>
             </div>
-         </div>
+         </motion.div>
          <button
             className={styles.resetButton}
             onClick={() =>
