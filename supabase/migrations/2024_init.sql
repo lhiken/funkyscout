@@ -1,3 +1,7 @@
+-- REMEMBER:
+-- Supabase Daashboard: Authentication > Hooks
+-- or you won't have access to any data!
+
 -- Create Custom Types --
 do $$ 
 begin
@@ -8,7 +12,7 @@ begin
       create type public.role as enum ('user', 'scouter', 'admin');
    end if;
    if not exists (select 1 from pg_type where typname = 'perm') then
-      create type public.perm as enum ('data.view', 'data.write', 'schedule.view', 'schedule.write', 'event.write', 'profiles.view');
+      create type public.perm as enum ('data.view', 'data.write', 'schedule.view', 'schedule.write', 'event.write', 'profiles.view', 'profiles.write', 'picklist.write', 'picklist.view');
    end if;
 end $$;
 
@@ -72,6 +76,33 @@ create table if not exists
 comment on table event_schedule is 'Match schedule for each scouter';
 
 create table if not exists
+   event_picklist (
+      --identifiers--
+      event    text     not null,
+      title    text     not null,
+
+      --data--
+      picklist jsonb    default '[]' not null,
+
+      --user info--
+      uname    text     not null,
+      uid      uuid     default auth.uid () not null,
+
+      constraint event_event_pkey primary key (event),
+
+      constraint event_list_event_fkey foreign key (event) 
+         references event_list (event) 
+         on update cascade 
+         on delete cascade,
+
+      constraint event_schedule_uid_fkey foreign key (uid) 
+         references user_profiles (uid)
+         on update cascade
+         on delete cascade
+   );
+comment on table event_schedule is 'Teams for each event and their pit scouting data';
+
+create table if not exists
    event_match_data (
       --identifiers--
       event    text     not null,
@@ -107,31 +138,31 @@ create table if not exists
 comment on table event_match_data is 'Match data received from scouters';
 
 create table if not exists
-   event_pit_data (
+   event_team_data (
       --identifiers--
       event    text     not null,
       team     text     not null,
 
       --data--
-      data     jsonb    not null,
+      data     jsonb    default '[]' not null,
 
       --data info--
-      name     text     not null,
+      name     text,
       uid      uuid     default auth.uid (),
       timestamp timestamp 
          with time zone 
          not null 
          default (now() at time zone 'utc'::text),
 
-      constraint event_pit_data_pkey primary key (event, team),
-      constraint event_pit_data_key  unique (event, team),
+      constraint event_team_data_pkey primary key (event, team),
+      constraint event_team_data_key  unique (event, team),
 
-      constraint event_pit_data_uid_fkey foreign key (uid) 
+      constraint event_team_data_uid_fkey foreign key (uid) 
          references user_profiles (uid) 
          on update cascade 
          on delete cascade
    );
-comment on table event_match_data is 'Pit scouting data received from scouters';
+comment on table event_match_data is 'Team data and pit scouting data received from scouters';
 
 create table if not exists
    user_roles (
@@ -145,7 +176,7 @@ comment on table user_roles is 'Permissions for each role';
 
 -- create index if not exists event_match_data_uid_index on event_match_data(uid);
 -- create index if not exists event_schedule_uid_index on event_schedule(uid);
--- create index if not exists event_pit_data_uid_index on event_pit_data(uid);
+-- create index if not exists event_team_data_uid_index on event_team_data(uid);
 
 -- Auth Hook Function --
 create or replace function public.custom_access_token_hook(event jsonb)
@@ -154,27 +185,33 @@ language plpgsql
 stable
 set search_path = public, pg_catalog
 as $$
-   declare
-      claims jsonb;
-      user_role public.role;
-   begin
-      -- Fetch the user role in the user_profiles table
-      select role into user_role from public.user_profiles where uid = (event->>'uid')::uuid;
+declare
+   claims jsonb;
+   user_role public.role;
+begin
+   -- Log the start of the function
+   raise log 'CATH: Modifying access token %', event;
 
-      claims := event->'claims';
+   -- Fetch the user role from the user_profiles table
+   select role into user_role from public.user_profiles where uid = (event->>'user_id')::text::uuid;
 
-      if user_role is not null then
-         claims := jsonb_set(claims, '{user_role}', to_jsonb(user_role));
-      else
-         claims := jsonb_set(claims, '{user_role}', 'null');
-      end if;
+   -- Extract claims from the event JSON
+   claims := event->'claims';
 
-      -- Update the 'claims' object in the original event
-      event := jsonb_set(event, '{claims}', claims);
+   -- Add or update the user_role in claims
+   if user_role is not null then
+      claims := jsonb_set(claims, '{user_role}', to_jsonb(user_role));
+   else
+      claims := jsonb_set(claims, '{user_role}', 'null');
+      raise log 'CATH: Updated claims with null user_role: %', claims;
+   end if;
 
-      -- Return the modified or original event
-      return event;
-   end;
+   -- Update the event JSON with the modified claims
+   event := jsonb_set(event, '{claims}', claims);
+
+   -- Return the modified event
+   return event;
+end;
 $$;
 
 -- Grant Permissions --
@@ -200,14 +237,14 @@ declare
    bind_permissions int;
    user_role public.role;
 begin
-  -- Fetch user role once and store it to reduce number of calls
-   select (auth.jwt() ->> 'user_role')::public.app_role into user_role;
+   -- Fetch user role once and store it to reduce number of calls
+   select (auth.jwt() ->> 'user_role')::public.role into user_role;
 
    select count(*)
    into bind_permissions
-   from public.role_permissions
-   where role_permissions.permission = requested_permission
-      and role_permissions.role = user_role;
+   from public.user_roles
+   where user_roles.permission = requested_permission
+      and user_roles.role = user_role;
 
    return bind_permissions > 0;
 end;
@@ -215,9 +252,10 @@ $$ language plpgsql stable security definer set search_path = '';
 
 -- Create RLS Policies --
 alter table event_match_data enable row level security;
-alter table event_pit_data   enable row level security;
+alter table event_team_data   enable row level security;
 alter table event_list       enable row level security;
 alter table event_schedule   enable row level security;
+alter table event_picklist   enable row level security;
 
 alter table user_profiles    enable row level security;
 alter table user_roles       enable row level security;
@@ -229,13 +267,32 @@ create policy "Allow access to user profiles"
    for select
    to public
    using (
-      ((select auth.role()) = 'supabase_auth_admin') 
-      or ((select auth.uid()) = uid)
-      or ((select authorize('profiles.view')))
+      ((select auth.uid()) = uid) or
+      ((select authorize('profiles.view')))
    );
 
+create policy "Allow supabase_auth_admin to SELECT"
+   on public.user_profiles
+   for SELECT
+   using (current_role = 'supabase_auth_admin');
+
+create policy "Allow supabase_auth_admin to DELETE"
+   on public.user_profiles
+   for DELETE
+   using (current_role = 'supabase_auth_admin');
+
+create policy "Allow supabase_auth_admin to SELECT"
+   on public.user_roles
+   for SELECT
+   using (current_role = 'supabase_auth_admin');
+
+create policy "Allow supabase_auth_admin to DELETE"
+   on public.user_roles
+   for DELETE
+   using (current_role = 'supabase_auth_admin');
+
 -- Ensure users can only update their own profile
-create policy "Enable insert for users based on uid"
+create policy "Enable update for users based on uid"
    on user_profiles
    as permissive
    for update
@@ -264,6 +321,12 @@ create policy "Allow authorized insert access"
    to authenticated 
    with check (authorize('schedule.write'));
 
+create policy "Allow authorized update access" 
+   on event_schedule
+   for UPDATE 
+   to authenticated 
+   with check (authorize('schedule.write'));
+
 create policy "Allow authorized select access" 
    on event_schedule
    for SELECT 
@@ -283,6 +346,12 @@ create policy "Allow authorized insert access (data)"
    to authenticated 
    with check (authorize('data.write'));
 
+create policy "Allow authorized update access (data)" 
+  on event_match_data
+  for UPDATE
+  to authenticated
+  using (authorize('data.write'));
+
 create policy "Allow authorized select access (data)" 
    on event_match_data
    for SELECT
@@ -290,19 +359,25 @@ create policy "Allow authorized select access (data)"
    using (authorize('data.view'));
 
 create policy "Allow authorized delete access (data)" 
-  on event_pit_data
+  on event_team_data
   for DELETE
   to authenticated
   using (authorize('data.write'));
 
+create policy "Allow authorized update access (data)" 
+  on event_team_data
+  for UPDATE
+  to authenticated
+  using (authorize('data.write'));
+
 create policy "Allow authorized insert access (data)" 
-   on event_pit_data
+   on event_team_data
    for INSERT 
    to authenticated 
    with check (authorize('data.write'));
 
 create policy "Allow authorized select access (data)" 
-   on event_pit_data
+   on event_team_data
    for SELECT
    to authenticated 
    using (authorize('data.view'));
@@ -326,6 +401,47 @@ create policy "Allow free select access"
    to public
    using (true);
 
+  -- Picklist Access Policies --
+create policy "Enable select for users based on uid"
+   on event_picklist
+   as permissive
+   for SELECT
+   to public
+   using (
+      ((select auth.uid()) = uid) or
+      authorize('picklist.view')
+   );
+
+create policy "Enable update for users based on uid"
+   on event_picklist
+   as permissive
+   for UPDATE
+   to public
+   with check (
+      ((select auth.uid()) = uid) or
+      authorize('picklist.write')
+   );
+
+create policy "Enable insert for users based on uid"
+   on event_picklist
+   as permissive
+   for INSERT
+   to public
+   with check (
+      ((select auth.uid()) = uid) or
+      authorize('picklist.write')
+   );
+
+create policy "Enable delete for users based on uid"
+   on event_picklist
+   as permissive
+   for DELETE
+   to public
+   using (
+      ((select auth.uid()) = uid) or
+      authorize('picklist.write')
+   );
+
 -- Populate Permissions Table --
 insert into user_roles (role, permission) values ('admin', 'data.view');
 insert into user_roles (role, permission) values ('admin', 'data.write');
@@ -333,9 +449,13 @@ insert into user_roles (role, permission) values ('admin', 'schedule.view');
 insert into user_roles (role, permission) values ('admin', 'schedule.write');
 insert into user_roles (role, permission) values ('admin', 'event.write');
 insert into user_roles (role, permission) values ('admin', 'profiles.view');
+insert into user_roles (role, permission) values ('admin', 'profiles.write');
+insert into user_roles (role, permission) values ('admin', 'picklist.view');
+insert into user_roles (role, permission) values ('admin', 'picklist.write');
 
 insert into user_roles (role, permission) values ('scouter', 'data.view');
 insert into user_roles (role, permission) values ('scouter', 'data.write');
+insert into user_roles (role, permission) values ('scouter', 'picklist.view');
 insert into user_roles (role, permission) values ('scouter', 'schedule.view');
 
 insert into user_roles (role, permission) values ('user', 'data.view');

@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "@swc/core": "^1.9.3",
-    "@vitejs/plugin-react-swc": "^3.7.1",
-    "vite-plugin-pwa": "^0.21.0"
-  }
-}
