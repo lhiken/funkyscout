@@ -69,6 +69,12 @@ function Dashboard() {
          <button onClick={testEventScheduleRead}>
             read event schedule
          </button>
+         <button
+            onClick={() => setLocation("/events/new")}
+         >
+            change events
+         </button>
+         {localStorage.getItem("event")}
          </div>
       </>
    );

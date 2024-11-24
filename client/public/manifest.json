@@ -29,7 +29,7 @@
   ],
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0d0d0d",
-  "theme_color": "#F7F7F7",
+  "background_color": "#090909",
+  "theme_color": "#090909",
   "description": "FRC 846's scouting app"
 }

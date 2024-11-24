@@ -3,6 +3,7 @@ import styles from "./auth.module.css";
 import SigninPage from "./sign-in";
 import SignupPage from "./sign-up";
 import { Tooltip } from "react-tooltip";
+import { toggleTheme } from "../../../utils/theme";
 
 enum AuthMode {
    SignIn = "signin",
@@ -21,18 +22,19 @@ function AuthPage() {
                      <i className="fa-solid fa-binoculars" />
                      &nbsp; Funkyscout
                   </div>
-                  <div
+                  <button
                      className="theme-selector"
                      style={{
-                        color: "var(--text-secondary)",
+                        color: "var(--surface)",
                         fontSize: "1.05rem",
                      }}
+                     onClick={toggleTheme}
                   >
                      <i className="fa-solid fa-circle-half-stroke"></i>
                      <Tooltip anchorSelect=".theme-selector" place="top">
                         Switch theme
                      </Tooltip>
-                  </div>
+                  </button>
                </div>
                <div className={styles.modebox}>
                   <button

@@ -8,12 +8,12 @@ function ErrorPage() {
       <>
          <div className={styles.container}>
             <div className={styles.header}>
-               Uh oh!
+               Error 404
             </div>
             <div className={styles.text}>
-               An error occured.
+               Page not found...
             </div>
-            <button className={styles.button} onClick={() => setLocation("/")}>
+            <button className={styles.button} style={{marginTop: "1rem"}} onClick={() => setLocation("/")}>
                Return
             </button>
          </div>

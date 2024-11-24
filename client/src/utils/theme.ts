@@ -1,4 +1,6 @@
-const setTheme = (theme: string) => {
+type theme = "theme-dark" | "theme-light"
+
+const setTheme = (theme: theme) => {
    localStorage.setItem("current_theme", theme);
    document.documentElement.className = theme;
 
@@ -15,7 +17,7 @@ const setTheme = (theme: string) => {
 const updateTheme = () => {
    const theme = localStorage.getItem("current_theme");
 
-   if (theme) {
+   if (theme == "theme-dark" || theme == "theme-light") {
       setTheme(theme);
    } else {
       const prefersDarkScheme =
@@ -28,4 +30,14 @@ const updateTheme = () => {
    }
 };
 
-export { setTheme, updateTheme };
+const toggleTheme = () => {
+   const theme = localStorage.getItem("current_theme");
+
+   if (theme == "theme-dark") {
+      setTheme("theme-light")
+   } else {
+      setTheme("theme-dark")
+   }
+}
+
+export { setTheme, updateTheme, toggleTheme };

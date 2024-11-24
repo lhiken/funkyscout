@@ -1,9 +1,14 @@
-import { Route, Router, useLocation } from "wouter";
+import { Route, Switch, useLocation } from "wouter";
 import { useEffect } from "react";
 import { updateTheme } from "./utils/theme";
 import AuthPage from "./pages/main/auth/auth";
 import Dashboard from "./pages/desktop/dashboard";
 import { getLocalUserData } from "./lib/supabase/auth";
+import ErrorPage from "./pages/main/error/error";
+import EventSelector from "./pages/main/event-selector/event-selector";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 export default function App() {
    useEffect(() => {
@@ -13,21 +18,31 @@ export default function App() {
    const [location, setLocation] = useLocation();
 
    useEffect(() => {
-      if ((location == "/" || location == "/auth/") && getLocalUserData().uid) {
-         setLocation("/dashboard/");
-      } else if (location == "/" || location == "/auth/") {
-         setLocation("/auth/");
+      const pathRegex = /^(\/|\/auth(\/|\/verify)?)$/;
+
+      if (pathRegex.test(location) && getLocalUserData().uid) {
+         setLocation("/dashboard");
+      } else if (pathRegex.test(location)) {
+         setLocation("/auth");
       }
-   }, [setLocation, location]);
+   }, [location, setLocation]);
 
    return (
       <>
-         <div className="app">
-            <Router>
-               <Route path="/auth/*" component={AuthPage} />
-               <Route path="/dashboard/" component={Dashboard} />
-            </Router>
-         </div>
+         <QueryClientProvider client={queryClient}>
+            <div className="app">
+               <Switch>
+                  <Route path="/auth" component={AuthPage} />
+                  <Route path="/auth/verify" component={AuthPage} />
+                  <Route path="/events" component={EventSelector} />
+                  <Route path="/events/new" component={EventSelector} />
+                  <Route path="/dashboard" component={Dashboard} />
+                  <Route>
+                     <ErrorPage />
+                  </Route>
+               </Switch>
+            </div>
+         </QueryClientProvider>
       </>
    );
 }

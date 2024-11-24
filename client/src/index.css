@@ -33,11 +33,13 @@ button, input {
    box-sizing: border-box;
 }
 
-input:-webkit-autofill, 
+input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus, 
-input:-webkit-autofill:active {
-   transition: all 5000s ease-in-out 0s !important;
+input:-webkit-autofill:active{
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: var(--text-primary);
+    box-shadow: inset 0 0 20px 20px var(--surface);
 }
 
 .app {
@@ -52,31 +54,33 @@ input:-webkit-autofill:active {
 
 .theme-dark {
    /* UI Elements 1 */
-   --background: #090909;
-   --primary: #cda745;
-   --primary-variant: #cda74566;
-   --error: #bf4141;
-   --surface: #131313;
-   --text-primary: #bbbbbb;
-   --text-secondary: #515151;
-   --text-background: #1e1e1e;
-   --text-surface: #c3c3c3;
-   --text-error: #ffa9a9;
-   --inset: #0d0d0d;
+   --primary: rgba(205, 167, 69, 1);
+   --primary-variant: rgba(205, 167, 69, 0.7);
+   --background: rgba(9, 9, 9, 1);
+   --inset: rgba(13, 13, 13, 1);
+   --surface: rgba(19, 19, 19, 1);
+   --error: rgba(191, 65, 65, 1);
+   --success: rgba(102, 183, 68, 1);
+   --text-primary: rgba(187, 187, 187, 1);
+   --text-secondary: rgba(81, 81, 81, 1);
+   --text-background: rgba(30, 30, 30, 1);
+   --text-surface: rgba(195, 195, 195, 1);
+   --text-error: rgba(75, 39, 39, 1);
 }
 
 .theme-light {
    /* UI Elements 1 */
-   --background: #090909;
-   --primary: #cda745;
-   --primary-variant: #dcbe73;
-   --error: #bf4141;
-   --surface: #131313;
-   --text-primary: #bbbbbb;
-   --text-secondary: #515151;
-   --text-background: #1e1e1e;
-   --text-surface: #c3c3c3;
-   --text-error: #ffa9a9;
-   --inset: #0d0d0d;
+   --primary: rgba(227, 195, 113, 1);
+   --primary-variant: rgba(220, 185, 95, 0.7);
+   --background: rgba(254, 254, 254, 1);
+   --inset: rgba(251, 251, 251, 1);
+   --surface: rgba(247, 247, 247, 1);
+   --error: rgba(191, 65, 65, 1);
+   --success: rgba(102, 183, 68, 1);
+   --text-primary: rgba(40, 40, 40, 1);
+   --text-secondary: rgba(155, 155, 155, 1);
+   --text-background: rgba(197, 197, 197, 1);
+   --text-surface: rgba(78, 78, 78, 1);
+   --text-error: rgba(51, 28, 28, 1);
 }
 

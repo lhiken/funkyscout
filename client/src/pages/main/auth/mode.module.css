@@ -49,7 +49,7 @@
    font-size: 1.5rem;
    color: var(--background);
    border-radius: 10rem;
-   transition: 0.1s
+   transition: 0.2s
 }
 
 .submitButton.active {
@@ -83,7 +83,7 @@
 }
 
 .icon.correct {
-   color: var(--primary);
+   color: var(--success);
 }
 
 .icon.incorrect {

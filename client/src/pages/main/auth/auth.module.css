@@ -7,7 +7,7 @@
    width: 18rem;
    flex-direction: column;
    gap: 1rem;
-   margin-top: calc(50vh - 9rem);
+   margin-top: calc(50vh - 10rem);
 }
 
 .header {
@@ -48,7 +48,7 @@
    height: 3rem;
    width: 100%;
 
-   transition: 0.1s;
+   transition: 0.2s;
 }
 
 .signinButton {

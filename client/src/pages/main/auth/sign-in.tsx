@@ -1,8 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { loginWithPassword } from "../../../lib/supabase/auth";
-import { useLocation } from "wouter";
+import { useLocation, useRoute } from "wouter";
 import styles from "./mode.module.css";
-import isMobile from "../../../utils/device";
 import throwNotification from "../../../components/toast/toast";
 
 function SigninPage() {
@@ -15,18 +14,22 @@ function SigninPage() {
       throwNotification("info", "Signing you in...");
       loginWithPassword(email, password).then((res) => {
          if (res) {
-            if (isMobile()) {
-               setLocation("/m/dashboard/");
-            } else {
-               setLocation("/dashboard/");
-            }
-            throwNotification("success", `Signed in with ${res.user.email}`);
+            throwNotification("success", `Signed in with ${res.user.email}`, 1000);
+            setLocation("/events");
             return true;
          } else {
             throwNotification("error", "Incorrect username or password");
          }
       });
    }
+
+   const [verified] = useRoute("/auth/verify");
+
+   useEffect(() => {
+      if (verified) {
+         throwNotification('success', 'Email verified! You may now sign in.', 2500);
+      }
+   }, [verified])
 
    return (
       <>

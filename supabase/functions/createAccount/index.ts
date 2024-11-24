@@ -26,6 +26,9 @@ Deno.serve(async (req) => {
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        redirectTo: `http://funkyscout.vercel.app/auth/verify`,
+      },
     });
 
     if (signUpError) {
