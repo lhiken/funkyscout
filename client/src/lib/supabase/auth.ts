@@ -38,21 +38,17 @@ async function signupWithPassword(
    username: string,
 ) {
    try {
-      console.log("trying to sign up");
-      // Call the Edge Function to sign up and create the profile
-      const { data, error } = await supabase.functions.invoke("createAccount", {
+      const { error } = await supabase.functions.invoke("createAccount", {
          body: { email: email, password: password, username: username },
       });
 
       if (error) {
-         console.log("uh oh!");
          throw new Error(error.message);
       }
 
-      console.log(data);
       return true;
    } catch (error) {
-      console.error("Error:", error);
+      handleError(error);
       return false;
    }
 }

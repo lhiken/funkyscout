@@ -24,7 +24,7 @@ export default function App() {
       <>
          <div className="app">
             <Router>
-               <Route path="/auth/" component={AuthPage} />
+               <Route path="/auth/*" component={AuthPage} />
                <Route path="/dashboard/" component={Dashboard} />
             </Router>
          </div>

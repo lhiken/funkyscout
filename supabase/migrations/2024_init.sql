@@ -157,6 +157,11 @@ create table if not exists
       constraint event_team_data_pkey primary key (event, team),
       constraint event_team_data_key  unique (event, team),
 
+      constraint event_team_data_event_fkey foreign key (event)
+         references event_list (event)
+         on update cascade
+         on delete cascade,
+
       constraint event_team_data_uid_fkey foreign key (uid) 
          references user_profiles (uid) 
          on update cascade 

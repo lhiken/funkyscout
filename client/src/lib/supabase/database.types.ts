@@ -4,270 +4,315 @@ export type Json =
   | boolean
   | null
   | { [key: string]: Json | undefined }
-  | Json[];
+  | Json[]
 
 export type Database = {
   public: {
     Tables: {
       event_list: {
         Row: {
-          alias: string;
-          date: string;
-          event: string;
-        };
+          alias: string
+          date: string
+          event: string
+        }
         Insert: {
-          alias: string;
-          date: string;
-          event: string;
-        };
+          alias: string
+          date: string
+          event: string
+        }
         Update: {
-          alias?: string;
-          date?: string;
-          event?: string;
-        };
-        Relationships: [];
-      };
+          alias?: string
+          date?: string
+          event?: string
+        }
+        Relationships: []
+      }
       event_match_data: {
         Row: {
-          alliance: Database["public"]["Enums"]["alliance"];
-          data: Json;
-          data_raw: Json;
-          event: string;
-          match: number;
-          name: string;
-          team: string;
-          timestamp: string;
-          uid: string | null;
-        };
+          alliance: Database["public"]["Enums"]["alliance"]
+          data: Json
+          data_raw: Json
+          event: string
+          match: number
+          name: string
+          team: string
+          timestamp: string
+          uid: string | null
+        }
         Insert: {
-          alliance: Database["public"]["Enums"]["alliance"];
-          data: Json;
-          data_raw: Json;
-          event: string;
-          match: number;
-          name: string;
-          team: string;
-          timestamp?: string;
-          uid?: string | null;
-        };
+          alliance: Database["public"]["Enums"]["alliance"]
+          data: Json
+          data_raw: Json
+          event: string
+          match: number
+          name: string
+          team: string
+          timestamp?: string
+          uid?: string | null
+        }
         Update: {
-          alliance?: Database["public"]["Enums"]["alliance"];
-          data?: Json;
-          data_raw?: Json;
-          event?: string;
-          match?: number;
-          name?: string;
-          team?: string;
-          timestamp?: string;
-          uid?: string | null;
-        };
+          alliance?: Database["public"]["Enums"]["alliance"]
+          data?: Json
+          data_raw?: Json
+          event?: string
+          match?: number
+          name?: string
+          team?: string
+          timestamp?: string
+          uid?: string | null
+        }
         Relationships: [
           {
-            foreignKeyName: "event_match_data_event_fkey";
-            columns: ["event", "match", "team"];
-            isOneToOne: true;
-            referencedRelation: "event_schedule";
-            referencedColumns: ["event", "match", "team"];
+            foreignKeyName: "event_match_data_event_fkey"
+            columns: ["event", "match", "team"]
+            isOneToOne: true
+            referencedRelation: "event_schedule"
+            referencedColumns: ["event", "match", "team"]
           },
           {
-            foreignKeyName: "event_match_data_uid_fkey";
-            columns: ["uid"];
-            isOneToOne: false;
-            referencedRelation: "user_profiles";
-            referencedColumns: ["uid"];
+            foreignKeyName: "event_match_data_uid_fkey"
+            columns: ["uid"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["uid"]
           },
-        ];
-      };
-      event_pit_data: {
+        ]
+      }
+      event_picklist: {
         Row: {
-          data: Json;
-          event: string;
-          name: string;
-          team: string;
-          timestamp: string;
-          uid: string | null;
-        };
+          event: string
+          picklist: Json
+          title: string
+          uid: string
+          uname: string
+        }
         Insert: {
-          data: Json;
-          event: string;
-          name: string;
-          team: string;
-          timestamp?: string;
-          uid?: string | null;
-        };
+          event: string
+          picklist?: Json
+          title: string
+          uid?: string
+          uname: string
+        }
         Update: {
-          data?: Json;
-          event?: string;
-          name?: string;
-          team?: string;
-          timestamp?: string;
-          uid?: string | null;
-        };
+          event?: string
+          picklist?: Json
+          title?: string
+          uid?: string
+          uname?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "event_pit_data_uid_fkey";
-            columns: ["uid"];
-            isOneToOne: false;
-            referencedRelation: "user_profiles";
-            referencedColumns: ["uid"];
+            foreignKeyName: "event_list_event_fkey"
+            columns: ["event"]
+            isOneToOne: true
+            referencedRelation: "event_list"
+            referencedColumns: ["event"]
           },
-        ];
-      };
+          {
+            foreignKeyName: "event_schedule_uid_fkey"
+            columns: ["uid"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["uid"]
+          },
+        ]
+      }
       event_schedule: {
         Row: {
-          alliance: Database["public"]["Enums"]["alliance"];
-          event: string;
-          match: number;
-          name: string | null;
-          team: string;
-          uid: string | null;
-        };
+          alliance: Database["public"]["Enums"]["alliance"]
+          event: string
+          match: number
+          name: string | null
+          team: string
+          uid: string | null
+        }
         Insert: {
-          alliance: Database["public"]["Enums"]["alliance"];
-          event: string;
-          match: number;
-          name?: string | null;
-          team: string;
-          uid?: string | null;
-        };
+          alliance: Database["public"]["Enums"]["alliance"]
+          event: string
+          match: number
+          name?: string | null
+          team: string
+          uid?: string | null
+        }
         Update: {
-          alliance?: Database["public"]["Enums"]["alliance"];
-          event?: string;
-          match?: number;
-          name?: string | null;
-          team?: string;
-          uid?: string | null;
-        };
+          alliance?: Database["public"]["Enums"]["alliance"]
+          event?: string
+          match?: number
+          name?: string | null
+          team?: string
+          uid?: string | null
+        }
         Relationships: [
           {
-            foreignKeyName: "event_schedule_event_fkey";
-            columns: ["event"];
-            isOneToOne: false;
-            referencedRelation: "event_list";
-            referencedColumns: ["event"];
+            foreignKeyName: "event_schedule_event_fkey"
+            columns: ["event"]
+            isOneToOne: false
+            referencedRelation: "event_list"
+            referencedColumns: ["event"]
           },
           {
-            foreignKeyName: "event_schedule_uid_fkey";
-            columns: ["uid"];
-            isOneToOne: false;
-            referencedRelation: "user_profiles";
-            referencedColumns: ["uid"];
+            foreignKeyName: "event_schedule_uid_fkey"
+            columns: ["uid"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["uid"]
           },
-        ];
-      };
+        ]
+      }
+      event_team_data: {
+        Row: {
+          data: Json
+          event: string
+          name: string | null
+          team: string
+          timestamp: string
+          uid: string | null
+        }
+        Insert: {
+          data?: Json
+          event: string
+          name?: string | null
+          team: string
+          timestamp?: string
+          uid?: string | null
+        }
+        Update: {
+          data?: Json
+          event?: string
+          name?: string | null
+          team?: string
+          timestamp?: string
+          uid?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_team_data_event_fkey"
+            columns: ["event"]
+            isOneToOne: false
+            referencedRelation: "event_list"
+            referencedColumns: ["event"]
+          },
+          {
+            foreignKeyName: "event_team_data_uid_fkey"
+            columns: ["uid"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["uid"]
+          },
+        ]
+      }
       user_profiles: {
         Row: {
-          accuracy: number;
-          missed: number;
-          name: string;
-          role: Database["public"]["Enums"]["role"];
-          scouted: number;
-          settings: Json;
-          uid: string;
-        };
+          accuracy: number
+          missed: number
+          name: string
+          role: Database["public"]["Enums"]["role"]
+          scouted: number
+          settings: Json
+          uid: string
+        }
         Insert: {
-          accuracy?: number;
-          missed?: number;
-          name?: string;
-          role?: Database["public"]["Enums"]["role"];
-          scouted?: number;
-          settings?: Json;
-          uid?: string;
-        };
+          accuracy?: number
+          missed?: number
+          name?: string
+          role?: Database["public"]["Enums"]["role"]
+          scouted?: number
+          settings?: Json
+          uid?: string
+        }
         Update: {
-          accuracy?: number;
-          missed?: number;
-          name?: string;
-          role?: Database["public"]["Enums"]["role"];
-          scouted?: number;
-          settings?: Json;
-          uid?: string;
-        };
-        Relationships: [];
-      };
+          accuracy?: number
+          missed?: number
+          name?: string
+          role?: Database["public"]["Enums"]["role"]
+          scouted?: number
+          settings?: Json
+          uid?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
-          id: number;
-          permission: Database["public"]["Enums"]["perm"];
-          role: Database["public"]["Enums"]["role"];
-        };
+          id: number
+          permission: Database["public"]["Enums"]["perm"]
+          role: Database["public"]["Enums"]["role"]
+        }
         Insert: {
-          id?: number;
-          permission: Database["public"]["Enums"]["perm"];
-          role: Database["public"]["Enums"]["role"];
-        };
+          id?: number
+          permission: Database["public"]["Enums"]["perm"]
+          role: Database["public"]["Enums"]["role"]
+        }
         Update: {
-          id?: number;
-          permission?: Database["public"]["Enums"]["perm"];
-          role?: Database["public"]["Enums"]["role"];
-        };
-        Relationships: [];
-      };
-    };
+          id?: number
+          permission?: Database["public"]["Enums"]["perm"]
+          role?: Database["public"]["Enums"]["role"]
+        }
+        Relationships: []
+      }
+    }
     Views: {
-      [_ in never]: never;
-    };
+      [_ in never]: never
+    }
     Functions: {
       authorize: {
         Args: {
-          requested_permission: Database["public"]["Enums"]["perm"];
-        };
-        Returns: boolean;
-      };
+          requested_permission: Database["public"]["Enums"]["perm"]
+        }
+        Returns: boolean
+      }
       custom_access_token_hook: {
         Args: {
-          event: Json;
-        };
-        Returns: Json;
-      };
-    };
+          event: Json
+        }
+        Returns: Json
+      }
+    }
     Enums: {
-      alliance: "red" | "blue";
+      alliance: "red" | "blue"
       perm:
         | "data.view"
         | "data.write"
         | "schedule.view"
         | "schedule.write"
         | "event.write"
-        | "profiles.view";
-      role: "user" | "scouter" | "admin";
-    };
+        | "profiles.view"
+        | "profiles.write"
+        | "picklist.write"
+        | "picklist.view"
+      role: "user" | "scouter" | "admin"
+    }
     CompositeTypes: {
-      [_ in never]: never;
-    };
-  };
-};
+      [_ in never]: never
+    }
+  }
+}
 
-type PublicSchema = Database[Extract<keyof Database, "public">];
+type PublicSchema = Database[Extract<keyof Database, "public">]
 
 export type Tables<
   PublicTableNameOrOptions extends
     | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof (
-      & Database[PublicTableNameOrOptions["schema"]]["Tables"]
-      & Database[PublicTableNameOrOptions["schema"]]["Views"]
-    )
+    ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
+        Database[PublicTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database } ? (
-    & Database[PublicTableNameOrOptions["schema"]]["Tables"]
-    & Database[PublicTableNameOrOptions["schema"]]["Views"]
-  )[TableName] extends {
-    Row: infer R;
-  } ? R
-  : never
-  : PublicTableNameOrOptions extends keyof (
-    & PublicSchema["Tables"]
-    & PublicSchema["Views"]
-  ) ? (
-      & PublicSchema["Tables"]
-      & PublicSchema["Views"]
-    )[PublicTableNameOrOptions] extends {
-      Row: infer R;
-    } ? R
+> = PublicTableNameOrOptions extends { schema: keyof Database }
+  ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
+      Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
     : never
-  : never;
+  : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
+        PublicSchema["Views"])
+    ? (PublicSchema["Tables"] &
+        PublicSchema["Views"])[PublicTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
 
 export type TablesInsert<
   PublicTableNameOrOptions extends
@@ -278,15 +323,17 @@ export type TablesInsert<
     : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-    Insert: infer I;
-  } ? I
-  : never
+      Insert: infer I
+    }
+    ? I
+    : never
   : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
     ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
-      Insert: infer I;
-    } ? I
+        Insert: infer I
+      }
+      ? I
+      : never
     : never
-  : never;
 
 export type TablesUpdate<
   PublicTableNameOrOptions extends
@@ -297,15 +344,17 @@ export type TablesUpdate<
     : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-    Update: infer U;
-  } ? U
-  : never
+      Update: infer U
+    }
+    ? U
+    : never
   : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
     ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
-      Update: infer U;
-    } ? U
+        Update: infer U
+      }
+      ? U
+      : never
     : never
-  : never;
 
 export type Enums<
   PublicEnumNameOrOptions extends
@@ -318,23 +367,19 @@ export type Enums<
   ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
     ? PublicSchema["Enums"][PublicEnumNameOrOptions]
-  : never;
+    : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof PublicSchema["CompositeTypes"]
     | { schema: keyof Database },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database;
-  } ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]][
-      "CompositeTypes"
-    ]
+    schema: keyof Database
+  }
+    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][
-    CompositeTypeName
-  ]
-  : PublicCompositeTypeNameOrOptions extends
-    keyof PublicSchema["CompositeTypes"]
+  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
     ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-  : never;
+    : never

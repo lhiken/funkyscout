@@ -1,9 +1,15 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { corsHeaders } from "../_shared/cors.ts";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+};
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+  if (req.method == "OPTIONS") {
+    return new Response("ok", { status: 200, headers: corsHeaders });
   }
 
   try {
@@ -25,6 +31,7 @@ Deno.serve(async (req) => {
     if (signUpError) {
       console.log("Signup Error: " + signUpError.message);
       return new Response(JSON.stringify({ error: signUpError.message }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 400,
       });
     }
@@ -35,11 +42,14 @@ Deno.serve(async (req) => {
       console.log("Could not get UUID");
       return new Response(
         JSON.stringify({ error: "Could not find your UUID" }),
-        { status: 400 },
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 400,
+        },
       );
     }
 
-    console.log(`Using UUID ${uid}`)
+    console.log(`Using UUID ${uid}`);
 
     // Step 2: Insert username into the user_profiles table
     const { error: profileError } = await supabase
@@ -51,6 +61,7 @@ Deno.serve(async (req) => {
     if (profileError) {
       console.log("Username Assignment Error: " + profileError.message);
       return new Response(JSON.stringify({ error: profileError.message }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 400,
       });
     }
@@ -60,10 +71,14 @@ Deno.serve(async (req) => {
       JSON.stringify({
         message: "User created and profile inserted successfully.",
       }),
-      { status: 200 },
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      },
     );
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });
   }
