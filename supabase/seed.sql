@@ -70,9 +70,9 @@ insert into
 
 insert into event_list (event, alias, date) values 
     ('2024prac', 'Practice Event', '01-01-2025'),
-    ('2025bcvi', 'Canadian Pacific Regional', '02-26-2025'),
-    ('2025casf', 'San Francisco Regional', '03-21-2025'),
-    ('2025caav', 'Aerospace Valley Regional', '04-02-2025');
+    ('2025bcvi', 'Canadian Pacific', '02-26-2025'),
+    ('2025casf', 'San Francisco', '03-21-2025'),
+    ('2025caav', 'Aerospace Valley', '04-02-2025');
 
 insert into event_schedule (event, match, team, alliance) values 
     ('2024prac', 1, 'frc846', 'red'),

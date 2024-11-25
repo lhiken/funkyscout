@@ -27,7 +27,7 @@ Deno.serve(async (req) => {
       email,
       password,
       options: {
-        redirectTo: `http://funkyscout.vercel.app/auth/verify`,
+        redirectTo: `https://funkyscout.vercel.app/auth/verify`,
       },
     });
 

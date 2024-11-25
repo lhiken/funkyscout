@@ -157,16 +157,16 @@ function getAuthStatus(): boolean {
    }
 }
 
-async function logout(): Promise<boolean> {
+async function logout() {
    try {
+      localStorage.removeItem("userData");
+      localStorage.removeItem("event");
+
       const { error } = await supabase.auth.signOut();
 
       if (error) {
          throw new Error(error.message);
       }
-
-      localStorage.removeItem("userData");
-      localStorage.removeItem("event");
 
       return true;
    } catch (error) {

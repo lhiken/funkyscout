@@ -1,0 +1,65 @@
+.topbar {
+   display: flex;
+   height: 3rem;
+   width: 100%;
+   align-items: center;
+   justify-content: space-between;
+}
+
+.path {
+   display: flex;
+   flex-direction: row;
+   gap: 0.5rem;
+   align-items: center;
+   color: var(--text-secondary);
+}
+
+.eventBreadcrumb {
+   display: flex;
+   background-color: var(--surface);
+   color: var(--text-primary);
+   padding-inline: 1rem;
+   height: 1.5rem;
+   align-items: center;
+   border-radius: 10rem;
+   
+   font-size: 0.935rem;
+
+   cursor: pointer;
+   transition: 0.2s;
+}
+
+.eventBreadcrumb:hover {
+   color: var(--primary);
+}
+
+.user {
+   display: flex;
+   flex-direction: row;
+   gap: 0.5rem;
+   align-items: center;
+   color: var(--text-primary);
+}
+
+.userBreadcrumb {
+   display: flex;
+   background-color: var(--primary);
+   color: var(--text-background);
+   padding-inline: 1rem;
+   height: 1.5rem;
+   align-items: center;
+   border-radius: 10rem;
+
+   font-size: 0.935rem;
+
+   cursor: pointer;
+   transition: 0.2s;
+}
+
+.topbarSeperator {
+   width: 100%;
+   height: 0.2rem;
+   background-color: var(--surface);
+   border-radius: 1rem;
+   margin: 0.25rem 0 0.5rem 0;
+}

@@ -36,7 +36,7 @@ export default function App() {
                   <Route path="/auth/verify" component={AuthPage} />
                   <Route path="/events" component={EventSelector} />
                   <Route path="/events/new" component={EventSelector} />
-                  <Route path="/dashboard" component={Dashboard} />
+                  <Route path="/dashboard" component={Dashboard} nest/>
                   <Route>
                      <ErrorPage />
                   </Route>

@@ -32,10 +32,20 @@ function AuthPage() {
                      }}
                      onClick={toggleTheme}
                   >
-                     <i className="fa-solid fa-circle-half-stroke"></i>
-                     <Tooltip anchorSelect=".theme-selector" place="top">
-                        Switch theme
-                     </Tooltip>
+                     <i
+                        className="fa-solid fa-circle-half-stroke"
+                        data-tooltip-id="theme-tooltip"
+                        data-tooltip-content="Switch theme"
+                     >
+                     </i>
+                     <Tooltip
+                        id="theme-tooltip"
+                        place="top"
+                        style={{
+                           backgroundColor: "var(--surface)",
+                           color: "var(--)",
+                        }}
+                     />
                   </button>
                </div>
                <div className={styles.modebox}>

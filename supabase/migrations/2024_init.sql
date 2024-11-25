@@ -179,9 +179,13 @@ create table if not exists
    );
 comment on table user_roles is 'Permissions for each role';
 
--- create index if not exists event_match_data_uid_index on event_match_data(uid);
--- create index if not exists event_schedule_uid_index on event_schedule(uid);
--- create index if not exists event_team_data_uid_index on event_team_data(uid);
+create index if not exists event_match_data_uid_index on event_match_data(uid);
+create index if not exists event_schedule_uid_index on event_schedule(uid);
+create index if not exists event_team_data_uid_index on event_team_data(uid);
+create index if not exists event_team_picklist_uid_index on event_picklist(uid);
+
+create index if not exists ix_event_match_data on event_match_data(event, team, match);
+create index if not exists ix_event_team_data on event_team_data(event, team);
 
 -- Auth Hook Function --
 create or replace function public.custom_access_token_hook(event jsonb)
@@ -273,13 +277,9 @@ create policy "Allow access to user profiles"
    to public
    using (
       ((select auth.uid()) = uid) or
-      ((select authorize('profiles.view')))
+      ((select authorize('profiles.view'))) or
+      (current_role = 'supabase_auth_admin')
    );
-
-create policy "Allow supabase_auth_admin to SELECT"
-   on public.user_profiles
-   for SELECT
-   using (current_role = 'supabase_auth_admin');
 
 create policy "Allow supabase_auth_admin to DELETE"
    on public.user_profiles
@@ -288,8 +288,12 @@ create policy "Allow supabase_auth_admin to DELETE"
 
 create policy "Allow supabase_auth_admin to SELECT"
    on public.user_roles
+   as permissive
    for SELECT
-   using (current_role = 'supabase_auth_admin');
+   using (
+      (current_role = 'supabase_auth_admin') or 
+      authorize('schedule.view')
+   );
 
 create policy "Allow supabase_auth_admin to DELETE"
    on public.user_roles
@@ -306,12 +310,6 @@ create policy "Enable update for users based on uid"
       ((select auth.role()) = 'supabase_auth_admin') 
       or ((select auth.uid()) = uid)
    );
-
-create policy "Allow authorized select access" 
-   on user_roles
-   for SELECT 
-   to authenticated 
-   using (authorize('schedule.view'));
 
   -- Schedule Access Policies --
 create policy "Allow authorized delete access" 

@@ -16,12 +16,14 @@ function EventCard({
    }
 
    function handleCardClick () {
-      handleEventChange(event);
-      if (isMobile()) {
-         navigate("/dashboard");
-      } else {
-         navigate("/dashboard");
-      }
+      setTimeout(() => {
+         handleEventChange(event);
+         if (isMobile()) {
+            navigate("/dashboard");
+         } else {
+            navigate("/dashboard");
+         }
+      }, 200)
    }
 
    return (
