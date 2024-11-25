@@ -14,6 +14,9 @@ begin
    if not exists (select 1 from pg_type where typname = 'perm') then
       create type public.perm as enum ('data.view', 'data.write', 'schedule.view', 'schedule.write', 'event.write', 'profiles.view', 'profiles.write', 'picklist.write', 'picklist.view');
    end if;
+      if not exists (select 1 from pg_type where typname = 'invite_code') then
+      create type public.invite_code as enum ('promote.scouter', 'promote.admin');
+   end if;
 end $$;
 
 create table if not exists
@@ -179,6 +182,18 @@ create table if not exists
    );
 comment on table user_roles is 'Permissions for each role';
 
+create table if not exists
+   invite_codes (
+      code        text         primary key,
+      type        invite_code  not null,
+      expiry      timestamp 
+         with time zone 
+         not null,
+
+      unique (code)
+   );
+comment on table user_roles is 'Codes that allow self-promotion';
+
 create index if not exists event_match_data_uid_index on event_match_data(uid);
 create index if not exists event_schedule_uid_index on event_schedule(uid);
 create index if not exists event_team_data_uid_index on event_team_data(uid);
@@ -261,13 +276,14 @@ $$ language plpgsql stable security definer set search_path = '';
 
 -- Create RLS Policies --
 alter table event_match_data enable row level security;
-alter table event_team_data   enable row level security;
+alter table event_team_data  enable row level security;
 alter table event_list       enable row level security;
 alter table event_schedule   enable row level security;
 alter table event_picklist   enable row level security;
 
 alter table user_profiles    enable row level security;
 alter table user_roles       enable row level security;
+alter table invite_codes     enable row level security;
 
 -- Allow the auth admin role to read all user profiles and users to select/update their own profiles
 create policy "Allow access to user profiles"
@@ -444,6 +460,31 @@ create policy "Enable delete for users based on uid"
       ((select auth.uid()) = uid) or
       authorize('picklist.write')
    );
+
+-- Invite code permissions --
+
+create policy "Enable insert for users based on permissions"
+   on invite_codes
+   as permissive
+   for INSERT
+   to public
+   with check (
+      authorize('profiles.write')
+   );
+
+-- Column-level security policies for user_profiles
+revoke
+insert
+   (role) on table user_profiles
+from
+   authenticated;
+
+revoke
+update
+   (role) on table user_profiles
+from
+   authenticated;
+
 
 -- Populate Permissions Table --
 insert into user_roles (role, permission) values ('admin', 'data.view');

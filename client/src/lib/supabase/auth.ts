@@ -175,6 +175,25 @@ async function logout() {
    }
 }
 
+async function applyInviteCode(code: string) {
+   try {
+      const { error } = await supabase.functions.invoke("useInviteCode", {
+         body: { userID: getLocalUserData().uid, inviteCode: code },
+      });
+
+      if (error) {
+         throw new Error(error.message);
+      }
+
+      fetchUserDetails();
+
+      return true;
+   } catch (error) {
+      handleError(error);
+      return false;
+   }
+}
+
 export {
    fetchSession,
    fetchUserDetails,
@@ -184,4 +203,5 @@ export {
    logout,
    signupWithPassword,
    storeLocalUserData,
+   applyInviteCode,
 };

@@ -9,9 +9,19 @@
 }
 
 .dashboardContainer {
+   display: flex;
+   height: 100%;
+   flex-direction: column;
    flex-grow: 1;
    border-radius: 2rem 0 0 2rem;
    background-color: var(--inset);
    padding: 0 1.5rem;
    padding-top: 1rem;
+}
+
+.dashboardContent {
+   display: flex;
+   height: 100%;
+   align-content: center;
+   justify-content: center;
 }

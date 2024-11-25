@@ -26,7 +26,7 @@ function Sidebar() {
 
    function handleNavigate(loc: string, match: boolean) {
       if (!match) {
-         navigate(`~${loc}`);
+         navigate(`~/dashboard${loc}`);
       } else {
          throwNotification("info", "You're already here!");
       }

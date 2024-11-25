@@ -201,6 +201,24 @@ export type Database = {
           },
         ]
       }
+      invite_codes: {
+        Row: {
+          code: string
+          expiry: string
+          type: Database["public"]["Enums"]["invite_code"]
+        }
+        Insert: {
+          code: string
+          expiry: string
+          type: Database["public"]["Enums"]["invite_code"]
+        }
+        Update: {
+          code?: string
+          expiry?: string
+          type?: Database["public"]["Enums"]["invite_code"]
+        }
+        Relationships: []
+      }
       user_profiles: {
         Row: {
           accuracy: number
@@ -269,6 +287,7 @@ export type Database = {
     }
     Enums: {
       alliance: "red" | "blue"
+      invite_code: "promote.scouter" | "promote.admin"
       perm:
         | "data.view"
         | "data.write"

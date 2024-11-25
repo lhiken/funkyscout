@@ -63,3 +63,12 @@
    border-radius: 1rem;
    margin: 0.25rem 0 0.5rem 0;
 }
+
+.link {
+   cursor: pointer;
+   transition: 0.2s;
+}
+
+.link:hover {
+   text-decoration: underline dotted;
+}
