@@ -317,14 +317,13 @@ create policy "Allow supabase_auth_admin to DELETE"
    using (current_role = 'supabase_auth_admin');
 
 -- Ensure users can only update their own profile
-create policy "Enable update for users based on uid"
+create policy "Enable update for supabase_auth_admin"
    on user_profiles
    as permissive
    for update
    to public
    with check (
       ((select auth.role()) = 'supabase_auth_admin') 
-      or ((select auth.uid()) = uid)
    );
 
   -- Schedule Access Policies --
@@ -348,8 +347,8 @@ create policy "Allow authorized update access"
 
 create policy "Allow authorized select access" 
    on event_schedule
-   for SELECT 
-   to authenticated 
+   for SELECT
+   to authenticated
    using (authorize('schedule.view'));
 
   -- Data Access Policies --
@@ -471,20 +470,6 @@ create policy "Enable insert for users based on permissions"
    with check (
       authorize('profiles.write')
    );
-
--- Column-level security policies for user_profiles
-revoke
-insert
-   (role) on table user_profiles
-from
-   authenticated;
-
-revoke
-update
-   (role) on table user_profiles
-from
-   authenticated;
-
 
 -- Populate Permissions Table --
 insert into user_roles (role, permission) values ('admin', 'data.view');

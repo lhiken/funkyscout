@@ -2,6 +2,9 @@ import { useLocation, useRoute } from "wouter";
 import { getLocalUserData } from "../../../lib/supabase/auth";
 import styles from "./topbar.module.css";
 import throwNotification from "../../../components/toast/toast";
+import { useState } from "react";
+import UserSettings from "./user-settings";
+import { AnimatePresence } from "motion/react";
 
 function Path({ path }: { path: string }) {
    const [location, navigate] = useLocation();
@@ -61,6 +64,8 @@ function Topbar() {
 
    const path = useLocation()[0];
 
+   const [showSettings, setShowSettings] = useState(false);
+
    return (
       <>
          <div className={styles.topbar}>
@@ -76,12 +81,24 @@ function Topbar() {
                <div style={{ color: "var(--text-background)" }}>/</div>
                {path == "/" ? <Path path={"/home"} /> : <Path path={path} />}
             </div>
-            <div className={styles.user}>
+            <div
+               className={styles.user}
+               onClick={() => setShowSettings(!showSettings)}
+            >
+               <i className="fa-solid fa-caret-down" />
                <div>{user.name}</div>
-               <div className={styles.userBreadcrumb}>
-                  {user.role.charAt(0).toUpperCase() + user.role.substring(1)}
+               <div
+                  className={styles.userBreadcrumb}
+               >
+                  {user.role.charAt(0).toUpperCase() +
+                     user.role.substring(1)}
                </div>
             </div>
+            <AnimatePresence>
+               {showSettings && (
+                  <UserSettings setShowSettings={setShowSettings} />
+               )}
+            </AnimatePresence>
          </div>
          <div className={styles.topbarSeperator} />
       </>

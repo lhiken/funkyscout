@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Tooltip } from "react-tooltip";
 import { toggleTheme } from "../../../utils/theme";
 import styles from "./auth.module.css";
 import SigninPage from "./sign-in";
 import SignupPage from "./sign-up";
+import Tippy from "@tippyjs/react";
 
 enum AuthMode {
    SignIn = "signin",
@@ -32,20 +32,12 @@ function AuthPage() {
                      }}
                      onClick={toggleTheme}
                   >
-                     <i
-                        className="fa-solid fa-circle-half-stroke"
-                        data-tooltip-id="theme-tooltip"
-                        data-tooltip-content="Switch theme"
-                     >
-                     </i>
-                     <Tooltip
-                        id="theme-tooltip"
-                        place="top"
-                        style={{
-                           backgroundColor: "var(--surface)",
-                           color: "var(--)",
-                        }}
-                     />
+                     <Tippy content="Switch theme">
+                        <i
+                           className="fa-solid fa-circle-half-stroke"
+                        >
+                        </i>
+                     </Tippy>
                   </button>
                </div>
                <div className={styles.modebox}>

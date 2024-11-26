@@ -7,6 +7,7 @@ import { motion } from "motion/react";
 import EventCard from "./event-card";
 import isMobile from "../../../utils/device";
 import styles from "./selector.module.css";
+import Tippy from "@tippyjs/react";
 
 function EventSelector() {
    const [, setLocation] = useLocation();
@@ -57,7 +58,10 @@ function EventSelector() {
                   }}
                   onClick={toggleTheme}
                >
-                  <i className="fa-solid fa-circle-half-stroke"></i>
+                  <Tippy content="Switch theme">
+                     <i className="fa-solid fa-circle-half-stroke">
+                     </i>
+                  </Tippy>
                </button>
             </div>
             <div className={styles.container}>

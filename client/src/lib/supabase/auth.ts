@@ -194,6 +194,25 @@ async function applyInviteCode(code: string) {
    }
 }
 
+async function changeName(name: string, userID: string) {
+   try {
+      const { error } = await supabase.functions.invoke("changeName", {
+         body: { userID: userID ? userID : "", name: name },
+      });
+
+      if (error) {
+         throw new Error(error.message);
+      }
+
+      fetchUserDetails();
+
+      return true;
+   } catch (error) {
+      handleError(error);
+      return false;
+   }
+}
+
 export {
    fetchSession,
    fetchUserDetails,
@@ -204,4 +223,5 @@ export {
    signupWithPassword,
    storeLocalUserData,
    applyInviteCode,
+   changeName
 };

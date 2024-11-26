@@ -39,6 +39,7 @@
    gap: 0.5rem;
    align-items: center;
    color: var(--text-primary);
+   cursor: pointer;
 }
 
 .userBreadcrumb {
@@ -51,8 +52,6 @@
    border-radius: 10rem;
 
    font-size: 0.935rem;
-
-   cursor: pointer;
    transition: 0.2s;
 }
 

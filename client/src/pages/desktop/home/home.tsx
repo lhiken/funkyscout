@@ -1,7 +1,7 @@
 function DashboardHome() {
    return (
       <div>
-         Homepage
+         
       </div>
    );
 }

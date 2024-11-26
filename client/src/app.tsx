@@ -7,6 +7,7 @@ import { getLocalUserData } from "./lib/supabase/auth";
 import ErrorPage from "./pages/main/error/error";
 import EventSelector from "./pages/main/event-selector/event-selector";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import "tippy.js/dist/tippy.css";
 
 const queryClient = new QueryClient();
 
