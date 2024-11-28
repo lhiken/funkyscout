@@ -3,7 +3,7 @@ import { motion } from "motion/react";
 import styles from "./mode.module.css";
 import authStyles from "./auth.module.css";
 import { signupWithPassword } from "../../../lib/supabase/auth";
-import throwNotification from "../../../components/toast/toast";
+import throwNotification from "../../../components/app/toast/toast";
 
 function SignupPage() {
    const [passwordMode, setPasswordMode] = useState(false);

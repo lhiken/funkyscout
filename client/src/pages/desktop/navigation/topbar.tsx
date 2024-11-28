@@ -1,10 +1,11 @@
 import { useLocation, useRoute } from "wouter";
 import { getLocalUserData } from "../../../lib/supabase/auth";
 import styles from "./topbar.module.css";
-import throwNotification from "../../../components/toast/toast";
+import throwNotification from "../../../components/app/toast/toast";
 import { useState } from "react";
 import UserSettings from "./user-settings";
 import { AnimatePresence } from "motion/react";
+import EventInfo from "./event-info";
 
 function Path({ path }: { path: string }) {
    const [location, navigate] = useLocation();
@@ -65,11 +66,12 @@ function Topbar() {
    const path = useLocation()[0];
 
    const [showSettings, setShowSettings] = useState(false);
+   const [showEventInfo, setShowEventInfo] = useState(false);
 
    return (
       <>
          <div className={styles.topbar}>
-            <div className={styles.path}>
+            <div className={`${styles.path} noselect`}>
                <div
                   className={styles.link}
                   onClick={() => handleNavigate("/", matchHome)}
@@ -77,15 +79,37 @@ function Topbar() {
                   Dashboard
                </div>
                <div style={{ color: "var(--text-background)" }}>/</div>
-               <div className={styles.eventBreadcrumb}>{event}</div>
+               <div className={styles.eventDropdownContainer}>
+                  <div
+                     className={styles.eventBreadcrumb}
+                     onClick={() => setShowEventInfo(!showEventInfo)}
+                  >
+                     <i
+                        className={`fa-solid fa-caret-${
+                           showEventInfo ? "up" : "down"
+                        }`}
+                     />
+                     &nbsp; {event}
+                  </div>
+                  <AnimatePresence>
+                     {showEventInfo && (
+                        <EventInfo setShowSettings={setShowEventInfo} />
+                     )}
+                  </AnimatePresence>
+               </div>
                <div style={{ color: "var(--text-background)" }}>/</div>
                {path == "/" ? <Path path={"/home"} /> : <Path path={path} />}
             </div>
             <div
-               className={styles.user}
+               className={`${styles.user} noselect`}
                onClick={() => setShowSettings(!showSettings)}
             >
-               <i className="fa-solid fa-caret-down" />
+               <div>
+                  <i
+                     className={`fa-solid fa-bars ${styles.icon}`}
+                     style={{ fontSize: "0.9rem" }}
+                  />
+               </div>
                <div>{user.name}</div>
                <div
                   className={styles.userBreadcrumb}

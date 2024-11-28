@@ -85,8 +85,8 @@ a {
 
 .theme-light {
    /* UI Elements 1 */
-   --primary: rgba(227, 195, 113, 1);
-   --primary-variant: rgba(220, 185, 95, 0.7);
+   --primary: rgb(218, 184, 89);
+   --primary-variant: rgba(218, 184, 89, 0.7);
    --background: rgba(254, 254, 254, 1);
    --inset: rgba(251, 251, 251, 1);
    --surface: rgba(247, 247, 247, 1);
@@ -94,7 +94,7 @@ a {
    --success: rgba(102, 183, 68, 1);
    --text-primary: rgba(40, 40, 40, 1);
    --text-secondary: rgba(155, 155, 155, 1);
-   --text-background: rgba(197, 197, 197, 1);
+   --text-background: rgb(235, 235, 235);
    --text-surface: rgba(78, 78, 78, 1);
    --text-error: rgba(51, 28, 28, 1);
 }
@@ -146,3 +146,13 @@ html {
    touch-action: pan-x pan-y;
    min-height: 100%; 
  }
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}

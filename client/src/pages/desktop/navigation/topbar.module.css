@@ -1,8 +1,7 @@
 .topbar {
    display: flex;
-   height: 3rem;
+   height: 2.75rem;
    width: 100%;
-   align-items: center;
    justify-content: space-between;
 }
 
@@ -40,6 +39,15 @@
    align-items: center;
    color: var(--text-primary);
    cursor: pointer;
+   transition: 0.2s;
+}
+
+.icon {
+   transition: 0.2s;
+}
+
+.user:hover .icon {
+   color: var(--primary);
 }
 
 .userBreadcrumb {
@@ -57,10 +65,10 @@
 
 .topbarSeperator {
    width: 100%;
-   height: 0.2rem;
+   height: 4px;
    background-color: var(--surface);
    border-radius: 1rem;
-   margin: 0.25rem 0 0.5rem 0;
+   margin: 0.5rem 0 0.5rem 0;
 }
 
 .link {
@@ -70,4 +78,9 @@
 
 .link:hover {
    text-decoration: underline dotted;
+}
+
+.eventDropdownContainer {
+   position: relative;
+   display: inline-block;
 }

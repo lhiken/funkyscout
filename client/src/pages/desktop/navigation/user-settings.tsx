@@ -2,8 +2,8 @@ import { motion } from "motion/react";
 import styles from "./user-settings.module.css";
 import { getLocalUserData } from "../../../lib/supabase/auth";
 import { Dispatch, SetStateAction } from "react";
-import InvitationCard from "../../../components/user-settings/invitation-card";
-import UsernameChangeCard from "../../../components/user-settings/username-card";
+import InvitationCard from "../../../components/app/user-settings/invitation-card";
+import UsernameChangeCard from "../../../components/app/user-settings/username-card";
 
 function UserSettings(
    { setShowSettings }: { setShowSettings: Dispatch<SetStateAction<boolean>> },
@@ -24,10 +24,10 @@ function UserSettings(
                onClick={() => setShowSettings(false)}
                style={{ fontSize: "1.1rem" }}
             >
-               <i className="fa-regular fa-circle-xmark" />
+               <i className="fa-regular fa-circle-xmark" style={{cursor: "pointer"}}/>
             </div>
          </div>
-         <div style={{ color: "var(--text-secondary)" }}>
+         <div style={{ color: "var(--text-secondary)", height: "0.5rem"}}>
             {getLocalUserData().email}
          </div>
          <div className={styles.seperator} />

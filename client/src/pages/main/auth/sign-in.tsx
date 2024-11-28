@@ -3,7 +3,7 @@ import { loginWithPassword } from "../../../lib/supabase/auth";
 import { useLocation, useRoute } from "wouter";
 import { motion } from "motion/react";
 import styles from "./mode.module.css";
-import throwNotification from "../../../components/toast/toast";
+import throwNotification from "../../../components/app/toast/toast";
 
 function SigninPage() {
    const [, setLocation] = useLocation();

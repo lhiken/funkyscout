@@ -178,8 +178,8 @@
 .skeleton {
    height: 4.5rem;
    width: 100%;
-   background: var(--background);
-   background: linear-gradient(90deg, var(--background) 5%, var(--inset) 18%, var(--background) 25%);
+   background: var(--surface);
+   background: linear-gradient(90deg, var(--surface) 5%, var(--text-background) 18%, var(--surface) 25%);
    border-radius: 1rem;
    background-size: 200% 100%;
    animation: 1.75s shine linear infinite;

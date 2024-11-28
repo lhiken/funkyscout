@@ -1,8 +1,9 @@
 import styles from "./sidebar.module.css";
 import { logout } from "../../../lib/supabase/auth";
 import { motion } from "motion/react";
-import throwNotification from "../../../components/toast/toast";
+import throwNotification from "../../../components/app/toast/toast";
 import { useLocation, useRoute } from "wouter";
+import { toggleTheme } from "../../../utils/theme";
 
 function Sidebar() {
    const [location, navigate] = useLocation();
@@ -102,15 +103,15 @@ function Sidebar() {
                </div>
             </div>
             <div className={styles.sidebarSection}>
+               <div className={`${styles.sidebarButton}`} onClick={toggleTheme}>
+                  <i className="fa-solid fa-moon" />
+               </div>
                <div
                   className={styles.sidebarButton}
                   style={{ fontSize: "1.4rem" }}
                   onClick={handleLogout}
                >
                   <i className="fa-solid fa-right-from-bracket" />
-               </div>
-               <div className={`${styles.sidebarButton} ${styles.active}`}>
-                  <i className="fa-solid fa-gear" />
                </div>
             </div>
          </motion.div>

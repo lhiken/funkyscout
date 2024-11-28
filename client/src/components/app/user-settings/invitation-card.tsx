@@ -1,33 +1,33 @@
-import { changeName, getLocalUserData } from "../../lib/supabase/auth";
-import { useState } from "react";
 import { motion } from "motion/react";
+import { applyInviteCode } from "../../../lib/supabase/auth";
+import { useState } from "react";
 import Tippy from "@tippyjs/react";
 import styles from "./styles.module.css"
 
-function UsernameChangeCard() {
-   const [name, setName] = useState("");
+function InvitationCard() {
+   const [inviteCode, setInviteCode] = useState("");
 
-   const [nameChangeStatus, setNameChangeStatus] = useState("");
+   const [invitationStatus, setInvitationStatus] = useState("");
 
-   function handleNameChange() {
-      if (name && !nameChangeStatus) {
-         setNameChangeStatus("changing")
-         changeName(name, getLocalUserData().uid).then((res) => {
+   function handleInvite() {
+      if (!invitationStatus) {
+         setInvitationStatus("applying");
+         applyInviteCode(inviteCode).then((res) => {
             if (res) {
-               setNameChangeStatus("Changed name!");
+               setInvitationStatus("Code applied!");
             } else {
-               setNameChangeStatus("An error occured")
+               setInvitationStatus("Invalid or expired code");
             }
-         })
+         });
       }
    }
 
    return (
       <div className={styles.contentContainer}>
          <div className={styles.contentHeader}>
-            Change display name
+            Use an invite code
             <div>
-               <Tippy content="Your display name will be associated with any collected data and used to assign shifts">
+               <Tippy content="An invite code allows you to receive a higher position like scouter or admin">
                   <i
                      className="fa-regular fa-circle-question"
                      style={{
@@ -40,30 +40,27 @@ function UsernameChangeCard() {
          </div>
          <div className={styles.inputWrapper}>
             <input
-               name="usernameChange"
+               name="inviteCode"
                type="text"
-               value={name}
-               onChange={(input) => setName(input.target.value)}
+               value={inviteCode}
+               onChange={(input) => setInviteCode(input.target.value)}
                className={styles.input}
-               placeholder={getLocalUserData().name}
+               placeholder="Invite code"
                autoComplete="off"
             />
             <button
                className={`${styles.inviteButton} ${
-                  nameChangeStatus ? styles.inactive : styles.active
+                  invitationStatus ? styles.inactive : styles.active
                }`}
-               onClick={handleNameChange}
+               onClick={handleInvite}
             >
                <i className="fa-solid fa-check" />
             </button>
          </div>
-         <div className={styles.usernameSubtext}>
-            Please use your real name
-         </div>
-         {nameChangeStatus && nameChangeStatus != "changing" &&
+         {invitationStatus && invitationStatus != "applying" &&
             (
                <motion.div
-                  onClick={() => setNameChangeStatus("")}
+                  onClick={() => setInvitationStatus("")}
                   initial={{ y: -20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: -20, opacity: 0 }}
@@ -73,17 +70,17 @@ function UsernameChangeCard() {
                      damping: 20,
                   }}
                   className={`${styles.inviteInfo} ${
-                     nameChangeStatus == "Changed name!"
+                     invitationStatus == "Code applied!"
                         ? styles.success
                         : styles.failure
                   }`}
                >
-                  {nameChangeStatus}
+                  {invitationStatus}
                   <i className="fa-solid fa-xmark" />
                </motion.div>
-         )}
+            )}
       </div>
    );
 }
 
-export default UsernameChangeCard;
+export default InvitationCard
