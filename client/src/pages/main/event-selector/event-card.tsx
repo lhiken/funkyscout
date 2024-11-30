@@ -1,5 +1,5 @@
 import { useLocation } from "wouter";
-import { handleEventChange } from "../../../utils/logic/app";
+import { getFocusTeam, handleEventChange, setFocusTeam } from "../../../utils/logic/app";
 import styles from "./selector.module.css";
 import isMobile from "../../../utils/device";
 
@@ -18,6 +18,9 @@ function EventCard({
    function handleCardClick () {
       setTimeout(() => {
          handleEventChange(event);
+         if (!getFocusTeam()) {
+            setFocusTeam("846");
+         }
          if (isMobile()) {
             navigate("/m");
          } else {

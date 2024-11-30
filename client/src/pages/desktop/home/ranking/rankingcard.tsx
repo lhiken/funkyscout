@@ -47,9 +47,9 @@ function RankingCard({
                   <motion.div
                      initial={{ height: 0, opacity: 0 }}
                      animate={{ height: "6.25rem", opacity: 1 }}
-                     exit={{ height: 0, opacity: 0 }}
+                     exit={{ height: 0, opacity: 0, y: -20 }}
                      transition={{
-                        duration: 0.1,
+                        duration: 0.2,
                      }}
                      className={styles.details}
                   >

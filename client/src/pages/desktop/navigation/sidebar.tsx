@@ -33,8 +33,6 @@ function Sidebar() {
       }
    }
 
-   console.log(location);
-
    return (
       <>
          <motion.div

@@ -4,7 +4,7 @@ import styles from "./styles.module.css";
 
 function MatchTeamInfo({
    team,
-}: { team: number }) {
+}: { team: string }) {
    const teamEPAs = useContext(TeamDataContext);
 
    return (

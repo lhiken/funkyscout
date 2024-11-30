@@ -16,4 +16,22 @@ function getEvent() {
    return event;
 }
 
-export { handleEventChange, getEvent };
+function setFocusTeam(team: string) {
+   const oldTeam = localStorage.getItem("focusTeam");
+
+   localStorage.setItem("focusTeam", team);
+
+   return oldTeam;
+}
+
+function getFocusTeam() {
+   const team = localStorage.getItem("focusTeam");
+
+   if (!team) {
+      return;
+   }
+
+   return team;
+}
+
+export { getEvent, getFocusTeam, handleEventChange, setFocusTeam };

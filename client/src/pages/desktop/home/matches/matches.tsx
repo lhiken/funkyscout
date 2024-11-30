@@ -3,7 +3,10 @@ import MatchCard from "./matchcard";
 import styles from "./styles.module.css";
 import { getNexusEventStatus } from "../../../../lib/nexus/events";
 import Skeleton from "../../../../components/app/skeleton/skeleton";
-import { getEvent } from "../../../../utils/logic/app";
+import { getEvent, getFocusTeam } from "../../../../utils/logic/app";
+import { useState } from "react";
+import { motion } from "motion/react";
+import { AnimatePresence } from "motion/react";
 
 function MatchesTab() {
    const { isPending, error, data } = useQuery({
@@ -11,8 +14,16 @@ function MatchesTab() {
       queryFn: () => getNexusEventStatus(getEvent() || ""),
    });
 
+   const [filterFocusOnly, setFilterFocusOnly] = useState(false);
+
    const matches = data
       ? data.matches
+         .filter((match) =>
+            filterFocusOnly
+               ? match.blueTeams.includes(getFocusTeam() || "") ||
+                  match.redTeams.includes(getFocusTeam() || "")
+               : true
+         )
          .filter((match) =>
             match.status != "On field" ||
             (
@@ -25,6 +36,12 @@ function MatchesTab() {
          )
       : [];
 
+   const [showOptions, setShowOptions] = useState(false);
+
+   function handleDropdownClick() {
+      setShowOptions(!showOptions);
+   }
+
    return (
       <div className={styles.container}>
          <div className={styles.header}>
@@ -32,13 +49,46 @@ function MatchesTab() {
                <i className="fa-solid fa-crosshairs" />&nbsp;&nbsp;Upcoming
                Matches
             </div>
-            <div className={styles.selectorBreadcrumb}>
-               <i className="fa-solid fa-caret-down" />&nbsp;&nbsp;All Matches
+            <div className={styles.selectorDropdownContainer}>
+               <div
+                  className={styles.selectorBreadcrumb}
+                  onClick={handleDropdownClick}
+               >
+                  <i className="fa-solid fa-caret-down" />&nbsp;&nbsp;{" "}
+                  {!filterFocusOnly ? "All matches" : getFocusTeam() + " only"}
+                  <AnimatePresence>
+                     {showOptions &&
+                        (
+                           <motion.div
+                              initial={{ y: -20, opacity: 0 }}
+                              animate={{ y: 0, opacity: 1 }}
+                              exit={{ y: 0, opacity: 0 }}
+                              transition={{
+                                 type: "spring",
+                                 stiffness: 400,
+                                 damping: 20,
+                              }}
+                              className={styles.selectorDropdown}
+                              onClick={() =>
+                                 filterFocusOnly
+                                    ? setFilterFocusOnly(false)
+                                    : setFilterFocusOnly(true)}
+                           >
+                              {filterFocusOnly
+                                 ? "All matches"
+                                 : getFocusTeam() + " only"}
+                           </motion.div>
+                        )}
+                  </AnimatePresence>
+               </div>
             </div>
          </div>
          <div className={styles.matchContainer}>
             {!error && !isPending && matches.length == 0 && (
-               <div className={styles.matchError}>No upcoming matches</div>
+               <div className={styles.matchError}>
+                  <i className="fa-regular fa-circle-xmark" />&nbsp;&nbsp;No
+                  upcoming matches
+               </div>
             )}
             {data &&
                matches.map((match, index) => (
@@ -57,7 +107,10 @@ function MatchesTab() {
                   />
                ))}
             {error && (
-               <div className={styles.matchError}>Couldn't load matches</div>
+               <div className={styles.matchError}>
+                  <i className="fa-regular fa-circle-xmark" />&nbsp;&nbsp;Couldn't
+                  load matches
+               </div>
             )}
          </div>
       </div>

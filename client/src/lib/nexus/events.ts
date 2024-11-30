@@ -12,8 +12,8 @@ interface NexusEvent {
 interface NexusMatch {
    label: string;
    status: "On field" | "On deck" | "Now queuing" | "Queuing soon";
-   redTeams: number[];
-   blueTeams: number[];
+   redTeams: string[];
+   blueTeams: string[];
    times: {
       estimatedQueueTime: number;
       estimatedOnDeckTime: number;
