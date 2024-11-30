@@ -124,7 +124,6 @@ function Topbar() {
                )}
             </AnimatePresence>
          </div>
-         <div className={styles.topbarSeperator} />
       </>
    );
 }

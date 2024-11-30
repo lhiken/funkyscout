@@ -8,6 +8,9 @@ import ErrorPage from "./pages/main/error/error";
 import EventSelector from "./pages/main/event-selector/event-selector";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "tippy.js/dist/tippy.css";
+import 'simplebar-react/dist/simplebar.min.css';
+import MobileApp from "./pages/mobile/mobile";
+import isMobile from "./utils/device";
 
 const queryClient = new QueryClient();
 
@@ -22,7 +25,11 @@ export default function App() {
       const pathRegex = /^(\/|\/auth(\/|\/verify)?)$/;
 
       if (pathRegex.test(location) && getLocalUserData().uid) {
-         setLocation("/dashboard");
+         if (isMobile()) {
+            setLocation("/m");
+         } else {
+            setLocation("/dashboard");
+         }
       } else if (pathRegex.test(location)) {
          setLocation("/auth");
       }
@@ -37,7 +44,8 @@ export default function App() {
                   <Route path="/auth/verify" component={AuthPage} />
                   <Route path="/events" component={EventSelector} />
                   <Route path="/events/new" component={EventSelector} />
-                  <Route path="/dashboard" component={Dashboard} nest/>
+                  <Route path="/dashboard" component={Dashboard} nest />
+                  <Route path="/m" component={MobileApp} nest />
                   <Route>
                      <ErrorPage />
                   </Route>

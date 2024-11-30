@@ -4,10 +4,10 @@
    width: 18rem;
    background-color: var(--inset);
    border: 3px solid var(--surface);
-   left: -8rem;
+   left: -9.25rem;
    border-radius: 1rem;
    padding: 1.25rem;
-   margin: 1.95rem 1.25rem;
+   margin: 1.5rem 1.25rem;
    z-index: 5;
    display: flex;
    flex-direction: column;

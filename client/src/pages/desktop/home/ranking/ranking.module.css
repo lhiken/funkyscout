@@ -1,0 +1,117 @@
+.container {
+   height: 100%;
+   /* If changing this value causes issues, 
+    * please forgive me and look in home.module.css 
+    */
+   width: 22rem; 
+   background-color: var(--surface);
+   border-radius: 1rem;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   padding: 1.75rem;
+   padding-bottom: 0rem;
+   gap: 1rem;
+}
+
+.header {
+   color: var(--primary);
+   width: 100%;
+   display: flex;
+   flex-direction: row;
+   justify-content: space-between;
+   margin-bottom: 0.25rem;
+}
+
+.headerText {
+   display: flex;
+   gap: 0.5rem;
+
+   justify-content: center;
+   align-items: center;
+}
+
+.headerIcon {
+   display: flex;
+   color: var(--text-secondary);
+   font-size: 1.2rem;
+   justify-content: center;
+   align-content: center;
+   transition: 0.2s;
+}
+
+.headerIcon:hover {
+   color: var(--text-primary);
+}
+
+.seperator {
+   width: 100%;
+   height: 0.2rem;
+   flex-shrink: 0;
+   background-color: var(--text-background);
+   border-radius: 10rem;
+}
+
+.cardContainer {
+   width: 100%;
+   overflow: auto;
+   height: 100%;
+   scroll-snap-type: y mandatory;
+}
+
+.card {
+   display: flex;
+   flex-direction: row;
+   width: 100%;
+   justify-content: space-between;
+   align-items: center;
+   height: 2.75rem;
+   scroll-snap-align: start;
+}
+
+.cardLeft {
+   display: flex;
+}
+
+.cardRank {
+   min-width: 1.75rem;
+   padding-right: 0.15rem;
+   color: var(--primary);
+   font-family: 'Ubuntu Mono';
+   font-size: 1.15rem;
+   line-height: 1.3rem;
+}
+
+.cardName {
+   white-space: nowrap;        /* Prevents text from wrapping to the next line */
+   overflow: hidden;           /* Hides the overflowed text */
+   text-overflow: ellipsis;    /* Adds the dots (ellipsis) */
+   width: 10rem;               /* Set a fixed width for the element */
+   display: inline-block; 
+   color: var(--text-primary);
+   font-size: 1rem;
+}
+
+.cardTeamNumber {
+   color: var(--primary);
+   width: 3rem;
+   text-align: right;
+   font-size: 0.9rem;
+   font-family: 'Ubuntu Mono';
+   font-size: 1.15rem;
+   line-height: 1.3rem;}
+
+.details {
+   display: flex;
+   flex-direction: column;
+   width: 100%;
+   gap: 0.5rem;
+   color: var(--text-primary);
+}
+
+.detailsRow {
+   display: flex;
+   flex-direction: row;
+   justify-content: space-between;
+   align-items: center;
+}

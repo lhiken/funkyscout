@@ -21,9 +21,9 @@ async function fetchEvents() {
 async function fetchEventByKey(key: string) {
    try {
       const { data: event_list, error } = await supabase
-      .from("event_list")
-      .select("*")
-      .eq("event", key);
+         .from("event_list")
+         .select("*")
+         .eq("event", key);
 
       if (error) {
          throw new Error(error.message);
@@ -38,4 +38,21 @@ async function fetchEventByKey(key: string) {
    }
 }
 
-export { fetchEvents, fetchEventByKey };
+async function fetchTeamsByEvent(event: string) {
+   try {
+      const { data: event_list, error } = await supabase
+         .from("event_team_data")
+         .select("*")
+         .eq("event", event);
+
+      if (error) {
+         throw new Error(error.message);
+      }
+
+      return event_list;
+   } catch (error) {
+      handleError(error);
+   }
+}
+
+export { fetchEventByKey, fetchEvents, fetchTeamsByEvent };

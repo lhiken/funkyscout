@@ -15,7 +15,7 @@ function EventSelector() {
    const storedEvent = localStorage.getItem("event");
 
    const { isPending, error, data } = useQuery({
-      queryKey: ["events"],
+      queryKey: ["eventSelectorFetchEvents"],
       queryFn: fetchEvents,
    });
 
@@ -24,7 +24,7 @@ function EventSelector() {
    useEffect(() => {
       if (storedEvent && !match) {
          if (isMobile()) {
-            setLocation("/dashboard");
+            setLocation("/m");
          } else {
             setLocation("/dashboard");
          }

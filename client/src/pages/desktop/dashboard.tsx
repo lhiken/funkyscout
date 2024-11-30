@@ -16,7 +16,7 @@ function Dashboard() {
                   <Switch>
                      <Route path={"/"} component={DashboardHome} />
                      <Route>
-                        <ErrorPage style={{ margin: "0 0 1rem 0" }} />
+                        <ErrorPage style={{ margin: "0.75rem 0 1rem 0" }} />
                      </Route>
                   </Switch>
                </div>

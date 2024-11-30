@@ -1,6 +1,6 @@
 .topbar {
    display: flex;
-   height: 2.75rem;
+   height: 3rem;
    width: 100%;
    justify-content: space-between;
 }
@@ -11,6 +11,9 @@
    gap: 0.5rem;
    align-items: center;
    color: var(--text-secondary);
+   padding: 1.25rem 1.5rem;
+   border-radius: 1rem;
+   border: 2px solid var(--surface);
 }
 
 .eventBreadcrumb {
@@ -40,6 +43,9 @@
    color: var(--text-primary);
    cursor: pointer;
    transition: 0.2s;
+   padding: 1.25rem 1.5rem;
+   border-radius: 1rem;
+   border: 2px solid var(--surface);
 }
 
 .icon {

@@ -19,7 +19,7 @@ function EventCard({
       setTimeout(() => {
          handleEventChange(event);
          if (isMobile()) {
-            navigate("/dashboard");
+            navigate("/m");
          } else {
             navigate("/dashboard");
          }

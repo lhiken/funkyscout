@@ -147,9 +147,7 @@
 /* Apply custom scrollbar to the 'event scroll container' */
 .eventScrollContainer::-webkit-scrollbar {
    width: 0.5rem;
-   /* Thin vertical scrollbar */
    height: 4px;
-   /* Thin horizontal scrollbar */
 }
 
 .eventScrollContainer::-webkit-scrollbar-track {

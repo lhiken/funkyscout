@@ -1,16 +1,15 @@
 .dashboard {
    display: flex;
    flex-direction: row;
-
    width: 100%;
    height: 100%;
-
    background-color: var(--background);
 }
 
 .dashboardContainer {
    display: flex;
    height: 100%;
+   width: 100%;
    flex-direction: column;
    flex-grow: 1;
    border-radius: 2rem 0 0 2rem;
@@ -19,9 +18,13 @@
    padding-top: 1rem;
 }
 
+/* Yes, I know! How could you!
+ * Please fix it since you take such offense.
+ */
 .dashboardContent {
    display: flex;
-   height: 100%;
+   height: calc(100% - 3rem);
+   width: 100%;
    align-content: center;
    justify-content: center;
 }

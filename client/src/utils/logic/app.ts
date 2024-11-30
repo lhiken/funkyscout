@@ -6,4 +6,14 @@ function handleEventChange(event: string) {
    return oldEvent;
 }
 
-export { handleEventChange };
+function getEvent() {
+   const event = localStorage.getItem("event");
+
+   if (!event) {
+      return;
+   }
+
+   return event;
+}
+
+export { handleEventChange, getEvent };
