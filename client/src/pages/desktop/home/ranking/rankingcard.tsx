@@ -10,12 +10,13 @@ function RankingCard({
    const [showDetails, setShowDetails] = useState(false);
    const [EPA, setEPA] = useState<number>(0);
 
-   const teamEPAs = useContext(TeamDataContext)
+   const teamEPAs = useContext(TeamDataContext);
 
    useEffect(() => {
-      console.log(teamEPAs);
       setEPA(
-         teamEPAs[team.key] != null ? teamEPAs[team.key].epa.total_points.mean : 0
+         teamEPAs[team.key] != null
+            ? teamEPAs[team.key].epa.total_points.mean
+            : 0,
       );
    }, [teamEPAs, team.key]);
 
@@ -45,20 +46,21 @@ function RankingCard({
                (
                   <motion.div
                      initial={{ height: 0, opacity: 0 }}
-                     animate={{ height: "6rem", opacity: 1 }}
+                     animate={{ height: "6.25rem", opacity: 1 }}
                      exit={{ height: 0, opacity: 0 }}
                      transition={{
                         duration: 0.1,
                      }}
                      className={styles.details}
                   >
-                     <div className={styles.seperator} style={{marginBottom: "0.25rem"}}/>
+                     <div
+                        className={styles.seperator}
+                        style={{ marginBottom: "0.25rem" }}
+                     />
                      <div className={styles.detailsRow}>
                         Team EPA
                         <div>
-                           {teamEPAs
-                              ? EPA.toFixed(1)
-                              : "N/A"}
+                           {teamEPAs ? EPA.toFixed(1) : "N/A"}
                         </div>
                      </div>
                      <div className={styles.detailsRow}>

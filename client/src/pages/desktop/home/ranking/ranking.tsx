@@ -5,6 +5,7 @@ import { getEvent } from "../../../../utils/logic/app";
 import { useQuery } from "@tanstack/react-query";
 import RankingCard from "./rankingcard";
 import SimpleBar from "simplebar-react";
+import Skeleton from "../../../../components/app/skeleton/skeleton";
 
 type sortDirection = "highlow" | "lowhigh";
 
@@ -42,13 +43,31 @@ function RankingTab() {
             </button>
          </div>
          <div className={styles.seperator} />
-         <SimpleBar className={styles.cardContainer}>
-            {sortedTeams && sortedTeams.map((team, index) => (
-               <RankingCard key={index} team={team}/>
-            ))}
-            {isPending && <div>loading</div>}
-            {error && <div>An error occured</div>}
-         </SimpleBar>
+         {!error && <SimpleBar className={styles.cardContainer}>
+            {sortedTeams &&
+               sortedTeams.map((team, index) => (
+                  <RankingCard key={index} team={team} />
+               ))}
+            {isPending && (
+               <>
+                  <Skeleton
+                     style={{
+                        height: "4rem",
+                        borderRadius: "0",
+                        marginBottom: "1rem",
+                     }}
+                  />
+                  <Skeleton
+                     style={{
+                        height: "4rem",
+                        borderRadius: "0",
+                        marginBottom: "1rem",
+                     }}
+                  />
+               </>
+            )}
+         </SimpleBar> }
+         {error && <div className={styles.rankingError}>Couldn't load rankings</div>}
       </div>
    );
 }
