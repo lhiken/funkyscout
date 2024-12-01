@@ -1,0 +1,42 @@
+.teamCard {
+   display: flex;
+   flex-direction: column;
+   width: 100%;
+   padding: 1.25rem;
+   padding-top: 0.75rem;
+   border-radius: 1rem;
+   border: 2px solid var(--text-background);
+   gap: 0.75rem;
+}
+
+.cardHeader {
+   color: var(--primary);
+   display: flex;
+   flex-direction: row;
+   justify-content: space-between;
+   align-items: center;
+   height: 2.25rem;
+}
+
+.cardValue {
+   display: flex;
+   flex-direction: row;
+   gap: 0.25rem;
+   height: 1.5rem;
+}
+
+.cardContent {
+   display: flex;
+   justify-content: space-between;
+}
+
+.icon {
+   width: 2.25rem;
+   height: 2.25rem;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   border: 2px solid var(--text-background);
+   border-radius: 10rem;
+   font-size: 1.1rem;
+}

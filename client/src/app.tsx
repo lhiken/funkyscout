@@ -11,6 +11,7 @@ import "tippy.js/dist/tippy.css";
 import 'simplebar-react/dist/simplebar.min.css';
 import MobileApp from "./pages/mobile/mobile";
 import isMobile from "./utils/device";
+import { getFocusTeam, setFocusTeam } from "./utils/logic/app";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,10 @@ export default function App() {
 
    useEffect(() => {
       const pathRegex = /^(\/|\/auth(\/|\/verify)?)$/;
+
+      if (!getFocusTeam()) {
+         setFocusTeam("846");
+      }
 
       if (pathRegex.test(location) && getLocalUserData().uid) {
          if (isMobile()) {

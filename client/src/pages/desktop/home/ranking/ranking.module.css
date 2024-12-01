@@ -1,17 +1,14 @@
 .container {
    height: 100%;
-   /* If changing this value causes issues, 
-    * please forgive me and look in home.module.css 
-    */
-   width: 22rem; 
+   width: 22rem;
    background-color: var(--surface);
    border-radius: 1rem;
    display: flex;
    flex-direction: column;
-   align-items: center;
    padding: 1.75rem;
    padding-bottom: 0rem;
    gap: 1rem;
+   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.05);
 }
 
 .header {

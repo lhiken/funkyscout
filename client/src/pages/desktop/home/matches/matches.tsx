@@ -103,6 +103,7 @@ function MatchesTab() {
                         width: "21rem",
                         border: "2px solid var(--text-background)",
                         flexShrink: 0,
+                        marginRight: "1rem"
                      }}
                   />
                ))}

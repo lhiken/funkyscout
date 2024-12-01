@@ -1,6 +1,6 @@
 import { fetchTBAData } from "./fetch";
 
-interface teamRank {
+interface TeamRank {
    key: string;
    team: number;
    name: string;
@@ -13,6 +13,7 @@ interface teamRank {
    nextMatch: string | null;
    lastMatch: string | null;
    matches: number;
+   orders: number[], //This is the "sort_orders" from TBA's API
 }
 
 /* Fetchs teams from TBA and returns each team
@@ -32,7 +33,7 @@ async function fetchTBAEventTeams(event: string) {
       return;
    }
 
-   const teams: teamRank[] = [];
+   const teams: TeamRank[] = [];
 
    if (teamsStatuses[teamsData[0].key] == null) {
       for (const team of teamsData) {
@@ -49,6 +50,7 @@ async function fetchTBAEventTeams(event: string) {
             nextMatch: "",
             lastMatch: "",
             matches: 0,
+            orders: [],
          });
       }
 
@@ -67,6 +69,7 @@ async function fetchTBAEventTeams(event: string) {
          nextMatch: teamStatus.next_match_key,
          lastMatch: teamStatus.last_match_key,
          matches: teamStatus.qual.ranking.matches_played,
+         orders: teamStatus.qual.ranking.sort_orders
       });
    }
 
@@ -74,4 +77,4 @@ async function fetchTBAEventTeams(event: string) {
 }
 
 export { fetchTBAEventTeams };
-export type { teamRank };
+export type { TeamRank };
