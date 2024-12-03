@@ -59,12 +59,18 @@
 
 .card {
    display: flex;
+   flex-direction: column;
+   scroll-snap-align: start;
+   transition: 0.2s;
+}
+
+.cardHeader {
+   display: flex;
    flex-direction: row;
-   width: 100%;
    justify-content: space-between;
    align-items: center;
+   width: 100%;
    height: 2.75rem;
-   scroll-snap-align: start;
 }
 
 .cardLeft {
@@ -123,4 +129,12 @@
    align-items: center;
    border: 2px solid var(--text-background);
    margin-bottom: 1.75rem;
+}
+
+.cardContainer:hover .card {
+   opacity: 0.5;
+}
+
+.cardContainer .card:hover {
+   opacity: 1;
 }

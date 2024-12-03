@@ -102,3 +102,7 @@
    border-radius: 10rem;
    font-size: 1.1rem;
 }
+
+.updateTime {
+   color: var(--text-secondary);
+}

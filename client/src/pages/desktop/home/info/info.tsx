@@ -1,7 +1,10 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import TeamEPAChart from "./cards/chart/epa-chart";
 import styles from "./styles.module.css";
-import { TeamDataContext } from "../dashboard-team-context";
+import {
+   TeamDataContext,
+   TeamDataProgressContext,
+} from "../dashboard-team-context";
 import { getEvent, getFocusTeam } from "../../../../utils/logic/app";
 import { useQueries } from "@tanstack/react-query";
 import { fetchTeamEventStatus } from "../../../../lib/tba/teams";
@@ -10,6 +13,7 @@ import { getNexusEventStatus } from "../../../../lib/nexus/events";
 
 function InfoTab() {
    const teamData = useContext(TeamDataContext);
+   const teamDataProgress = useContext(TeamDataProgressContext);
 
    const [teamStatusResult, eventStatusResult] = useQueries({
       queries: [
@@ -20,20 +24,28 @@ function InfoTab() {
                   getEvent() || "",
                   "frc" + getFocusTeam() || "",
                ),
+            refetchInterval: 120 * 1000,
+            refetchOnWindowFocus: false,
          },
          {
             queryKey: ["dashboardTeamInfoFetchNexusStatus"],
-            queryFn: () => getNexusEventStatus(getEvent() || ""),
+            queryFn: () => getNexusEventStatus("demo8631"),
+            refetchInterval: 60 * 1000,
+            refetchOnWindowFocus: false,
          },
       ],
    });
+
+   const [updateStatus, setUpdateStatus] = useState<string>(
+      "Updating",
+   );
 
    const teamStatus = teamStatusResult.data;
    const eventStatus = eventStatusResult.data;
    const eventIsPending = eventStatusResult.isPending;
    const eventError = eventStatusResult.error;
 
-   function formatAnnouncementTime(time: number) {
+   function formatTime(time: number) {
       const diffInMs = Date.now() - time; // Get the difference in milliseconds
 
       const seconds = Math.floor(diffInMs / 1000);
@@ -52,12 +64,28 @@ function InfoTab() {
       }
    }
 
+   useEffect(() => {
+      const updateInterval = setInterval(() => {
+         setUpdateStatus(
+            teamDataProgress.fetchTime && teamDataProgress.fetchTime > 0
+               ? `Last updated ${formatTime(teamDataProgress.fetchTime)}`
+               : "Updating...",
+         );
+         console.log();
+      }, 100);
+
+      return () => clearInterval(updateInterval);
+   }, [teamDataProgress.fetchTime]);
+
    return (
       <div className={styles.container}>
          <div className={styles.header}>
             <div>
                <i className="fa-solid fa-chart-line" />&nbsp;&nbsp; Event
                Information
+            </div>
+            <div className={styles.updateTime}>
+               {updateStatus}
             </div>
          </div>
          <div className={styles.content}>
@@ -93,7 +121,7 @@ function InfoTab() {
                   icon={<i className="fa-solid fa-gauge-high" />}
                />
                <InfoCard
-                  title="Match Record"
+                  title="Team Record"
                   contents={[
                      {
                         title: "Wins",
@@ -133,7 +161,7 @@ function InfoTab() {
                                  className={styles.announcementTime}
                                  style={{ color: "var(--text-secondary)" }}
                               >
-                                 {formatAnnouncementTime(
+                                 {formatTime(
                                     announcement.postedTime,
                                  )}
                               </div>

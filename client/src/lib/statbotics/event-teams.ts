@@ -1,7 +1,4 @@
-import {
-   fetchStatboticsTeamEPA,
-   StatboticsTeamEPAs,
-} from "./teams";
+import { fetchStatboticsTeamEPA, StatboticsTeamEPAs } from "./teams";
 import { fetchTeamsByEvent } from "../supabase/data";
 import { handleError } from "../../utils/errorHandler";
 
@@ -11,8 +8,16 @@ import { handleError } from "../../utils/errorHandler";
  */
 async function fetchEventTeamEPAs(
    event: string,
-   onProgress?: (fetched: number, total: number, errors: number) => void,
+   onProgress?: (
+      fetched: number,
+      total: number,
+      errors: number,
+      fetchTime: number,
+   ) => void,
 ): Promise<Record<string, StatboticsTeamEPAs>> {
+   console.log("Fetch team EPAs: Started")
+   console.log(event);
+
    const data = localStorage.getItem("statboticsTeamData");
    const fetchEvent = localStorage.getItem("statboticsTeamDataFetchEvent");
    const fetchTime = Number(
@@ -25,8 +30,16 @@ async function fetchEventTeamEPAs(
       ? JSON.parse(data)
       : {};
 
-   if (fetchEvent == event && cachedData) {
+   if (onProgress) {
+      onProgress(0, 0, 0, fetchTime);
+   }
+
+   if (
+      fetchEvent == event && cachedData && cachedData &&
+      Object.keys(cachedData).length != 0
+   ) {
       console.log("Fetch team EPAs: Returned cached data");
+
       if (Date.now() - fetchTime >= invalidateMiliseconds) {
          fetchNewData(event, onProgress);
       }
@@ -36,13 +49,17 @@ async function fetchEventTeamEPAs(
    return fetchNewData(event, onProgress);
 }
 
-
 /* This is a helper function to allow for background data fetching
  * by the fetchEventTeamEPAs function
  */
 async function fetchNewData(
    event: string,
-   onProgress?: (fetched: number, total: number, errors: number) => void,
+   onProgress?: (
+      fetched: number,
+      total: number,
+      errors: number,
+      fetchTime: number,
+   ) => void,
 ) {
    try {
       const teams = await fetchTeamsByEvent(event);
@@ -75,7 +92,9 @@ async function fetchNewData(
             );
          } finally {
             fetchedCount++;
-            if (onProgress) onProgress(fetchedCount, teams.length, errorCount);
+            if (onProgress) {
+               onProgress(fetchedCount, teams.length, errorCount, -1);
+            }
          }
       });
 
@@ -87,6 +106,10 @@ async function fetchNewData(
          Date.now().toString(),
       );
       localStorage.setItem("statboticsTeamDataFetchEvent", event);
+
+      if (onProgress) {
+         onProgress(fetchedCount, teams.length, errorCount, Date.now());
+      }
 
       console.log("Fetch team EPAs: Refreshed data and updated cache");
       return teamEPAs;

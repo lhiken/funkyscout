@@ -9,6 +9,12 @@
    gap: 0.75rem;
 }
 
+.hide {
+   @media (max-height: 1000px) {
+      display: none;
+   }
+}
+
 .cardHeader {
    color: var(--primary);
    display: flex;

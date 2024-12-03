@@ -13,6 +13,10 @@ import { useEffect, useState } from "react";
 import { StatboticsTeamEPAs } from "../../../lib/statbotics/teams";
 
 function DashboardHome() {
+   // Nexus API poll rate to avoid spamming servers;
+   // Can't be less than 120s
+   const NEXUS_POLL_RATE_SECONDS = 120;
+
    const [teamData, setTeamData] = useState<Record<string, StatboticsTeamEPAs>>(
       {},
    );
@@ -20,27 +24,30 @@ function DashboardHome() {
       fetched: number;
       total: number;
       errors: number;
-   }>({ fetched: 0, total: 0, errors: 0 });
+      fetchTime: number;
+   }>({ fetched: 0, total: 0, errors: 0, fetchTime: -1 });
 
-   function setProgress(fetched: number, total: number, errors: number) {
+   function setProgress(fetched: number, total: number, errors: number, fetchTime: number) {
       setTeamDataProgress({
          fetched: fetched,
          total: total,
          errors: errors,
+         fetchTime: fetchTime,
       });
    }
 
    const { isError } = useQuery({
-      queryKey: ["dashboardHomeFetchTeamEPAs"],
+      queryKey: [`dashboardHomeFetchTeamEPAs/event${getEvent()}`],
       queryFn: () =>
          fetchEventTeamEPAs(getEvent() || "", setProgress).then((res) => {
             if (res) {
                setTeamData(res);
-               return true; // Query is successful
+               return true;
             } else {
                return false; // Query is unsuccessful
             }
          }),
+      refetchInterval: NEXUS_POLL_RATE_SECONDS * 1000
    });
 
    useEffect(() => {
