@@ -68,7 +68,7 @@ function InfoTab() {
       const updateInterval = setInterval(() => {
          setUpdateStatus(
             teamDataProgress.fetchTime && teamDataProgress.fetchTime > 0
-               ? `Last updated ${formatTime(teamDataProgress.fetchTime)}`
+               ? `EPAs updated ${formatTime(teamDataProgress.fetchTime)}`
                : "Updating...",
          );
          console.log();

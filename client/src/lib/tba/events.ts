@@ -13,7 +13,7 @@ interface TeamRank {
    nextMatch: string | null;
    lastMatch: string | null;
    matches: number;
-   orders: number[], //This is the "sort_orders" from TBA's API
+   orders: number[]; //This is the "sort_orders" from TBA's API
 }
 
 /* Fetchs teams from TBA and returns each team
@@ -69,12 +69,51 @@ async function fetchTBAEventTeams(event: string) {
          nextMatch: teamStatus.next_match_key,
          lastMatch: teamStatus.last_match_key,
          matches: teamStatus.qual.ranking.matches_played,
-         orders: teamStatus.qual.ranking.sort_orders
+         orders: teamStatus.qual.ranking.sort_orders,
       });
    }
 
    return teams;
 }
 
-export { fetchTBAEventTeams };
-export type { TeamRank };
+interface EventSchedule {
+   [match_key: string]: {
+      redTeams: string[];
+      blueTeams: string[];
+      est_time: number;
+   };
+}
+
+async function fetchTBAMatchSchedule(eventKey: string) {
+   const matchStatus = await fetchTBAData(
+      `/event/${eventKey}/matches/simple`,
+      "GET",
+   );
+
+   if (!matchStatus || matchStatus.length == 0) {
+      return;
+   }
+
+   const matchSchedule: EventSchedule = {};
+
+   for (const team of matchStatus) {
+      matchSchedule[team.key] = {
+         redTeams: [
+            team.alliances.red.team_keys[0],
+            team.alliances.red.team_keys[1],
+            team.alliances.red.team_keys[2],
+         ],
+         blueTeams: [
+            team.alliances.blue.team_keys[0],
+            team.alliances.blue.team_keys[1],
+            team.alliances.blue.team_keys[2],
+         ],
+         est_time: team.predicted_time,
+      };
+   }
+
+   return matchSchedule;
+}
+
+export { fetchTBAEventTeams, fetchTBAMatchSchedule };
+export type { EventSchedule, TeamRank };

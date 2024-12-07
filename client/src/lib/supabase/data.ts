@@ -55,4 +55,44 @@ async function fetchTeamsByEvent(event: string) {
    }
 }
 
-export { fetchEventByKey, fetchEvents, fetchTeamsByEvent };
+async function fetchTeamAssignments(event: string) {
+   try {
+      const { data: event_team_data, error } = await supabase
+         .from("event_team_data")
+         .select("*")
+         .eq("event", event);
+
+      if (error) {
+         throw new Error(error.message);
+      }
+
+      return event_team_data;
+   } catch (error) {
+      handleError(error);
+   }
+}
+
+async function fetchMatchAssignments(event: string) {
+   try {
+      const { data: event_schedule, error } = await supabase
+         .from("event_schedule")
+         .select("*")
+         .eq("event", event);
+
+      if (error) {
+         throw new Error(error.message);
+      }
+
+      return event_schedule;
+   } catch (error) {
+      handleError(error);
+   }
+}
+
+export {
+   fetchEventByKey,
+   fetchEvents,
+   fetchMatchAssignments,
+   fetchTeamAssignments,
+   fetchTeamsByEvent,
+};

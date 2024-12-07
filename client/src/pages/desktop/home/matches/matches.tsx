@@ -12,9 +12,8 @@ function MatchesTab() {
    const { isPending, error, data } = useQuery({
       queryKey: ["matchesTabFetchMatches"],
       queryFn: () => getNexusEventStatus("demo8631"),
-      refetchInterval: 60 * 1000,
+      refetchInterval: 20 * 1000,
       refetchOnWindowFocus: false,
-      staleTime: 60 * 1000
    });
 
    const [filterFocusOnly, setFilterFocusOnly] = useState(false);

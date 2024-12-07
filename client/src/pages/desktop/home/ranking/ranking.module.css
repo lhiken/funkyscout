@@ -87,10 +87,10 @@
 }
 
 .cardName {
-   white-space: nowrap;        /* Prevents text from wrapping to the next line */
-   overflow: hidden;           /* Hides the overflowed text */
-   text-overflow: ellipsis;    /* Adds the dots (ellipsis) */
-   width: 10rem;               /* Set a fixed width for the element */
+   white-space: nowrap;      
+   overflow: hidden;          
+   text-overflow: ellipsis;  
+   width: 10rem;              
    display: inline-block; 
    color: var(--text-primary);
    font-size: 1rem;

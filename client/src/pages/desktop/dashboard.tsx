@@ -4,6 +4,7 @@ import Sidebar from "./navigation/sidebar";
 import Topbar from "./navigation/topbar";
 import DashboardHome from "./home/home";
 import ErrorPage from "../main/error/error";
+import SchedulePage from "./schedule/schedule";
 
 function Dashboard() {
    return (
@@ -15,6 +16,7 @@ function Dashboard() {
                <div className={styles.dashboardContent}>
                   <Switch>
                      <Route path={"/"} component={DashboardHome} />
+                     <Route path={"/schedule"} component={SchedulePage} />
                      <Route>
                         <ErrorPage style={{ margin: "0.75rem 0 1rem 0" }} />
                      </Route>
