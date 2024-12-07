@@ -52,6 +52,39 @@ create table if not exists
 comment on table event_list is 'List of scoutable events';
 
 create table if not exists
+   event_team_data (
+      --identifiers--
+      event    text     not null,
+      team     text     not null,
+
+      --data--
+      data     jsonb    default '[]' not null,
+
+      --data info--
+      name     text,
+      uid      uuid     default auth.uid (),
+      assigned uuid,
+      timestamp timestamp 
+         with time zone 
+         not null 
+         default (now() at time zone 'utc'::text),
+
+      constraint event_team_data_pkey primary key (event, team),
+      constraint event_team_data_key  unique (event, team),
+
+      constraint event_team_data_event_fkey foreign key (event)
+         references event_list (event)
+         on update cascade
+         on delete cascade,
+
+      constraint event_team_data_uid_fkey foreign key (uid) 
+         references user_profiles (uid) 
+         on update cascade 
+         on delete cascade
+   );
+comment on table event_team_data is 'Team data and pit scouting data received from scouters';
+
+create table if not exists
    event_schedule (
       --identifiers--
       event    text     not null,
@@ -66,8 +99,8 @@ create table if not exists
       constraint event_schedule_pkey primary key (event, match, team),
       constraint event_schedule_key  unique (event, match, team),
 
-      constraint event_schedule_event_fkey foreign key (event) 
-         references event_list (event) 
+      constraint event_schedule_event_fkey foreign key (event, team) 
+         references event_team_data (event, team) 
          on update cascade 
          on delete cascade,
 
@@ -103,7 +136,7 @@ create table if not exists
          on update cascade
          on delete cascade
    );
-comment on table event_schedule is 'Teams for each event and their pit scouting data';
+comment on table event_picklist is 'Teams for each event and their pit scouting data';
 
 create table if not exists
    event_match_data (
@@ -141,38 +174,6 @@ create table if not exists
 comment on table event_match_data is 'Match data received from scouters';
 
 create table if not exists
-   event_team_data (
-      --identifiers--
-      event    text     not null,
-      team     text     not null,
-
-      --data--
-      data     jsonb    default '[]' not null,
-
-      --data info--
-      name     text,
-      uid      uuid     default auth.uid (),
-      timestamp timestamp 
-         with time zone 
-         not null 
-         default (now() at time zone 'utc'::text),
-
-      constraint event_team_data_pkey primary key (event, team),
-      constraint event_team_data_key  unique (event, team),
-
-      constraint event_team_data_event_fkey foreign key (event)
-         references event_list (event)
-         on update cascade
-         on delete cascade,
-
-      constraint event_team_data_uid_fkey foreign key (uid) 
-         references user_profiles (uid) 
-         on update cascade 
-         on delete cascade
-   );
-comment on table event_match_data is 'Team data and pit scouting data received from scouters';
-
-create table if not exists
    user_roles (
       id          bigserial primary key,
       role        role      not null,
@@ -192,7 +193,7 @@ create table if not exists
 
       unique (code)
    );
-comment on table user_roles is 'Codes that allow self-promotion';
+comment on table invite_codes is 'Codes that allow self-promotion';
 
 create index if not exists event_match_data_uid_index on event_match_data(uid);
 create index if not exists event_schedule_uid_index on event_schedule(uid);
