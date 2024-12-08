@@ -48,8 +48,10 @@ function getFocusTeam() {
  * @param mode
  * @returns string such as "Qualification"
  */
-function parseMatchKey(key: string, mode: "nexus" | "short" | "long") {
+function parseMatchKey(key: string, mode: "nexus" | "short" | "long" | "number") {
    let returnKey = "";
+
+   if (mode == "number") return key.substring(key.indexOf("_") + 2)
 
    if (mode == "long") returnKey += key.substring(0, key.indexOf("_")) + " ";
 
@@ -65,7 +67,7 @@ function parseMatchKey(key: string, mode: "nexus" | "short" | "long") {
          returnKey += `Finals ${key.substring(1, key.indexOf("m"))}`;
       }
    } else {
-      key = key.substring(key.indexOf("_"));
+      key = key.substring(key.indexOf("_") + 1);
       if (key.substring(0, 2) == "qm") {
          returnKey += `Qual ${key.substring(2)}`;
       }
@@ -83,6 +85,8 @@ function parseMatchKey(key: string, mode: "nexus" | "short" | "long") {
 function parseTeamKey(key: string) {
    if (key.substring(0, 3) == "frc") {
       return key.substring(3);
+   } else {
+      return key;
    }
 }
 

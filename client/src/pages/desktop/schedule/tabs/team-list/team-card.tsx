@@ -1,7 +1,8 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { TeamRank } from "../../../../../lib/tba/events";
 import styles from "./styles.module.css";
 import { AssignmentContext, ScheduleContext } from "../../schedule-context";
+import { AnimatePresence, motion } from "motion/react";
 
 function TeamAssignmentCard({
    teamData,
@@ -20,9 +21,16 @@ function TeamAssignmentCard({
       }
    }
 
+   const [showDetails, setShowDetails] = useState(false);
+
    return (
-      <div className={styles.teamCard}>
-         <div className={styles.teamInfo} onClick={handleStarClick}>
+      <div
+         className={styles.teamCard}
+         onMouseEnter={() => setShowDetails(true)}
+         onMouseLeave={() => setShowDetails(false)}
+         onClick={handleStarClick}
+      >
+         <div className={styles.teamInfo}>
             <div className={styles.teamTitle}>
                <div
                   style={{
@@ -33,7 +41,7 @@ function TeamAssignmentCard({
                   }}
                >
                   {assignmentData.val?.matchData.filter((val) =>
-                     val.team == teamData.key
+                     (val.team == teamData.key) && val.uid
                   ).length}/{Object.entries(
                      scheduleData.val?.matchData || {},
                   ).filter(
@@ -73,6 +81,30 @@ function TeamAssignmentCard({
                </div>
             </div>
          </div>
+         <AnimatePresence>
+            {showDetails &&
+               (
+                  <motion.div
+                     initial={{ height: 0, opacity: 0 }}
+                     animate={{ height: "2rem", opacity: 1 }}
+                     exit={{ height: 0, opacity: 0, y: -20 }}
+                     transition={{
+                        duration: 0.2,
+                     }}
+                     className={styles.teamDetails}
+                  >
+                     Scouter
+                     <div className={styles.dropdown}>
+                        {assignmentData.val?.scouterList.find((val) =>
+                           val.uid ==
+                              assignmentData.val?.teamData.find((val) =>
+                                 val.team == teamData.key
+                              )?.assigned
+                        )?.name || "N/A"}
+                     </div>
+                  </motion.div>
+               )}
+         </AnimatePresence>
       </div>
    );
 }

@@ -145,10 +145,10 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "event_schedule_event_fkey"
-            columns: ["event"]
+            columns: ["event", "team"]
             isOneToOne: false
-            referencedRelation: "event_list"
-            referencedColumns: ["event"]
+            referencedRelation: "event_team_data"
+            referencedColumns: ["event", "team"]
           },
           {
             foreignKeyName: "event_schedule_uid_fkey"
@@ -161,6 +161,7 @@ export type Database = {
       }
       event_team_data: {
         Row: {
+          assigned: string | null
           data: Json
           event: string
           name: string | null
@@ -169,6 +170,7 @@ export type Database = {
           uid: string | null
         }
         Insert: {
+          assigned?: string | null
           data?: Json
           event: string
           name?: string | null
@@ -177,6 +179,7 @@ export type Database = {
           uid?: string | null
         }
         Update: {
+          assigned?: string | null
           data?: Json
           event?: string
           name?: string | null

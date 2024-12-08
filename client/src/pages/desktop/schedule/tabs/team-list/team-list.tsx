@@ -12,18 +12,21 @@ function TeamList() {
 
    const queriedTeams = (
       teamQuery
-        ? val?.teamData?.filter(
+         ? val?.teamData?.filter(
             (team) =>
-              team.key.toLowerCase().includes(teamQuery.toLowerCase()) ||
-              team.name.toLowerCase().includes(teamQuery.toLowerCase())
-          )
-        : val?.teamData
-    )?.sort((a, b) => {
-      const aCount = assignedData?.matchData?.filter((i) => i.team === a.key).length || 0;
-      const bCount = assignedData?.matchData?.filter((i) => i.team === b.key).length || 0;
+               team.key.toLowerCase().includes(teamQuery.toLowerCase()) ||
+               team.name.toLowerCase().includes(teamQuery.toLowerCase()),
+         )
+         : val?.teamData
+   )?.sort((a, b) => {
+      const aCount = 
+         assignedData?.matchData?.filter((i) => i.team === a.key && i.uid).length || 0;
+
+      const bCount =
+         assignedData?.matchData?.filter((i) => i.team === b.key && i.uid).length || 0;
+
       return bCount - aCount;
-    });
-    
+   });
 
    return (
       <div className={styles.container}>

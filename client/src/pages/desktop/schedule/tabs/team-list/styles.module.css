@@ -57,6 +57,7 @@
   display: flex;
   align-items: center;
   width: 100%;
+  flex-direction: column;
 }
 
 .teamInfo {
@@ -65,14 +66,18 @@
   align-items: center;
   height: 2.75rem;
   width: 100%;
+
+  cursor: pointer;
 }
 
 .teamTitle {
   display: flex;
+  user-select: none;
 }
 
 .teamNumber {
   display: flex;
+  user-select: none;
 }
 
 .teamName {
@@ -93,4 +98,13 @@
 
 .teamStarIcon.active {
   color: var(--primary);
+}
+
+.teamDetails {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
 }

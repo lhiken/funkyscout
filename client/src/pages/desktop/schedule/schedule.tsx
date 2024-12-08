@@ -39,6 +39,7 @@ interface AssignmentData {
    teamData: Tables<"event_team_data">[];
    matchData: Tables<"event_schedule">[];
    priorityTeams: string[];
+   scouterList: { name: string; uid: string }[];
 }
 
 function SchedulePage() {
@@ -59,6 +60,7 @@ function SchedulePage() {
       teamData: [],
       matchData: [],
       priorityTeams: [],
+      scouterList: [],
    });
 
    const results = useQueries({
@@ -66,22 +68,27 @@ function SchedulePage() {
          {
             queryKey: [`scheduleFetchTeams/${getEvent()}`],
             queryFn: () => fetchTBAEventTeams(getEvent() || ""),
+            refetchOnWindowFocus: false,
          },
          {
             queryKey: [`scheduleFetchUsers/${getEvent()}`],
             queryFn: () => fetchAllUserDetails(),
+            refetchOnWindowFocus: false,
          },
          {
             queryKey: [`scheduleFetchMatches/${getEvent()}`],
             queryFn: () => fetchTBAMatchSchedule(getEvent() || ""),
+            refetchOnWindowFocus: false,
          },
          {
             queryKey: [`scheduleFetchAssignedTeams/${getEvent()}`],
             queryFn: () => fetchTeamAssignments(getEvent() || ""),
+            refetchOnWindowFocus: false,
          },
          {
             queryKey: [`scheduleFetchAssignedMatches/${getEvent()}`],
             queryFn: () => fetchMatchAssignments(getEvent() || ""),
+            refetchOnWindowFocus: false,
          },
       ],
    });
@@ -117,7 +124,7 @@ function SchedulePage() {
          teamData: assignedTeams.data || [],
          matchData: assignedMatches.data || [],
       }));
-      
+
       // This is valid as it only updates when data changes.
       // Other solutions exist, but this is the easiest.
       // eslint-disable-next-line react-hooks/exhaustive-deps
