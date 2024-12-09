@@ -55,6 +55,9 @@ function SigninPage() {
                name="email"
                value={email}
                onChange={(input) => setEmail(input.target.value)}
+               onKeyDown={(e) => {
+                  if (e.key === "Enter") e.currentTarget.blur();
+               }}
                className={styles.input}
                placeholder="Email"
                autoComplete="email"
@@ -65,6 +68,12 @@ function SigninPage() {
                   type="password"
                   value={password}
                   onChange={(input) => setPassword(input.target.value)}
+                  onKeyDown={(e) => {
+                     if (e.key === "Enter") {
+                        e.currentTarget.blur();
+                        handleLogin();
+                     }
+                  }}
                   className={styles.input}
                   placeholder="Password"
                   autoComplete="off"

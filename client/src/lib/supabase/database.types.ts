@@ -33,7 +33,7 @@ export type Database = {
           data: Json
           data_raw: Json
           event: string
-          match: number
+          match: string
           name: string
           team: string
           timestamp: string
@@ -44,7 +44,7 @@ export type Database = {
           data: Json
           data_raw: Json
           event: string
-          match: number
+          match: string
           name: string
           team: string
           timestamp?: string
@@ -55,7 +55,7 @@ export type Database = {
           data?: Json
           data_raw?: Json
           event?: string
-          match?: number
+          match?: string
           name?: string
           team?: string
           timestamp?: string
@@ -63,11 +63,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "event_match_data_event_fkey"
-            columns: ["event", "match", "team"]
-            isOneToOne: true
+            foreignKeyName: "event_match_data_match_event_team_fkey"
+            columns: ["match", "event", "team"]
+            isOneToOne: false
             referencedRelation: "event_schedule"
-            referencedColumns: ["event", "match", "team"]
+            referencedColumns: ["match", "event", "team"]
           },
           {
             foreignKeyName: "event_match_data_uid_fkey"
@@ -121,7 +121,7 @@ export type Database = {
         Row: {
           alliance: Database["public"]["Enums"]["alliance"]
           event: string
-          match: number
+          match: string
           name: string | null
           team: string
           uid: string | null
@@ -129,7 +129,7 @@ export type Database = {
         Insert: {
           alliance: Database["public"]["Enums"]["alliance"]
           event: string
-          match: number
+          match: string
           name?: string | null
           team: string
           uid?: string | null
@@ -137,7 +137,7 @@ export type Database = {
         Update: {
           alliance?: Database["public"]["Enums"]["alliance"]
           event?: string
-          match?: number
+          match?: string
           name?: string | null
           team?: string
           uid?: string | null

@@ -5,8 +5,10 @@ import { AssignmentContext, ScheduleContext } from "../../schedule-context";
 import { Tables } from "../../../../../lib/supabase/database.types";
 import Checkbox from "../../../../../components/app/buttons/checkbox";
 import RoundInput from "../../../../../components/app/input/round-input";
-import { assignUsersToTeams } from "./scheduler";
+import { assignUsersToMatches, assignUsersToTeams } from "./scheduler";
 import { getEvent } from "../../../../../utils/logic/app";
+import { uploadTeamAssignments } from "../../../../../lib/supabase/setup";
+import throwNotification from "../../../../../components/app/toast/toast";
 
 function SetupPanel() {
    const scheduleData = useContext(ScheduleContext);
@@ -26,22 +28,37 @@ function SetupPanel() {
    const [showOptions, setShowOptions] = useState(false);
 
    function handleScheduleMatches() {
-      console.log(scheduleData.val?.matchData || []);
-      console.log(assignmentData.val?.priorityTeams || []);
-      console.log(assignmentData.val?.scouterList || []);
+      if (assignmentData.setVal) {
+         const updatedMatchData = assignUsersToMatches(
+            scheduleData.val?.matchData || {},
+            assignmentData.val?.priorityTeams || [],
+            assignmentData.val?.scouterList || [],
+            Number(maxConsecShifts),
+            getEvent() || "",
+         );
+
+         assignmentData.setVal((prev) => ({
+            ...prev,
+            matchData: updatedMatchData,
+         }));
+      }
    }
 
    function handleScheduleTeams() {
       if (assignmentData.setVal) {
+         const teamKeys = scheduleData.val?.teamData?.map((team) => team.key) ||
+            [];
+         const scouterList = assignmentData.val?.scouterList || [];
+         const event = getEvent() || "";
+
+         const updatedTeamData = assignUsersToTeams(
+            teamKeys,
+            scouterList,
+            event,
+         );
          assignmentData.setVal((prev) => ({
             ...prev,
-            teamData: assignUsersToTeams(
-               scheduleData.val?.teamData
-                  ? scheduleData.val?.teamData.map((team) => team.key)
-                  : [],
-               assignmentData.val?.scouterList || [],
-               getEvent() || "",
-            ),
+            teamData: updatedTeamData,
          }));
       }
    }
@@ -51,6 +68,17 @@ function SetupPanel() {
    useEffect(() => {
       setHasRendered(true);
    }, []);
+
+   function handleSaveShifts() {
+      throwNotification("info", "Saving shift assignments...");
+      uploadTeamAssignments(assignmentData.val?.teamData || []).then((res) => {
+         if (res) {
+            throwNotification("success", "Successfully saved team assignments");
+         } else {
+            throwNotification("error", "Could not save shift assignments");
+         }
+      });
+   }
 
    const setupPage = (
       <div className={styles.content}>
@@ -66,7 +94,7 @@ function SetupPanel() {
                {showInfo && (
                   <motion.div
                      initial={hasRendered ? { height: 0, opacity: 0 } : false} // Skip initial animation on first render
-                     animate={{ height: "10.25rem", opacity: 1 }}
+                     animate={{ height: "11rem", opacity: 1 }}
                      exit={{ height: 0, opacity: 0 }}
                      transition={{ duration: 0.2 }}
                      className="infoContent"
@@ -118,6 +146,11 @@ function SetupPanel() {
       </div>
    );
 
+   const [targetConsecShifts, setTargetConsecShifts] = useState("4");
+   const [maxConsecShifts, setMaxConsecShifts] = useState("6");
+   const [minConsecShifts, setMinConsecShifts] = useState("3");
+   const [breakLength, setBreakLength] = useState("4");
+
    const optionsPage = (
       <div className={styles.content}>
          <div className={styles.assignSettings}>
@@ -126,13 +159,60 @@ function SetupPanel() {
             </div>
             <div className={styles.seperator} />
             <div className={styles.option}>
-               Max total shifts
+               Max. consec. shifts
+               <input
+                  className={styles.input}
+                  type="text"
+                  value={maxConsecShifts}
+                  onChange={(val) => setMaxConsecShifts(val.target.value)}
+                  placeholder={"~"}
+                  onKeyDown={(e) => {
+                     if (e.key === "Enter") e.currentTarget.blur();
+                  }}
+                  maxLength={2}
+               />
             </div>
             <div className={styles.option}>
-               Min consec. shifts
+               Min. consec. shifts
+               <input
+                  className={styles.input}
+                  type="text"
+                  value={minConsecShifts}
+                  onChange={(val) => setMinConsecShifts(val.target.value)}
+                  onKeyDown={(e) => {
+                     if (e.key === "Enter") e.currentTarget.blur();
+                  }}
+                  placeholder={"~"}
+                  maxLength={2}
+               />
             </div>
             <div className={styles.option}>
-               Min consec. shifts
+               Target shifts
+               <input
+                  className={styles.input}
+                  type="text"
+                  value={targetConsecShifts}
+                  onChange={(val) => setTargetConsecShifts(val.target.value)}
+                  onKeyDown={(e) => {
+                     if (e.key === "Enter") e.currentTarget.blur();
+                  }}
+                  placeholder={"~"}
+                  maxLength={2}
+               />
+            </div>
+            <div className={styles.option}>
+               Min. break length
+               <input
+                  className={styles.input}
+                  type="text"
+                  value={breakLength}
+                  onChange={(val) => setBreakLength(val.target.value)}
+                  placeholder={"~"}
+                  onKeyDown={(e) => {
+                     if (e.key === "Enter") e.currentTarget.blur();
+                  }}
+                  maxLength={2}
+               />
             </div>
          </div>
          <div
@@ -200,7 +280,7 @@ function SetupPanel() {
                   <i className="fa-solid fa-arrow-left" />
                </div>
             </div>
-            <div className={styles.saveButton}>
+            <div className={styles.saveButton} onClick={handleSaveShifts}>
                Save shifts
                <div>
                   <i

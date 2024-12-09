@@ -1,5 +1,6 @@
 import { handleError } from "../../utils/errorHandler";
 import { fetchTBAEventTeams } from "../tba/events";
+import { Tables } from "./database.types";
 import supabase from "./supabase";
 
 async function setupEventTeamList(event: string) {
@@ -41,4 +42,60 @@ async function setupEventTeamList(event: string) {
    };
 }
 
-export { setupEventTeamList };
+async function uploadTeamAssignments(
+   data: Tables<"event_team_data">[],
+) {
+   const prunedData = data.map((val) => ({
+      event: val.event,
+      team: val.team,
+      assigned: val.assigned,
+      uid: null,
+   }));
+
+   try {
+      const { data, error } = await supabase
+         .from("event_team_data")
+         .upsert(prunedData)
+         .select();
+
+      if (error) {
+         throw new Error(error.message);
+      }
+
+      return data;
+   } catch (error) {
+      handleError(error);
+      return false;
+   }
+}
+
+async function uploadMatchAssignments(
+   data: Tables<"event_schedule">[],
+) {
+   const prunedData = data.map((val) => ({
+      event: val.event,
+      team: val.team,
+      match: val.match,
+      name: val.name,
+      uid: val.uid,
+      alliance: val.alliance,
+   }));
+
+   try {
+      const { data, error } = await supabase
+         .from("event_schedule")
+         .upsert(prunedData)
+         .select();
+
+      if (error) {
+         throw new Error(error.message);
+      }
+
+      return data;
+   } catch (error) {
+      handleError(error);
+      return false;
+   }
+}
+
+export { setupEventTeamList, uploadMatchAssignments, uploadTeamAssignments };

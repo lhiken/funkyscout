@@ -88,7 +88,7 @@ create table if not exists
    event_schedule (
       --identifiers--
       event    text     not null,
-      match    integer  not null,
+      match    text     not null,
       team     text     not null,
       alliance alliance not null,
 
@@ -142,7 +142,7 @@ create table if not exists
    event_match_data (
       --identifiers--
       event    text     not null,
-      match    integer  not null,
+      match    text     not null,
       team     text     not null,
       alliance alliance not null,
 

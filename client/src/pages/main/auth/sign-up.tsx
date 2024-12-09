@@ -59,6 +59,9 @@ function SignupPage() {
                         type="email"
                         value={email}
                         onChange={(input) => setEmail(input.target.value)}
+                        onKeyDown={(e) => {
+                           if (e.key === "Enter") e.currentTarget.blur();
+                        }}
                         className={styles.input}
                         placeholder="Email"
                         autoComplete="email"
@@ -68,6 +71,9 @@ function SignupPage() {
                         type="name"
                         value={username}
                         onChange={(input) => setUsername(input.target.value)}
+                        onKeyDown={(e) => {
+                           if (e.key === "Enter") e.currentTarget.blur();
+                        }}
                         className={styles.input}
                         placeholder="Name"
                         autoComplete="name"
@@ -85,6 +91,9 @@ function SignupPage() {
                            className={styles.input}
                            placeholder="Password (6+ chars)"
                            autoComplete="none"
+                           onKeyDown={(e) => {
+                              if (e.key === "Enter") e.currentTarget.blur();
+                           }}
                         />
                         <span
                            className={`${styles.icon} ${
@@ -110,6 +119,9 @@ function SignupPage() {
                            className={styles.input}
                            placeholder="Confirm Password"
                            autoComplete="none"
+                           onKeyDown={(e) => {
+                              if (e.key === "Enter") e.currentTarget.blur();
+                           }}
                         />
                         <span
                            className={`${styles.icon} ${

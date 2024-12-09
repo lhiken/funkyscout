@@ -19,11 +19,13 @@ function TeamList() {
          )
          : val?.teamData
    )?.sort((a, b) => {
-      const aCount = 
-         assignedData?.matchData?.filter((i) => i.team === a.key && i.uid).length || 0;
+      const aCount = assignedData?.matchData?.filter((i) =>
+         i.team === a.key && i.uid
+      ).length || 0;
 
-      const bCount =
-         assignedData?.matchData?.filter((i) => i.team === b.key && i.uid).length || 0;
+      const bCount = assignedData?.matchData?.filter((i) =>
+         i.team === b.key && i.uid
+      ).length || 0;
 
       return bCount - aCount;
    });
@@ -61,6 +63,17 @@ function TeamList() {
             {queriedTeams && queriedTeams.map((val, index) => {
                return <TeamAssignmentCard key={index} teamData={val} />;
             })}
+            {val?.queryProgress.teamData.isLoading && (
+               <div className={styles.loadBox}>
+                  Loading teams...
+               </div>
+            )}
+            {val?.queryProgress.teamData.isError && (
+               <div className={styles.loadBox}>
+                  <i className="fa-regular fa-circle-xmark" />&nbsp;
+                  Couldn't load teams
+               </div>
+            )}
          </div>
       </div>
    );
