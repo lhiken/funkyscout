@@ -72,9 +72,9 @@ function MatchCard({
       <div
          className={`${styles.matchUserCard} ${
             matchEntry ? styles.enabled : styles.disabled
-         } ${isPrevBlank ? styles.start : ""} ${isNextBlank ? styles.end : ""}`}
+         } ${isPrevBlank && matchEntry?.team ? styles.start : ""} ${isNextBlank && matchEntry?.team ? styles.end : ""}`}
       >
-         {matchEntry?.team.substring(3)}
+         {matchEntry?.team.substring(3) ? matchEntry?.team.substring(3) : "N/A"}
       </div>
    );
 }

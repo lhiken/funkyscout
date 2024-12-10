@@ -28,7 +28,7 @@ function ScheduleTable() {
    const [matchMode, setMatchMode] = useState(true);
 
    const [currentPage, setCurrentPage] = useState(0);
-   const itemsPerPage = 3;
+   const itemsPerPage = 5;
 
    const scouterList = assignmentData.val?.scouterList || [];
 
@@ -61,12 +61,12 @@ function ScheduleTable() {
             >
                {matchMode
                   ? (
-                     <div>
+                     <div className={styles.scheduleChangeButton}>
                         Match View <i className="fa-solid fa-caret-right" />
                      </div>
                   )
                   : (
-                     <div>
+                     <div className={styles.scheduleChangeButton}>
                         <i className="fa-solid fa-caret-left" /> Users View
                      </div>
                   )}
@@ -145,27 +145,33 @@ function ScheduleTable() {
                   <div className={styles.headerCards}>
                      <div className={styles.matchHeaderInfo}>Match</div>
                      <div className={styles.usersHeaderInfo}>
-                        <div className={styles.pageButton} onClick={handlePrevious}>
+                        <div
+                           className={styles.pageButton}
+                           onClick={handlePrevious}
+                        >
                            <i className="fa-solid fa-angle-left" />
                         </div>
-
-                        {currentScouters.map((scouter, index) => {
-                           return (
-                              <div
-                                 key={index}
-                                 className={styles.userHeaderCard}
-                              >
-                                 {scouter.name}
-                              </div>
-                           );
-                        })}
+                        <div className={styles.scouterHeaders}>
+                           {currentScouters.map((scouter, index) => {
+                              return (
+                                 <div
+                                    key={index}
+                                    className={styles.userHeaderCard}
+                                 >
+                                    {scouter.name}
+                                 </div>
+                              );
+                           })}
+                        </div>
                         <div className={styles.pageButton} onClick={handleNext}>
                            <i className="fa-solid fa-angle-right" />
                         </div>
                      </div>
-                     <div style={{
-                        width: "5rem"
-                     }}>Time</div>
+                     <div
+                        className={styles.headerTime}
+                     >
+                        Time
+                     </div>
                   </div>{" "}
                   <div className={styles.seperator} />
                   <div className={styles.scouterCalendar}>
@@ -185,7 +191,7 @@ function ScheduleTable() {
                                     >
                                        <div
                                           style={{
-                                             lineHeight: "1.35rem",
+                                             lineHeight: "2rem",
                                           }}
                                        >
                                           {parseMatchKey(key, "short")
@@ -195,7 +201,7 @@ function ScheduleTable() {
                                           style={{
                                              fontFamily: "Ubuntu Mono",
                                              fontSize: "1.1rem",
-                                             lineHeight: "1.35rem",
+                                             lineHeight: "2rem",
                                           }}
                                        >
                                           {parseMatchKey(key, "short")
@@ -215,6 +221,53 @@ function ScheduleTable() {
                               />
                            );
                         })}
+                     </div>
+                     <div className={styles.matchesInfo}>
+                        <div>
+                           {Object.keys(scheduleData.val?.matchData || {})
+                              .filter((
+                                 key,
+                              ) => key.includes("qm")).sort((a, b) =>
+                                 Number(a.substring(a.indexOf("qm") + 2)) -
+                                 Number(b.substring(a.indexOf("qm") + 2))
+                              ).map((key, index) => {
+                                 return (
+                                    <div
+                                       key={index}
+                                       className={styles.matchDetailCard}
+                                       style={{
+                                          display: "flex",
+                                          justifyContent: "flex-end",
+                                       }}
+                                    >
+                                       <div
+                                          style={{
+                                             fontFamily: "Ubuntu Mono",
+                                             fontSize: "1.1rem",
+                                             lineHeight: "2rem",
+                                             textAlign: "left",
+                                             color: "var(--text-secondary)",
+                                          }}
+                                       >
+                                          {(new Date(
+                                             scheduleData.val?.matchData &&
+                                                   scheduleData.val
+                                                         ?.matchData[key]
+                                                         .est_time * 1000 || "",
+                                          )).toLocaleTimeString(
+                                             undefined,
+                                             {
+                                                hour12: true,
+                                                hour: "2-digit",
+                                                minute: "2-digit",
+                                                hourCycle: "h12",
+                                             },
+                                          )}
+                                       </div>
+                                    </div>
+                                 );
+                              })}
+                        </div>
                      </div>
                   </div>
                </>
