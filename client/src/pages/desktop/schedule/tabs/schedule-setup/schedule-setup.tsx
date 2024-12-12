@@ -7,14 +7,17 @@ import Checkbox from "../../../../../components/app/buttons/checkbox";
 import RoundInput from "../../../../../components/app/input/round-input";
 import { assignUsersToMatches, assignUsersToTeams } from "./scheduler";
 import { getEvent } from "../../../../../utils/logic/app";
-import { uploadTeamAssignments } from "../../../../../lib/supabase/setup";
+import {
+   uploadMatchAssignments,
+   uploadTeamAssignments,
+} from "../../../../../lib/supabase/setup";
 import throwNotification from "../../../../../components/app/toast/toast";
 
 function SetupPanel() {
    const scheduleData = useContext(ScheduleContext);
    const assignmentData = useContext(AssignmentContext);
 
-   const [showInfo, setShowInfo] = useState(true);
+   const [showInfo, setShowInfo] = useState(false);
    const [userQuery, setUserQuery] = useState("");
 
    const queriedUsers = scheduleData?.val?.userData
@@ -29,13 +32,19 @@ function SetupPanel() {
 
    function handleScheduleMatches() {
       if (assignmentData.setVal) {
+         const t0 = performance.now();
          const updatedMatchData = assignUsersToMatches(
             scheduleData.val?.matchData || {},
             assignmentData.val?.priorityTeams || [],
             assignmentData.val?.scouterList || [],
             Number(maxConsecShifts),
+            Number(breakLength),
+            Number(targetConsecShifts),
             getEvent() || "",
          );
+         const t1 = performance.now();
+
+         throwNotification("info", `Assigned shifts in ${Math.round((t1 - t0) * 10) / 10} ms`);
 
          assignmentData.setVal((prev) => ({
             ...prev,
@@ -73,7 +82,21 @@ function SetupPanel() {
       throwNotification("info", "Saving shift assignments...");
       uploadTeamAssignments(assignmentData.val?.teamData || []).then((res) => {
          if (res) {
-            throwNotification("success", "Successfully saved team assignments");
+            uploadMatchAssignments(assignmentData.val?.matchData || []).then(
+               (res) => {
+                  if (res) {
+                     throwNotification(
+                        "success",
+                        "Successfully saved assignments",
+                     );
+                  } else {
+                     throwNotification(
+                        "error",
+                        "Could not save shift assignments",
+                     );
+                  }
+               },
+            );
          } else {
             throwNotification("error", "Could not save shift assignments");
          }
@@ -93,15 +116,18 @@ function SetupPanel() {
             <AnimatePresence>
                {showInfo && (
                   <motion.div
-                     initial={hasRendered ? { height: 0, opacity: 0 } : false} // Skip initial animation on first render
-                     animate={{ height: "11rem", opacity: 1 }}
+                     initial={hasRendered ? { height: 0, opacity: 0 } : false}
+                     animate={{ height: "12rem", opacity: 1 }}
                      exit={{ height: 0, opacity: 0 }}
                      transition={{ duration: 0.2 }}
                      className="infoContent"
                   >
                      <div
                         className={styles.seperator}
-                        style={{ marginBottom: "1rem", marginTop: "0.5rem" }}
+                        style={{
+                           marginBottom: "0.75rem",
+                           marginTop: "0.25rem",
+                        }}
                      />
                      Before proceeding, first set up the event and choose which
                      scouters you want to assign shifts to. <br />

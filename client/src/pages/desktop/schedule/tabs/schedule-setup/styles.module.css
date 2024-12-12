@@ -41,6 +41,9 @@
   flex-direction: column;
   gap: 0.5rem;
   overflow: hidden;
+  line-height: 1.5rem;
+  cursor: pointer;
+  user-select: none;
 }
 
 .infoContent {

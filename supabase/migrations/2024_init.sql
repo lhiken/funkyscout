@@ -323,6 +323,9 @@ create policy "Enable update for supabase_auth_admin"
    as permissive
    for update
    to public
+   using (
+      ((select auth.role()) = 'supabase_auth_admin') 
+   )
    with check (
       ((select auth.role()) = 'supabase_auth_admin') 
    );
@@ -344,6 +347,7 @@ create policy "Allow authorized update access"
    on event_schedule
    for UPDATE 
    to authenticated 
+   using (authorize('schedule.write'))
    with check (authorize('schedule.write'));
 
 create policy "Allow authorized select access" 
@@ -354,10 +358,10 @@ create policy "Allow authorized select access"
 
   -- Data Access Policies --
 create policy "Allow authorized delete access (data)" 
-  on event_match_data
-  for DELETE
-  to authenticated
-  using (authorize('data.write'));
+   on event_match_data
+   for DELETE
+   to authenticated
+   using (authorize('data.write'));
 
 create policy "Allow authorized insert access (data)" 
    on event_match_data
@@ -366,10 +370,11 @@ create policy "Allow authorized insert access (data)"
    with check (authorize('data.write'));
 
 create policy "Allow authorized update access (data)" 
-  on event_match_data
-  for UPDATE
-  to authenticated
-  using (authorize('data.write'));
+   on event_match_data
+   for UPDATE
+   to authenticated
+   using (authorize('data.write'))
+   with check (authorize('data.write'));
 
 create policy "Allow authorized select access (data)" 
    on event_match_data
@@ -378,16 +383,17 @@ create policy "Allow authorized select access (data)"
    using (authorize('data.view'));
 
 create policy "Allow authorized delete access (data)" 
-  on event_team_data
-  for DELETE
-  to authenticated
-  using (authorize('data.write'));
+   on event_team_data
+   for DELETE
+   to authenticated
+   using (authorize('data.write'));
 
 create policy "Allow authorized update access (data)" 
-  on event_team_data
-  for UPDATE
-  to authenticated
-  using (authorize('data.write'));
+   on event_team_data
+   for UPDATE
+   to authenticated
+   using (authorize('data.write'))
+   with check (authorize('data.write'));
 
 create policy "Allow authorized insert access (data)" 
    on event_team_data
@@ -436,6 +442,10 @@ create policy "Enable update for users based on uid"
    as permissive
    for UPDATE
    to public
+   using (
+      ((select auth.uid()) = uid) or
+      authorize('picklist.write')
+   )
    with check (
       ((select auth.uid()) = uid) or
       authorize('picklist.write')

@@ -123,10 +123,17 @@ function SchedulePage() {
          ...prev,
          teamData: assignedTeams.data || [],
          matchData: assignedMatches.data || [],
+         scouterList: Array.from(
+            new Map(
+               (assignmentData.matchData || [])
+                  .filter((val) => val.uid && val.name)
+                  .map((val) => [val.uid, { name: val.name!, uid: val.uid! }]),
+            ).values(),
+         ),
       }));
 
       // This is valid as it only updates when data changes.
-      // Other solutions exist, but this is the easiest.
+      // We could do it some other way but oh well!
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [results.map((res) => res.isFetching).join()]);
 

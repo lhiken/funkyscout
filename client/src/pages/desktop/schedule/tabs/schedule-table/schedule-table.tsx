@@ -130,10 +130,19 @@ function ScheduleTable() {
                         Loading teams...
                      </div>
                   )}
-                  {scheduleData.val?.queryProgress.teamData.isError && (
+                  {(scheduleData.val?.queryProgress.teamData.isError) && (
                      <div className={styles.loadBox}>
                         <i className="fa-regular fa-circle-xmark" />&nbsp;
                         Couldn't load teams
+                     </div>
+                  )}
+                  {(!scheduleData.val?.queryProgress.teamData.isError &&
+                     !scheduleData?.val?.queryProgress.teamData.isLoading &&
+                     Object.keys(scheduleData.val?.matchData || {}).length ==
+                        0) && (
+                     <div className={styles.loadBox}>
+                        <i className="fa-regular fa-circle-xmark" />&nbsp; No
+                        matches found
                      </div>
                   )}
                   <div>

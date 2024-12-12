@@ -1,25 +1,30 @@
 import { Tables } from "../../../../../lib/supabase/database.types";
 import { EventSchedule } from "../../../../../lib/tba/events";
 
+interface Scouter {
+   name: string;
+   uid: string;
+   accuracy?: number;
+}
+
+interface UnavailableScouter extends Scouter {
+   skippedMatches: number; // Number of matches this scouter has not been scouting for
+}
+
+interface AvailableScouter extends Scouter {
+   scoutedMatches: number; // Number of matches this scouter has been scouting for
+   available: boolean; // Whether this scouter has scouted a particular match
+}
+
 function assignUsersToMatches(
    schedule: EventSchedule,
    priorityTeams: string[],
    users: { name: string; uid: string }[],
-   maxConsecShift: number,
+   maxConsecMatches: number,
+   breakLength: number,
+   targetShiftLength: number,
    event: string,
 ): Tables<"event_schedule">[] {
-   // Create a list of scouters with their shift avaliability
-   const userList = users.map((val) => ({
-      ...val,
-      isOnBreak: false,
-      isInShift: true,
-      avaliable: true,
-      consecScoutMatches: 0,
-      consecBreakMatches: 0,
-   }));
-
-   const breakLength = maxConsecShift;
-
    const matchKeys = Object.keys(schedule).filter((
       key,
    ) => key.includes("qm")).sort((a, b) =>
@@ -27,15 +32,24 @@ function assignUsersToMatches(
       Number(b.substring(a.indexOf("qm") + 2))
    );
 
+   // Takes all given scouters and puts them into the unavailable scouter pool
+   const unavailableScouterPool: UnavailableScouter[] = users.map((val) => ({
+      name: val.name,
+      uid: val.uid,
+      skippedMatches: 0,
+   }));
+
+   // Takes some scouters from the unavailable pool and moves them to the available pool
+   const availableScouterPool: AvailableScouter[] = getStartingScouters();
+
+   console.log(unavailableScouterPool);
+   console.log(availableScouterPool);
+
    const shifts: Tables<"event_schedule">[] = [];
 
    for (const matchKey of matchKeys) {
       const matchData = schedule[matchKey];
-
-      //Sort teams in order of priority, then number of matches already scouted
-      const matchTeams = [...matchData.blueTeams, ...matchData.redTeams].sort(
-         () => Math.random() - 0.5,
-      ).sort(
+      const teamKeys = [...matchData.blueTeams, ...matchData.redTeams].sort(
          (a, b) => {
             const aPriority = priorityTeams.includes(a);
             const bPriority = priorityTeams.includes(b);
@@ -43,79 +57,147 @@ function assignUsersToMatches(
             if (aPriority && !bPriority) return -1;
             if (bPriority && !aPriority) return 1;
 
-            const aScouted = shifts.filter((match) => match.team == a).length;
-            const bScouted = shifts.filter((match) => match.team == b).length;
+            const aMatches = shifts.filter((val) => val.team == a).length;
+            const bMatches = shifts.filter((val) => val.team == b).length;
 
-            return aScouted - bScouted;
+            return aMatches - bMatches;
          },
       );
 
-      for (const team of matchTeams) {
-         const scouter = getAvaliableScouter();
+      let successfulAssignments = 0;
+
+      for (const team of teamKeys) {
+         const scouter = getAvailableScouter();
+
+         if (scouter) {
+            successfulAssignments++;
+         }
 
          shifts.push({
+            alliance: matchData.blueTeams.includes(team) ? "blue" : "red",
             event: event,
             match: matchKey,
             team: team,
-            alliance: matchData.blueTeams.includes(team) ? "blue" : "red",
-            name: scouter.name,
-            uid: scouter.uid,
+            name: scouter?.name || null,
+            uid: scouter?.uid || null,
          });
       }
 
-      updateAvaliability();
-   }
-
-   function getAvaliableScouter() {
-      const avaliableScouters = userList.filter((user) =>
-         user.avaliable && user.isInShift
+      updateAvaliability(
+         successfulAssignments == 6 ? "relaxed" : "strict",
       );
-
-      if (avaliableScouters.length == 0) {
-         return {
-            name: null,
-            uid: null,
-         };
-      }
-
-      const targetScouterIndex = userList.findIndex((val) =>
-         val.uid == avaliableScouters[0].uid
-      );
-      const targetScouter = userList[targetScouterIndex];
-
-      userList[targetScouterIndex] = {
-         ...userList[targetScouterIndex],
-         avaliable: false,
-         consecScoutMatches: targetScouter.consecScoutMatches + 1,
-      };
-
-      return targetScouter;
-   }
-
-   function updateAvaliability() {
-      for (let i = 0; i < userList.length; i++) {
-         const canBreak = userList[i].consecScoutMatches > maxConsecShift - 1||
-            (userList[i].isOnBreak &&
-               userList[i].consecBreakMatches < breakLength);
-         const canShift =
-            userList[i].consecScoutMatches < maxConsecShift - 1&&
-               userList[i].isInShift || !canBreak;
-         const newBreakLength = canBreak
-            ? userList[i].consecBreakMatches + 1
-            : 0;
-
-         userList[i] = {
-            ...userList[i],
-            avaliable: true,
-            isOnBreak: canBreak,
-            isInShift: canShift,
-            consecBreakMatches: newBreakLength,
-            consecScoutMatches: canBreak ? 0 : userList[i].consecScoutMatches,
-         };
-      }
    }
 
    return shifts;
+
+   function getAvailableScouter(): AvailableScouter | undefined {
+      let index = -1;
+
+      for (let i = 0; i < availableScouterPool.length; i++) {
+         if (availableScouterPool[i].available) {
+            index = i;
+            break;
+         }
+      }
+
+      if (index == -1) return;
+
+      availableScouterPool[0].available = false;
+      availableScouterPool[0].scoutedMatches++;
+
+      const scouter = availableScouterPool.splice(0, 1)[0];
+      availableScouterPool.push(scouter);
+
+      return scouter;
+   }
+
+   function getStartingScouters() {
+      const scouters: AvailableScouter[] = [];
+
+      for (let i = 0; i < unavailableScouterPool.length && i < 6; i++) {
+         const newScouter = popUnavailable();
+         if (newScouter) {
+            scouters.push(newScouter);
+         }
+      }
+
+      return scouters;
+   }
+
+   function updateAvaliability(mode: "strict" | "relaxed") {
+      //Updates the avaliable pool
+      for (let i = 0; i < availableScouterPool.length; i++) {
+         availableScouterPool[i].available = true;
+
+         if (
+            availableScouterPool[i].scoutedMatches >= targetShiftLength &&
+            mode == "relaxed"
+         ) {
+            swapAvailable(i);
+         } else if (
+            availableScouterPool[i].scoutedMatches >= maxConsecMatches
+         ) {
+            swapAvailable(i);
+         }
+      }
+
+      for (let i = 0; i < unavailableScouterPool.length; i++) {
+         unavailableScouterPool[i].skippedMatches++;
+
+         if (
+            availableScouterPool.length < 6 &&
+            unavailableScouterPool[i].skippedMatches > breakLength
+         ) {
+            swapUnavailable(i);
+         }
+      }
+   }
+
+   function swapAvailable(index: number): UnavailableScouter {
+      const scouter = availableScouterPool[index];
+
+      availableScouterPool.splice(index, 1);
+
+      const newScouter = {
+         name: scouter.name,
+         uid: scouter.uid,
+         skippedMatches: 0,
+      };
+
+      unavailableScouterPool.push(newScouter);
+
+      return newScouter;
+   }
+
+   function swapUnavailable(index: number): AvailableScouter {
+      const scouter = unavailableScouterPool[index];
+
+      unavailableScouterPool.splice(index, 1);
+
+      const newScouter = {
+         name: scouter.name,
+         uid: scouter.uid,
+         available: true,
+         scoutedMatches: 0,
+      };
+
+      availableScouterPool.push(newScouter);
+
+      return newScouter;
+   }
+
+   function popUnavailable(): AvailableScouter | undefined {
+      const scouter = unavailableScouterPool.pop();
+
+      if (!scouter) return;
+
+      return {
+         name: scouter.name,
+         uid: scouter.uid,
+         scoutedMatches: 0,
+         available: true,
+      };
+   }
 }
 
 function assignUsersToTeams(
