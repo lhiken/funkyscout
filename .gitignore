@@ -36,3 +36,5 @@ dev-dist
 # Builds
 *.tsbuildinfo
 .vercel
+
+.vercel

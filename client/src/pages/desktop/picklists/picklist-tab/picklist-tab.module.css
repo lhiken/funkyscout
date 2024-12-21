@@ -1,0 +1,16 @@
+.container {
+   height: 100%;
+   width: 21rem;
+   background-color: var(--surface);
+   border-radius: 1rem;
+   display: flex;
+   flex-direction: column;
+   padding: 1.75rem;
+   padding-bottom: 0rem;
+   gap: 1rem;
+   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.05);
+}
+
+.containerHeader {
+   color: var(--primary);
+}

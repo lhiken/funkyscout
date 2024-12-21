@@ -8,7 +8,7 @@ import ErrorPage from "./pages/main/error/error";
 import EventSelector from "./pages/main/event-selector/event-selector";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "tippy.js/dist/tippy.css";
-import 'simplebar-react/dist/simplebar.min.css';
+import "simplebar-react/dist/simplebar.min.css";
 import MobileApp from "./pages/mobile/mobile";
 import isMobile from "./utils/device";
 import { getFocusTeam, setFocusTeam } from "./utils/logic/app";

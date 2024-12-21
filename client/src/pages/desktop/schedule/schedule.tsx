@@ -105,7 +105,9 @@ function SchedulePage() {
       setScheduleData((prev) => ({
          ...prev,
          teamData: teamsResult.data,
-         userData: usersResult.data || [],
+         userData: usersResult.data
+            ? usersResult.data.filter((val) => val.role == "scouter")
+            : [],
          matchData: matchesResult.data,
          queryProgress: {
             teamData: {
@@ -127,10 +129,21 @@ function SchedulePage() {
             new Map(
                (assignmentData.matchData || [])
                   .filter((val) => val.uid && val.name)
+                  .filter((val) =>
+                     usersResult.data
+                        ? usersResult.data.filter((val) =>
+                           val.role == "scouter"
+                        ).map((val) => val.uid).includes(
+                           val.uid || "",
+                        )
+                        : ""
+                  )
                   .map((val) => [val.uid, { name: val.name!, uid: val.uid! }]),
             ).values(),
          ),
       }));
+
+      console.log(assignmentData);
 
       // This is valid as it only updates when data changes.
       // We could do it some other way but oh well!

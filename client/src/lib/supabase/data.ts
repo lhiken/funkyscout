@@ -89,10 +89,28 @@ async function fetchMatchAssignments(event: string) {
    }
 }
 
+async function fetchPicklists(event: string) {
+   try {
+      const { data: event_picklist, error } = await supabase
+         .from("event_picklist")
+         .select("*")
+         .eq("event", event);
+
+      if (error) {
+         throw new Error(error.message);
+      }
+
+      return event_picklist;
+   } catch (error) {
+      handleError(error);
+   }
+}
+
 export {
    fetchEventByKey,
    fetchEvents,
    fetchMatchAssignments,
+   fetchPicklists,
    fetchTeamAssignments,
    fetchTeamsByEvent,
 };

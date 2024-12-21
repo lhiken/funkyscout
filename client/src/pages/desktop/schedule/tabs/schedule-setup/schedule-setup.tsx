@@ -39,7 +39,6 @@ function SetupPanel() {
             assignmentData.val?.scouterList || [],
             Number(maxConsecShifts),
             Number(breakLength),
-            Number(targetConsecShifts),
             getEvent() || "",
          );
          const t1 = performance.now();
@@ -227,7 +226,7 @@ function SetupPanel() {
                />
             </div>
             <div className={styles.option}>
-               Min. break length
+               break length
                <input
                   className={styles.input}
                   type="text"

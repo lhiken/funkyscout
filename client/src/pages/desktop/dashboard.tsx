@@ -5,6 +5,7 @@ import Topbar from "./navigation/topbar";
 import DashboardHome from "./home/home";
 import ErrorPage from "../main/error/error";
 import SchedulePage from "./schedule/schedule";
+import PicklistPage from "./picklists/picklists";
 
 function Dashboard() {
    return (
@@ -17,6 +18,7 @@ function Dashboard() {
                   <Switch>
                      <Route path={"/"} component={DashboardHome} />
                      <Route path={"/schedule"} component={SchedulePage} />
+                     <Route path={"/picklist"} component={PicklistPage} />
                      <Route>
                         <ErrorPage style={{ margin: "0.75rem 0 1rem 0" }} />
                      </Route>
