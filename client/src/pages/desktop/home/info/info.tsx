@@ -37,7 +37,7 @@ function InfoTab() {
    });
 
    const [updateStatus, setUpdateStatus] = useState<string>(
-      "Updating",
+      `Updating... ${teamDataProgress.fetched}/${teamDataProgress.total}`,
    );
 
    const teamStatus = teamStatusResult.data;
@@ -69,7 +69,7 @@ function InfoTab() {
          setUpdateStatus(
             teamDataProgress.fetchTime && teamDataProgress.fetchTime > 0
                ? `EPAs updated ${formatTime(teamDataProgress.fetchTime)}`
-               : "Updating...",
+               : `Updating... ${teamDataProgress.fetched}/${teamDataProgress.total}`,
          );
          console.log();
       }, 100);
@@ -85,7 +85,7 @@ function InfoTab() {
                Information
             </div>
             <div className={styles.updateTime}>
-               {updateStatus}
+               {updateStatus}&nbsp;<i className="fa-solid fa-arrows-rotate" style={{cursor: "pointer"}}/>
             </div>
          </div>
          <div className={styles.content}>

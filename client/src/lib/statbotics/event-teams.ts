@@ -14,6 +14,7 @@ async function fetchEventTeamEPAs(
       errors: number,
       fetchTime: number,
    ) => void,
+   force?: boolean
 ): Promise<Record<string, StatboticsTeamEPAs>> {
    console.log("Fetch team EPAs: Started")
    console.log(event);
@@ -29,6 +30,10 @@ async function fetchEventTeamEPAs(
    const cachedData: Record<string, StatboticsTeamEPAs> = data
       ? JSON.parse(data)
       : {};
+
+   if (force) {
+      return fetchNewData(event, onProgress);
+   }
 
    if (onProgress) {
       onProgress(0, 0, 0, fetchTime);

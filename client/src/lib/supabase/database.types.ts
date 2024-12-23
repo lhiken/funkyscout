@@ -82,21 +82,27 @@ export type Database = {
         Row: {
           event: string
           picklist: Json
+          timestamp: string
           title: string
+          type: Database["public"]["Enums"]["pick_type"]
           uid: string
           uname: string
         }
         Insert: {
           event: string
           picklist?: Json
+          timestamp?: string
           title: string
+          type?: Database["public"]["Enums"]["pick_type"]
           uid?: string
           uname: string
         }
         Update: {
           event?: string
           picklist?: Json
+          timestamp?: string
           title?: string
+          type?: Database["public"]["Enums"]["pick_type"]
           uid?: string
           uname?: string
         }
@@ -301,6 +307,7 @@ export type Database = {
         | "profiles.write"
         | "picklist.write"
         | "picklist.view"
+      pick_type: "public" | "default" | "private"
       role: "user" | "scouter" | "admin"
     }
     CompositeTypes: {

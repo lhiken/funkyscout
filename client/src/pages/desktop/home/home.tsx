@@ -37,9 +37,9 @@ function DashboardHome() {
    }
 
    const { isError } = useQuery({
-      queryKey: [`dashboardHomeFetchTeamEPAs/event${getEvent()}`],
-      queryFn: () =>
-         fetchEventTeamEPAs(getEvent() || "", setProgress).then((res) => {
+      queryKey: [`dashboardHomeFetchTeamEPAs/event${getEvent()}`, false],
+      queryFn: ({queryKey}) =>
+         fetchEventTeamEPAs(getEvent() || "", setProgress, queryKey[1] as boolean).then((res) => {
             if (res) {
                setTeamData(res);
                return true;

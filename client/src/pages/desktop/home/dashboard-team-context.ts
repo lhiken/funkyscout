@@ -12,6 +12,7 @@ export const TeamDataProgressContext = createContext<{
    errors: 0,
    fetchTime: -1,
 });
+
 export const TeamDataContext = createContext<
    Record<string, StatboticsTeamEPAs>
 >({});

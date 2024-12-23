@@ -41,4 +41,49 @@
    border: 2px solid var(--text-background);
    border-radius: 1rem;
    padding: 1rem 1.25rem;
+   display: flex;
+   flex-direction: column;
+   gap: 0.5rem;
+   user-select: none;
+   cursor: pointer;
+   transition: 0.2s;
+}
+
+.picklistCard:hover {
+   border: 2px solid var(--primary-variant);
+}
+
+.picklistCardTop {
+   display: flex;
+   width: 100%;
+   justify-content: space-between;
+}
+
+.picklistCardBottom {
+   font-size: 0.935rem;
+   display: flex;
+   width: 100%;
+   justify-content: space-between;
+   color: var(--text-secondary);
+}
+
+.picklistCardType {
+   color: var(--primary);
+}
+
+.newPicklistButton {
+   width: 100%;
+   border: 2px solid var(--text-background);
+   border-radius: 1rem;
+   padding: 1rem 1.25rem;
+   display: flex;
+   flex-direction: row;
+   justify-content: space-between;
+   user-select: none;
+   cursor: pointer;
+   transition: 0.2s;
+}
+
+.newPicklistButton:hover {
+   color: var(--primary);
 }
