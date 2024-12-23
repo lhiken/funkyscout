@@ -14,8 +14,11 @@ begin
    if not exists (select 1 from pg_type where typname = 'perm') then
       create type public.perm as enum ('data.view', 'data.write', 'schedule.view', 'schedule.write', 'event.write', 'profiles.view', 'profiles.write', 'picklist.write', 'picklist.view');
    end if;
-      if not exists (select 1 from pg_type where typname = 'invite_code') then
+   if not exists (select 1 from pg_type where typname = 'invite_code') then
       create type public.invite_code as enum ('promote.scouter', 'promote.admin');
+   end if;
+   if not exists (select 1 from pg_type where typname = 'pick_type') then
+      create type public.pick_type as enum ('public', 'default', 'private');
    end if;
 end $$;
 
@@ -124,6 +127,12 @@ create table if not exists
       uname    text     not null,
       uid      uuid     default auth.uid () not null,
 
+      type     pick_type  default 'default' not null,
+      timestamp timestamp 
+         with time zone 
+         not null 
+         default (now() at time zone 'utc'::text),
+
       constraint event_event_pkey primary key (event),
 
       constraint event_list_event_fkey foreign key (event) 
@@ -136,7 +145,7 @@ create table if not exists
          on update cascade
          on delete cascade
    );
-comment on table event_picklist is 'Teams for each event and their pit scouting data';
+comment on table event_picklist is 'User-created picklists';
 
 create table if not exists
    event_match_data (
@@ -434,7 +443,8 @@ create policy "Enable select for users based on uid"
    to public
    using (
       ((select auth.uid()) = uid) or
-      authorize('picklist.view')
+      (type = 'public') or
+      (authorize('picklist.view') and not (type = 'private'))
    );
 
 create policy "Enable update for users based on uid"
@@ -444,11 +454,11 @@ create policy "Enable update for users based on uid"
    to public
    using (
       ((select auth.uid()) = uid) or
-      authorize('picklist.write')
+      (authorize('picklist.view') and not (type = 'private'))
    )
    with check (
       ((select auth.uid()) = uid) or
-      authorize('picklist.write')
+      (authorize('picklist.view') and not (type = 'private'))
    );
 
 create policy "Enable insert for users based on uid"
@@ -458,7 +468,7 @@ create policy "Enable insert for users based on uid"
    to public
    with check (
       ((select auth.uid()) = uid) or
-      authorize('picklist.write')
+      (authorize('picklist.view') and not (type = 'private'))
    );
 
 create policy "Enable delete for users based on uid"
@@ -467,8 +477,8 @@ create policy "Enable delete for users based on uid"
    for DELETE
    to public
    using (
-      ((select auth.uid()) = uid) or
-      authorize('picklist.write')
+      ((select auth.uid()) = uid) or 
+      (authorize('picklist.view') and not (type = 'private'))
    );
 
 -- Invite code permissions --

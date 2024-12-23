@@ -26,13 +26,24 @@ function PicklistSelectionTab() {
 
    return (
       <div className={styles.selectionContent}>
-         <RoundInput value={picklistQuery} style={{ borderColor: "var(--text-background)" }} setValue={setPicklistQuery} placeholder="Search picklists..." type="text" cornerStyle="sharp" icon={
+         <RoundInput value={picklistQuery} style={{
+            height: "3.25rem",
+            backgroundColor: "var(--inset)",
+            border: "2px solid var(--text-background)",
+         }} setValue={setPicklistQuery} placeholder="Search picklists..." type="text" cornerStyle="sharp" icon={
             <i className="fa-solid fa-magnifying-glass" />
          } />
          <div className={styles.picklistList}>
+            <PicklistCard picklist={{
+               event: "2024casf",
+               picklist: {},
+               title: "Main Picklist",
+               uid: "2323",
+               uname: "Chen"
+            }}/>
             {
                picklistData.val?.picklists.map((val, index) => {
-                  return <PicklistCard picklist={val} key={index}/>
+                  return <PicklistCard picklist={val} key={index} />
                }) || ""
             }
          </div>
@@ -47,7 +58,7 @@ function PicklistCard({
    picklist
 }: { picklist: Tables<"event_picklist"> }) {
    return (
-      <div className={styles.PicklistCard}>
+      <div className={styles.picklistCard}>
          {picklist.title}
       </div>
    )
