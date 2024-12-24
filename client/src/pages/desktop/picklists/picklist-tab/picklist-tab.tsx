@@ -135,6 +135,7 @@ function PicklistSelectionTab() {
 
          const newPicklist: Tables<"event_picklist"> = {
             event: getEvent() || "",
+            id: btoa(getLocalUserData().uid + Date.now()),
             picklist: res!.map((val) => ({
                teamKey: val,
                excluded: false,

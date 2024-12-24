@@ -1,4 +1,5 @@
 import { handleError } from "../../utils/errorHandler";
+import { Tables } from "./database.types";
 import supabase from "./supabase";
 
 async function fetchEvents() {
@@ -106,11 +107,48 @@ async function fetchPicklists(event: string) {
    }
 }
 
+async function updatePicklist(picklist: Tables<"event_picklist">) {
+   try {
+      const { data: event_picklist, error } = await supabase
+         .from("event_picklist")
+         .upsert(picklist);
+
+      if (error) {
+         throw new Error(error.message);
+      }
+
+      return event_picklist;
+   } catch (error) {
+      handleError(error);
+   }
+}
+
+async function deletePicklist(picklist: Tables<"event_picklist">) {
+   try {
+      const { data: event_picklist, error } = await supabase
+         .from("event_picklist")
+         .delete()
+         .eq("event", picklist.event)
+         .eq("id", picklist.id)
+         .select();
+
+      if (error) {
+         throw new Error(error.message);
+      }
+
+      return event_picklist;
+   } catch (error) {
+      handleError(error);
+   }
+}
+
 export {
+   deletePicklist,
    fetchEventByKey,
    fetchEvents,
    fetchMatchAssignments,
    fetchPicklists,
    fetchTeamAssignments,
    fetchTeamsByEvent,
+   updatePicklist,
 };

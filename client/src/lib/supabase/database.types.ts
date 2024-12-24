@@ -81,6 +81,7 @@ export type Database = {
          event_picklist: {
             Row: {
                event: string;
+               id: string;
                picklist: Json;
                timestamp: string;
                title: string;
@@ -90,6 +91,7 @@ export type Database = {
             };
             Insert: {
                event: string;
+               id: string;
                picklist?: Json;
                timestamp?: string;
                title: string;
@@ -99,6 +101,7 @@ export type Database = {
             };
             Update: {
                event?: string;
+               id?: string;
                picklist?: Json;
                timestamp?: string;
                title?: string;
@@ -108,9 +111,9 @@ export type Database = {
             };
             Relationships: [
                {
-                  foreignKeyName: "event_list_event_fkey";
+                  foreignKeyName: "event_picklist_event_list_fkey";
                   columns: ["event"];
-                  isOneToOne: true;
+                  isOneToOne: false;
                   referencedRelation: "event_list";
                   referencedColumns: ["event"];
                },

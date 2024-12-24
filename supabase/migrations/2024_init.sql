@@ -117,6 +117,7 @@ comment on table event_schedule is 'Match schedule for each scouter';
 create table if not exists
    event_picklist (
       --identifiers--
+      id       text     not null,
       event    text     not null,
       title    text     not null,
 
@@ -133,9 +134,10 @@ create table if not exists
          not null 
          default (now() at time zone 'utc'::text),
 
-      constraint event_event_pkey primary key (event),
+      constraint event_picklist_pkey primary key (event, id),
+      constraint event_picklist_unique_key unique (event, id),
 
-      constraint event_list_event_fkey foreign key (event) 
+      constraint event_picklist_event_list_fkey foreign key (event) 
          references event_list (event) 
          on update cascade 
          on delete cascade,
