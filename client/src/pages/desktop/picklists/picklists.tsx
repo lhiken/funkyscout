@@ -6,10 +6,14 @@ import { getEvent } from "../../../utils/logic/app";
 import { fetchPicklists } from "../../../lib/supabase/data";
 import { Tables } from "../../../lib/supabase/database.types";
 import {
+   ComparedTeamKeysContext,
    PicklistDataContext,
+   TargetPicklistContext,
    TeamFetchedDataContext,
 } from "./picklists-context";
 import PicklistTab from "./picklist-tab/picklist-tab";
+import { Picklist } from "../../../schemas/schema";
+import ComparisonTab from "./comparison-box/comparison";
 
 export interface PicklistData {
    picklists: Tables<"event_picklist">[];
@@ -43,6 +47,10 @@ function PicklistPage() {
          isError: false,
       },
    });
+
+   const [comparedTeamKeys, setComparedTeamKeys] = useState<string[]>([])
+
+   const [targetPicklist, setTargetPicklist] = useState<Picklist | undefined>();
 
    const results = useQueries({
       queries: [
@@ -101,9 +109,20 @@ function PicklistPage() {
                setVal: setFetchedTeamData,
             }}
          >
-            <div className={styles.container}>
-               <PicklistTab />
-            </div>
+            <TargetPicklistContext.Provider value={{
+               val: targetPicklist,
+               setVal: setTargetPicklist,
+            }}>
+               <ComparedTeamKeysContext.Provider value={{
+                  val: comparedTeamKeys,
+                  setVal: setComparedTeamKeys,
+               }}>
+                  <div className={styles.container}>
+                     <PicklistTab />
+                     <ComparisonTab />
+                  </div>
+               </ComparedTeamKeysContext.Provider>
+            </TargetPicklistContext.Provider>
          </TeamFetchedDataContext.Provider>
       </PicklistDataContext.Provider>
    );

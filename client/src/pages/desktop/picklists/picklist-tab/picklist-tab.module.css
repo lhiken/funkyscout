@@ -1,6 +1,7 @@
 .container {
    height: 100%;
    width: 21rem;
+   flex-shrink: 0;
    background-color: var(--surface);
    border-radius: 1rem;
    display: flex;
@@ -26,6 +27,13 @@
    flex-grow: 1;
    flex-direction: column;
    height: 1rem;
+   overflow: scroll;
+   gap: 0.75rem;
+   scroll-snap-type: y mandatory;
+}
+
+.picklistList::-webkit-scrollbar {
+   display: none;
 }
 
 .selectionContent {
@@ -37,6 +45,7 @@
 }
 
 .picklistCard {
+   scroll-snap-align: start;
    width: 100%;
    border: 2px solid var(--text-background);
    border-radius: 1rem;
@@ -86,4 +95,15 @@
 
 .newPicklistButton:hover {
    color: var(--primary);
+}
+
+.loadBox {
+   height: 100%;
+   width: 100%;
+   border: 2px solid var(--text-background);
+   border-radius: 1rem;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   color: var(--text-secondary);
 }
