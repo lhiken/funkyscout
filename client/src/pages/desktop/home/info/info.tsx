@@ -71,11 +71,10 @@ function InfoTab() {
                ? `EPAs updated ${formatTime(teamDataProgress.fetchTime)}`
                : `Updating... ${teamDataProgress.fetched}/${teamDataProgress.total}`,
          );
-         console.log();
       }, 100);
 
       return () => clearInterval(updateInterval);
-   }, [teamDataProgress.fetchTime]);
+   }, [teamDataProgress]);
 
    return (
       <div className={styles.container}>

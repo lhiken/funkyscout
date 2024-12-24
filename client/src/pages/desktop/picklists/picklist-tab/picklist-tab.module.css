@@ -107,3 +107,13 @@
    align-items: center;
    color: var(--text-secondary);
 }
+
+.editNameButton {
+   color: var(--text-background);
+   cursor: pointer;
+   transition: 0.2s;
+}
+
+.editNameButton:hover {
+   color: var(--text-primary);
+}
