@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 import { applyInviteCode } from "../../../lib/supabase/auth";
 import { useState } from "react";
 import Tippy from "@tippyjs/react";
-import styles from "./styles.module.css"
+import styles from "./styles.module.css";
 
 function InvitationCard() {
    const [inviteCode, setInviteCode] = useState("");
@@ -83,4 +83,4 @@ function InvitationCard() {
    );
 }
 
-export default InvitationCard
+export default InvitationCard;

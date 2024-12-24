@@ -48,10 +48,13 @@ function getFocusTeam() {
  * @param mode
  * @returns string such as "Qualification"
  */
-function parseMatchKey(key: string, mode: "nexus" | "short" | "long" | "number") {
+function parseMatchKey(
+   key: string,
+   mode: "nexus" | "short" | "long" | "number",
+) {
    let returnKey = "";
 
-   if (mode == "number") return key.substring(key.indexOf("_") + 2)
+   if (mode == "number") return key.substring(key.indexOf("_") + 2);
 
    if (mode == "long") returnKey += key.substring(0, key.indexOf("_")) + " ";
 

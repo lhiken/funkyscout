@@ -30,7 +30,10 @@ function EventInfo(
                onClick={() => setShowSettings(false)}
                style={{ fontSize: "1.1rem" }}
             >
-               <i className="fa-regular fa-circle-xmark" style={{cursor: "pointer"}}/>
+               <i
+                  className="fa-regular fa-circle-xmark"
+                  style={{ cursor: "pointer" }}
+               />
             </div>
          </div>
          {data && (

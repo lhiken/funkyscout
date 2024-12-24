@@ -14,7 +14,10 @@ function MatchCard({ match }: { match: NexusMatch }) {
                   ? {
                      background: "var(--primary)",
                   }
-                  : { background: "var(--text-background)", color: "var(--text-secondary)"}}
+                  : {
+                     background: "var(--text-background)",
+                     color: "var(--text-secondary)",
+                  }}
             >
                {match.status}
             </div>

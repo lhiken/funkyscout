@@ -52,4 +52,4 @@ async function getNexusEventStatus(event: string) {
 }
 
 export { getNexusEventStatus };
-export type { NexusAnnouncement, NexusEvent, NexusMatch, NexusPartRequest }
+export type { NexusAnnouncement, NexusEvent, NexusMatch, NexusPartRequest };

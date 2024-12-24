@@ -33,9 +33,7 @@ function AuthPage() {
                      onClick={toggleTheme}
                   >
                      <Tippy content="Switch theme">
-                        <i
-                           className="fa-solid fa-circle-half-stroke"
-                        >
+                        <i className="fa-solid fa-circle-half-stroke">
                         </i>
                      </Tippy>
                   </button>

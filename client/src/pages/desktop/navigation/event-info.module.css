@@ -32,25 +32,27 @@
    border-radius: 10rem;
 }
 
-
 .eventSkeleton {
    height: 4.5rem;
    width: 100%;
-   background: linear-gradient(90deg, var(--surface) 5%, var(--text-background) 18%, var(--surface) 25%);
+   background: linear-gradient(
+      90deg,
+      var(--surface) 5%,
+      var(--text-background) 18%,
+      var(--surface) 25%
+   );
    border-radius: 1rem;
    background-size: 200% 100%;
    animation: 1.75s shine linear infinite;
    cursor: wait;
 }
 
-
 @keyframes shine {
    to {
-     background-position-x: -200%;
+      background-position-x: -200%;
    }
- }
- 
- 
+}
+
 .eventChangeButton {
    padding: 1rem;
    border-radius: 1rem;

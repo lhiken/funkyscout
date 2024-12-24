@@ -7,7 +7,9 @@ function Checkbox({
 }: { enabled: boolean; setEnabled?: Dispatch<boolean> }) {
    return (
       <div
-         className={`${styles.checkbox} ${enabled ? styles.active : styles.inactive}`}
+         className={`${styles.checkbox} ${
+            enabled ? styles.active : styles.inactive
+         }`}
          onClick={() => setEnabled && setEnabled(!enabled)}
       />
    );

@@ -19,7 +19,7 @@
 
    border-radius: 0.9375rem;
    border: 2px solid var(--surface, #131313);
-   background: var(--inset, #0D0D0D);
+   background: var(--inset, #0d0d0d);
    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.05);
 }
 
@@ -70,7 +70,7 @@
 
    border-radius: 0.9375rem;
    border: 2px solid var(--surface, #131313);
-   background: var(--inset, #0D0D0D);
+   background: var(--inset, #0d0d0d);
    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.05);
 }
 
@@ -91,7 +91,7 @@
    direction: rtl;
 }
 
-.eventScrollContainer>* {
+.eventScrollContainer > * {
    direction: ltr;
    /* Reset the text/content direction to left-to-right */
 }
@@ -177,7 +177,12 @@
    height: 4.5rem;
    width: 100%;
    background: var(--surface);
-   background: linear-gradient(90deg, var(--surface) 5%, var(--text-background) 18%, var(--surface) 25%);
+   background: linear-gradient(
+      90deg,
+      var(--surface) 5%,
+      var(--text-background) 18%,
+      var(--surface) 25%
+   );
    border-radius: 1rem;
    background-size: 200% 100%;
    animation: 1.75s shine linear infinite;
@@ -186,7 +191,6 @@
 
 @keyframes shine {
    to {
-     background-position-x: -200%;
+      background-position-x: -200%;
    }
- }
- 
+}

@@ -12,7 +12,6 @@ import {
    TeamFetchedDataContext,
 } from "./picklists-context";
 import PicklistTab from "./picklist-tab/picklist-tab";
-import { Picklist } from "../../../schemas/schema";
 import ComparisonTab from "./comparison-box/comparison";
 
 export interface PicklistData {
@@ -48,9 +47,11 @@ function PicklistPage() {
       },
    });
 
-   const [comparedTeamKeys, setComparedTeamKeys] = useState<string[]>([])
+   const [comparedTeamKeys, setComparedTeamKeys] = useState<string[]>([]);
 
-   const [targetPicklist, setTargetPicklist] = useState<Picklist | undefined>();
+   const [targetPicklist, setTargetPicklist] = useState<
+      Tables<"event_picklist"> | undefined
+   >();
 
    const results = useQueries({
       queries: [
@@ -109,14 +110,18 @@ function PicklistPage() {
                setVal: setFetchedTeamData,
             }}
          >
-            <TargetPicklistContext.Provider value={{
-               val: targetPicklist,
-               setVal: setTargetPicklist,
-            }}>
-               <ComparedTeamKeysContext.Provider value={{
-                  val: comparedTeamKeys,
-                  setVal: setComparedTeamKeys,
-               }}>
+            <TargetPicklistContext.Provider
+               value={{
+                  val: targetPicklist,
+                  setVal: setTargetPicklist,
+               }}
+            >
+               <ComparedTeamKeysContext.Provider
+                  value={{
+                     val: comparedTeamKeys,
+                     setVal: setComparedTeamKeys,
+                  }}
+               >
                   <div className={styles.container}>
                      <PicklistTab />
                      <ComparisonTab />

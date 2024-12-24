@@ -94,7 +94,10 @@ function MatchesTab() {
             )}
             {data &&
                matches.map((match, index) => (
-                  <MatchCard key={index} match={match} />
+                  <MatchCard
+                     key={index}
+                     match={match}
+                  />
                ))}
             {isPending &&
                Array.from({ length: 4 }, (_, index) => (
@@ -105,7 +108,7 @@ function MatchesTab() {
                         width: "21rem",
                         border: "2px solid var(--text-background)",
                         flexShrink: 0,
-                        marginRight: "1rem"
+                        marginRight: "1rem",
                      }}
                   />
                ))}

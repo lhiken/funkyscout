@@ -81,17 +81,17 @@
    min-width: 1.75rem;
    padding-right: 0.15rem;
    color: var(--primary);
-   font-family: 'Ubuntu Mono';
+   font-family: "Ubuntu Mono";
    font-size: 1.15rem;
    line-height: 1.3rem;
 }
 
 .cardName {
-   white-space: nowrap;      
-   overflow: hidden;          
-   text-overflow: ellipsis;  
-   width: 10rem;              
-   display: inline-block; 
+   white-space: nowrap;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   width: 10rem;
+   display: inline-block;
    color: var(--text-primary);
    font-size: 1rem;
 }
@@ -101,9 +101,10 @@
    width: 3rem;
    text-align: right;
    font-size: 0.9rem;
-   font-family: 'Ubuntu Mono';
+   font-family: "Ubuntu Mono";
    font-size: 1.15rem;
-   line-height: 1.3rem;}
+   line-height: 1.3rem;
+}
 
 .details {
    display: flex;

@@ -17,7 +17,9 @@ function DashboardHome() {
    // Can't be less than 120s
    const NEXUS_POLL_RATE_SECONDS = 120;
 
-   const [teamData, setTeamData] = useState<Record<string, StatboticsTeamEPAs>>(
+   const [teamData, setTeamData] = useState<
+      Record<string, StatboticsTeamEPAs>
+   >(
       {},
    );
    const [teamDataProgress, setTeamDataProgress] = useState<{
@@ -27,7 +29,12 @@ function DashboardHome() {
       fetchTime: number;
    }>({ fetched: 0, total: 0, errors: 0, fetchTime: -1 });
 
-   function setProgress(fetched: number, total: number, errors: number, fetchTime: number) {
+   function setProgress(
+      fetched: number,
+      total: number,
+      errors: number,
+      fetchTime: number,
+   ) {
       setTeamDataProgress({
          fetched: fetched,
          total: total,
@@ -38,16 +45,21 @@ function DashboardHome() {
 
    const { isError } = useQuery({
       queryKey: [`dashboardHomeFetchTeamEPAs/event${getEvent()}`, false],
-      queryFn: ({queryKey}) =>
-         fetchEventTeamEPAs(getEvent() || "", setProgress, queryKey[1] as boolean).then((res) => {
-            if (res) {
-               setTeamData(res);
-               return true;
-            } else {
-               return false; // Query is unsuccessful
-            }
-         }),
-      refetchInterval: NEXUS_POLL_RATE_SECONDS * 1000
+      queryFn: ({ queryKey }) =>
+         fetchEventTeamEPAs(
+            getEvent() || "",
+            setProgress,
+            queryKey[1] as boolean,
+         )
+            .then((res) => {
+               if (res) {
+                  setTeamData(res);
+                  return true;
+               } else {
+                  return false; // Query is unsuccessful
+               }
+            }),
+      refetchInterval: NEXUS_POLL_RATE_SECONDS * 1000,
    });
 
    useEffect(() => {

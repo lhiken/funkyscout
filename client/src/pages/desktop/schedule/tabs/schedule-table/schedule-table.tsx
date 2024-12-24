@@ -13,11 +13,15 @@ function ScheduleTable() {
 
    const queriedMatches = scheduleData?.val?.matchData
       ? (matchQuery
-         ? Object.entries(scheduleData.val.matchData).map(([match, data]) => ({
+         ? Object.entries(scheduleData.val.matchData).map((
+            [match, data],
+         ) => ({
             match,
             ...data,
          })).filter((match) => match.match == matchQuery)
-         : Object.entries(scheduleData.val.matchData).map(([match, data]) => ({
+         : Object.entries(scheduleData.val.matchData).map((
+            [match, data],
+         ) => ({
             match,
             ...data,
          }))).filter((match) => match.match.includes("qm")).sort((a, b) =>
@@ -121,15 +125,19 @@ function ScheduleTable() {
                   <div className={styles.matchContainer}>
                      {queriedMatches.map((match, index) => {
                         return (
-                           <MatchAssignmentCard key={index} matchData={match} />
+                           <MatchAssignmentCard
+                              key={index}
+                              matchData={match}
+                           />
                         );
                      })}
                   </div>
-                  {scheduleData?.val?.queryProgress.teamData.isLoading && (
-                     <div className={styles.loadBox}>
-                        Loading teams...
-                     </div>
-                  )}
+                  {scheduleData?.val?.queryProgress.teamData.isLoading &&
+                     (
+                        <div className={styles.loadBox}>
+                           Loading teams...
+                        </div>
+                     )}
                   {(scheduleData.val?.queryProgress.teamData.isError) && (
                      <div className={styles.loadBox}>
                         <i className="fa-regular fa-circle-xmark" />&nbsp;
@@ -137,8 +145,10 @@ function ScheduleTable() {
                      </div>
                   )}
                   {(!scheduleData.val?.queryProgress.teamData.isError &&
-                     !scheduleData?.val?.queryProgress.teamData.isLoading &&
-                     Object.keys(scheduleData.val?.matchData || {}).length ==
+                     !scheduleData?.val?.queryProgress.teamData
+                        .isLoading &&
+                     Object.keys(scheduleData.val?.matchData || {})
+                           .length ==
                         0) && (
                      <div className={styles.loadBox}>
                         <i className="fa-regular fa-circle-xmark" />&nbsp; No
@@ -165,14 +175,18 @@ function ScheduleTable() {
                               return (
                                  <div
                                     key={index}
-                                    className={styles.userHeaderCard}
+                                    className={styles
+                                       .userHeaderCard}
                                  >
                                     {scouter.name}
                                  </div>
                               );
                            })}
                         </div>
-                        <div className={styles.pageButton} onClick={handleNext}>
+                        <div
+                           className={styles.pageButton}
+                           onClick={handleNext}
+                        >
                            <i className="fa-solid fa-angle-right" />
                         </div>
                      </div>
@@ -186,24 +200,38 @@ function ScheduleTable() {
                   <div className={styles.scouterCalendar}>
                      <div className={styles.matchesInfo}>
                         <div>
-                           {Object.keys(scheduleData.val?.matchData || {})
+                           {Object.keys(
+                              scheduleData.val?.matchData || {},
+                           )
                               .filter((
                                  key,
                               ) => key.includes("qm")).sort((a, b) =>
-                                 Number(a.substring(a.indexOf("qm") + 2)) -
-                                 Number(b.substring(a.indexOf("qm") + 2))
+                                 Number(
+                                    a.substring(
+                                       a.indexOf("qm") + 2,
+                                    ),
+                                 ) -
+                                 Number(
+                                    b.substring(
+                                       a.indexOf("qm") + 2,
+                                    ),
+                                 )
                               ).map((key, index) => {
                                  return (
                                     <div
                                        key={index}
-                                       className={styles.matchDetailCard}
+                                       className={styles
+                                          .matchDetailCard}
                                     >
                                        <div
                                           style={{
                                              lineHeight: "2rem",
                                           }}
                                        >
-                                          {parseMatchKey(key, "short")
+                                          {parseMatchKey(
+                                             key,
+                                             "short",
+                                          )
                                              .substring(0, 5)}
                                        </div>
                                        <div
@@ -213,7 +241,10 @@ function ScheduleTable() {
                                              lineHeight: "2rem",
                                           }}
                                        >
-                                          {parseMatchKey(key, "short")
+                                          {parseMatchKey(
+                                             key,
+                                             "short",
+                                          )
                                              .substring(5)}
                                        </div>
                                     </div>
@@ -233,17 +264,28 @@ function ScheduleTable() {
                      </div>
                      <div className={styles.matchesInfo}>
                         <div>
-                           {Object.keys(scheduleData.val?.matchData || {})
+                           {Object.keys(
+                              scheduleData.val?.matchData || {},
+                           )
                               .filter((
                                  key,
                               ) => key.includes("qm")).sort((a, b) =>
-                                 Number(a.substring(a.indexOf("qm") + 2)) -
-                                 Number(b.substring(a.indexOf("qm") + 2))
+                                 Number(
+                                    a.substring(
+                                       a.indexOf("qm") + 2,
+                                    ),
+                                 ) -
+                                 Number(
+                                    b.substring(
+                                       a.indexOf("qm") + 2,
+                                    ),
+                                 )
                               ).map((key, index) => {
                                  return (
                                     <div
                                        key={index}
-                                       className={styles.matchDetailCard}
+                                       className={styles
+                                          .matchDetailCard}
                                        style={{
                                           display: "flex",
                                           justifyContent: "flex-end",
@@ -259,10 +301,16 @@ function ScheduleTable() {
                                           }}
                                        >
                                           {(new Date(
-                                             scheduleData.val?.matchData &&
-                                                   scheduleData.val
-                                                         ?.matchData[key]
-                                                         .est_time * 1000 || "",
+                                             scheduleData.val
+                                                      ?.matchData &&
+                                                   scheduleData
+                                                         .val
+                                                         ?.matchData[
+                                                            key
+                                                         ]
+                                                         .est_time *
+                                                      1000 ||
+                                                "",
                                           )).toLocaleTimeString(
                                              undefined,
                                              {

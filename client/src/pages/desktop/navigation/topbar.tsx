@@ -93,7 +93,9 @@ function Topbar() {
                   </div>
                   <AnimatePresence>
                      {showEventInfo && (
-                        <EventInfo setShowSettings={setShowEventInfo} />
+                        <EventInfo
+                           setShowSettings={setShowEventInfo}
+                        />
                      )}
                   </AnimatePresence>
                </div>

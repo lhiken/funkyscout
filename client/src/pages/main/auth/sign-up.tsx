@@ -19,7 +19,8 @@ function SignupPage() {
       if (username && email && direction == 1 && !passwordMode) {
          setPasswordMode(true);
       } else if (
-         password && passwordConfirmation && password == passwordConfirmation &&
+         password && passwordConfirmation &&
+         password == passwordConfirmation &&
          password.length >= 6 &&
          direction == 1
       ) {
@@ -27,7 +28,10 @@ function SignupPage() {
          signupWithPassword(email, password, username).then((res) => {
             if (res) {
                setShowVerification(true);
-               throwNotification("success", "Successfully created account!");
+               throwNotification(
+                  "success",
+                  "Successfully created account!",
+               );
             } else {
                throwNotification(
                   "error",
@@ -60,7 +64,9 @@ function SignupPage() {
                         value={email}
                         onChange={(input) => setEmail(input.target.value)}
                         onKeyDown={(e) => {
-                           if (e.key === "Enter") e.currentTarget.blur();
+                           if (e.key === "Enter") {
+                              e.currentTarget.blur();
+                           }
                         }}
                         className={styles.input}
                         placeholder="Email"
@@ -72,7 +78,9 @@ function SignupPage() {
                         value={username}
                         onChange={(input) => setUsername(input.target.value)}
                         onKeyDown={(e) => {
-                           if (e.key === "Enter") e.currentTarget.blur();
+                           if (e.key === "Enter") {
+                              e.currentTarget.blur();
+                           }
                         }}
                         className={styles.input}
                         placeholder="Name"
@@ -92,7 +100,10 @@ function SignupPage() {
                            placeholder="Password (6+ chars)"
                            autoComplete="none"
                            onKeyDown={(e) => {
-                              if (e.key === "Enter") e.currentTarget.blur();
+                              if (e.key === "Enter") {
+                                 e.currentTarget
+                                    .blur();
+                              }
                            }}
                         />
                         <span
@@ -115,24 +126,32 @@ function SignupPage() {
                            type="password"
                            value={passwordConfirmation}
                            onChange={(input) =>
-                              setPasswordConfirmation(input.target.value)}
+                              setPasswordConfirmation(
+                                 input.target.value,
+                              )}
                            className={styles.input}
                            placeholder="Confirm Password"
                            autoComplete="none"
                            onKeyDown={(e) => {
-                              if (e.key === "Enter") e.currentTarget.blur();
+                              if (e.key === "Enter") {
+                                 e.currentTarget
+                                    .blur();
+                              }
                            }}
                         />
                         <span
                            className={`${styles.icon} ${
-                              (password && passwordConfirmation == password)
+                              (password &&
+                                    passwordConfirmation ==
+                                       password)
                                  ? styles.correct
                                  : passwordConfirmation
                                  ? styles.incorrect
                                  : styles.inactive
                            }`}
                         >
-                           {(password && passwordConfirmation == password)
+                           {(password &&
+                                 passwordConfirmation == password)
                               ? <i className="fa-regular fa-circle-check" />
                               : <i className="fa-regular fa-circle-xmark" />}
                         </span>
@@ -153,7 +172,8 @@ function SignupPage() {
                               borderRight: `1.5px solid ${
                                  passwordMode && password &&
                                     passwordConfirmation &&
-                                    password == passwordConfirmation &&
+                                    password ==
+                                       passwordConfirmation &&
                                     password.length >= 6
                                     ? "var(--inset)"
                                     : "var(--surface)"
@@ -167,9 +187,12 @@ function SignupPage() {
                            className={`${authStyles.modeButton} ${authStyles.signupButton} ${
                               authStyles[
                                  (password && passwordConfirmation &&
-                                       password == passwordConfirmation &&
-                                       passwordMode && password.length >= 6) ||
-                                    (username && email && !passwordMode)
+                                       password ==
+                                          passwordConfirmation &&
+                                       passwordMode &&
+                                       password.length >= 6) ||
+                                    (username && email &&
+                                       !passwordMode)
                                     ? "active"
                                     : "inactive"
                               ]
@@ -178,7 +201,8 @@ function SignupPage() {
                               borderLeft: `1.5px solid ${
                                  passwordMode && password &&
                                     passwordConfirmation &&
-                                    password == passwordConfirmation &&
+                                    password ==
+                                       passwordConfirmation &&
                                     password.length >= 6
                                     ? "var(--inset)"
                                     : "var(--surface)"

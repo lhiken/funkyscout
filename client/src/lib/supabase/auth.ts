@@ -214,6 +214,8 @@ async function changeName(name: string, userID: string) {
 }
 
 export {
+   applyInviteCode,
+   changeName,
    fetchSession,
    fetchUserDetails,
    getAuthStatus,
@@ -222,6 +224,4 @@ export {
    logout,
    signupWithPassword,
    storeLocalUserData,
-   applyInviteCode,
-   changeName
 };

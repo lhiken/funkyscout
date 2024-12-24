@@ -72,7 +72,9 @@ function TeamAssignmentCard({
                &nbsp;
                <div
                   className={`${styles.teamStarIcon} ${
-                     assignmentData.val?.priorityTeams.includes(teamData.key)
+                     assignmentData.val?.priorityTeams.includes(
+                           teamData.key,
+                        )
                         ? styles.active
                         : styles.inactive
                   }`}
@@ -97,9 +99,9 @@ function TeamAssignmentCard({
                      <div className={styles.dropdown}>
                         {assignmentData.val?.scouterList.find((val) =>
                            val.uid ==
-                              assignmentData.val?.teamData.find((val) =>
-                                 val.team == teamData.key
-                              )?.assigned
+                              assignmentData.val?.teamData.find((
+                                 val,
+                              ) => val.team == teamData.key)?.assigned
                         )?.name || "N/A"}
                      </div>
                   </motion.div>

@@ -85,7 +85,10 @@ function InfoTab() {
                Information
             </div>
             <div className={styles.updateTime}>
-               {updateStatus}&nbsp;<i className="fa-solid fa-arrows-rotate" style={{cursor: "pointer"}}/>
+               {updateStatus}&nbsp;<i
+                  className="fa-solid fa-arrows-rotate"
+                  style={{ cursor: "pointer" }}
+               />
             </div>
          </div>
          <div className={styles.content}>
@@ -152,14 +155,20 @@ function InfoTab() {
                      </div>
                   </div>
                   <div className={styles.announcementContainer}>
-                     {eventStatus && eventStatus.announcements.length > 0 &&
+                     {eventStatus &&
+                        eventStatus.announcements.length > 0 &&
                         eventStatus.announcements.sort((a, b) =>
                            b.postedTime - a.postedTime
                         ).map((announcement, index) => (
-                           <div key={index} className={styles.announcement}>
+                           <div
+                              key={index}
+                              className={styles.announcement}
+                           >
                               <div
                                  className={styles.announcementTime}
-                                 style={{ color: "var(--text-secondary)" }}
+                                 style={{
+                                    color: "var(--text-secondary)",
+                                 }}
                               >
                                  {formatTime(
                                     announcement.postedTime,
@@ -173,7 +182,8 @@ function InfoTab() {
                            Loading announcements...
                         </div>
                      )}
-                     {((!eventStatus && !eventIsPending) || eventError) && (
+                     {((!eventStatus && !eventIsPending) ||
+                        eventError) && (
                         <div className={styles.announcementsInfoBox}>
                            Couldn't load announcements
                         </div>

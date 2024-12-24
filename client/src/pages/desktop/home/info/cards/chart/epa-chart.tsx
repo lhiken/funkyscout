@@ -27,7 +27,7 @@ function TeamEPAChart() {
    }
 
    const [teamEPAs, setTeamEPAs] = useState<TeamWithEPA[]>([]);
-   
+
    useEffect(() => {
       if (teamData.length > 0) {
          setTeamEPAs(
@@ -53,7 +53,12 @@ function TeamEPAChart() {
                         data={teamEPAs}
                         keys={["meanEPA"]}
                         indexBy="team"
-                        margin={{ top: 0, right: 0, bottom: 5, left: 22 }}
+                        margin={{
+                           top: 0,
+                           right: 0,
+                           bottom: 5,
+                           left: 22,
+                        }}
                         valueScale={{ type: "linear" }}
                         indexScale={{ type: "band", round: true }}
                         colors={(d) =>
@@ -89,24 +94,35 @@ function TeamEPAChart() {
                                     display: "flex",
                                  }}
                               >
-                                 <div style={{ color: "var(--primary)" }}>
+                                 <div
+                                    style={{
+                                       color: "var(--primary)",
+                                    }}
+                                 >
                                     {indexValue}
                                  </div>&nbsp;<div
-                                    style={{ color: "var(--text-background)" }}
+                                    style={{
+                                       color: "var(--text-background)",
+                                    }}
                                  >
                                     |
                                  </div>&nbsp;EPA {value.toFixed(1)}
                               </div>
-                              <div style={{ color: "var(--text-secondary)" }}>
+                              <div
+                                 style={{
+                                    color: "var(--text-secondary)",
+                                 }}
+                              >
                                  Rank {teamEPAs.length - index} by EPA
                               </div>
                            </div>
                         )}
                         enableGridX={true}
-                        gridXValues={teamEPAs.map(({ team }) => team).filter((
-                           _,
-                           index,
-                        ) => index % 3 === 0)}
+                        gridXValues={teamEPAs.map(({ team }) => team)
+                           .filter((
+                              _,
+                              index,
+                           ) => index % 3 === 0)}
                         enableLabel={false}
                         ariaLabel="Team EPAs"
                      />
@@ -121,7 +137,9 @@ function TeamEPAChart() {
                         <div
                            className={styles.chartSettingsText}
                            onClick={() =>
-                              setShowChartSettings(!showChartSettings)}
+                              setShowChartSettings(
+                                 !showChartSettings,
+                              )}
                         >
                            Chart Settings&nbsp;&nbsp;<i
                               className={`fa-solid fa-gear ${styles.chartSettingsGear}`}
@@ -136,11 +154,16 @@ function TeamEPAChart() {
                                  transition={{
                                     duration: 0.2,
                                  }}
-                                 className={styles.chartSettingsDetails}
+                                 className={styles
+                                    .chartSettingsDetails}
                                  onClick={() =>
-                                    setFocusOnOwnTeam(!focusOnOwnTeam)}
+                                    setFocusOnOwnTeam(
+                                       !focusOnOwnTeam,
+                                    )}
                               >
-                                 <div className={styles.settingsEntry}>
+                                 <div
+                                    className={styles.settingsEntry}
+                                 >
                                     Set focus on {getFocusTeam()}
                                     <Checkbox
                                        enabled={focusOnOwnTeam}
@@ -153,7 +176,8 @@ function TeamEPAChart() {
                   </div>
                </>
             )
-            : (!(teamFetchProgress.errors == teamFetchProgress.fetched && teamFetchProgress.fetched > 4)
+            : (!(teamFetchProgress.errors == teamFetchProgress.fetched &&
+                  teamFetchProgress.fetched > 4)
                ? (
                   <motion.div
                      initial={{ opacity: 0 }}

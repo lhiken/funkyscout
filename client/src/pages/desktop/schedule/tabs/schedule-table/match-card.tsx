@@ -89,7 +89,8 @@ function Team({ team, matchKey }: {
       <div className={styles.teamCardWrapper}>
          <div
             className={`${styles.teamCard} ${
-               assignedData.val?.priorityTeams.includes(team) && styles.priority
+               assignedData.val?.priorityTeams.includes(team) &&
+               styles.priority
             } ${
                assignedData.val?.matchData.filter((val) =>
                   val.match == matchKey
@@ -116,9 +117,11 @@ function Team({ team, matchKey }: {
                      Assigned to: {scheduleData.val?.userData
                         ? scheduleData.val.userData.find((val) =>
                            val.uid ==
-                              assignedData.val?.matchData.filter((val) =>
-                                 val.match == matchKey
-                              ).find((val) => val.team == team)?.uid
+                              assignedData.val?.matchData.filter((
+                                 val,
+                              ) => val.match == matchKey).find((
+                                 val,
+                              ) => val.team == team)?.uid
                         )?.name || "N/A"
                         : "N/A"}
                   </motion.div>

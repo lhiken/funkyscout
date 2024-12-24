@@ -92,7 +92,10 @@ function TeamList() {
             setAssignedData({
                ...assignedData,
                priorityTeams: [
-                  ...new Set([...assignedData.priorityTeams, ...priorityList]),
+                  ...new Set([
+                     ...assignedData.priorityTeams,
+                     ...priorityList,
+                  ]),
                ],
             });
          } else {

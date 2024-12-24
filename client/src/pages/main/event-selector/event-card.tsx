@@ -15,7 +15,7 @@ function EventCard({
       return `${Number(month)}/${Number(day)}`;
    }
 
-   function handleCardClick () {
+   function handleCardClick() {
       setTimeout(() => {
          handleEventChange(event);
          if (isMobile()) {
@@ -23,7 +23,7 @@ function EventCard({
          } else {
             navigate("/dashboard");
          }
-      }, 200)
+      }, 200);
    }
 
    return (
@@ -32,7 +32,9 @@ function EventCard({
             <div>
                {alias.length > 20 ? alias.slice(0, 20) + "..." : alias}
             </div>
-            <div style={{ color: "var(--text-secondary)", fontWeight: 400 }}>
+            <div
+               style={{ color: "var(--text-secondary)", fontWeight: 400 }}
+            >
                {convertDate(date)}
             </div>
          </div>

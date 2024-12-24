@@ -43,7 +43,10 @@ function SetupPanel() {
          );
          const t1 = performance.now();
 
-         throwNotification("info", `Assigned shifts in ${Math.round((t1 - t0) * 10) / 10} ms`);
+         throwNotification(
+            "info",
+            `Assigned shifts in ${Math.round((t1 - t0) * 10) / 10} ms`,
+         );
 
          assignmentData.setVal((prev) => ({
             ...prev,
@@ -137,7 +140,10 @@ function SetupPanel() {
          </div>
          <div className={styles.scoutersBox}>
             <div className={styles.header}>
-               Scouter List
+               Scouter List{" "}
+               <div style={{ color: "var(--text-secondary)" }}>
+                  {assignmentData.val?.scouterList.length}
+               </div>
             </div>
             <RoundInput
                value={userQuery}
@@ -171,9 +177,7 @@ function SetupPanel() {
       </div>
    );
 
-   const [targetConsecShifts, setTargetConsecShifts] = useState("4");
    const [maxConsecShifts, setMaxConsecShifts] = useState("6");
-   const [minConsecShifts, setMinConsecShifts] = useState("3");
    const [breakLength, setBreakLength] = useState("4");
 
    const optionsPage = (
@@ -184,7 +188,7 @@ function SetupPanel() {
             </div>
             <div className={styles.seperator} />
             <div className={styles.option}>
-               Max. consec. shifts
+               Max shift length
                <input
                   className={styles.input}
                   type="text"
@@ -198,35 +202,7 @@ function SetupPanel() {
                />
             </div>
             <div className={styles.option}>
-               Min. consec. shifts
-               <input
-                  className={styles.input}
-                  type="text"
-                  value={minConsecShifts}
-                  onChange={(val) => setMinConsecShifts(val.target.value)}
-                  onKeyDown={(e) => {
-                     if (e.key === "Enter") e.currentTarget.blur();
-                  }}
-                  placeholder={"~"}
-                  maxLength={2}
-               />
-            </div>
-            <div className={styles.option}>
-               Target shifts
-               <input
-                  className={styles.input}
-                  type="text"
-                  value={targetConsecShifts}
-                  onChange={(val) => setTargetConsecShifts(val.target.value)}
-                  onKeyDown={(e) => {
-                     if (e.key === "Enter") e.currentTarget.blur();
-                  }}
-                  placeholder={"~"}
-                  maxLength={2}
-               />
-            </div>
-            <div className={styles.option}>
-               break length
+               Min break length
                <input
                   className={styles.input}
                   type="text"
@@ -260,7 +236,9 @@ function SetupPanel() {
          </div>
          <div className={styles.scoutersBox}>
             <div className={styles.header}>
-               Scouter List
+               Scouter List<div style={{ color: "var(--text-secondary)" }}>
+                  {assignmentData.val?.scouterList.length}
+               </div>
             </div>
             <div className={styles.seperator} />
             <div className={styles.scouterList}>

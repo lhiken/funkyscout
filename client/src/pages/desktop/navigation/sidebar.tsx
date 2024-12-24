@@ -14,7 +14,10 @@ function Sidebar() {
          if (res) {
             throwNotification("success", "Logged out!", 1500);
          } else {
-            throwNotification("error", "An error occurred while logging out.");
+            throwNotification(
+               "error",
+               "An error occurred while logging out.",
+            );
          }
          navigate("~/auth");
       });
@@ -101,7 +104,10 @@ function Sidebar() {
                </div>
             </div>
             <div className={styles.sidebarSection}>
-               <div className={`${styles.sidebarButton}`} onClick={toggleTheme}>
+               <div
+                  className={`${styles.sidebarButton}`}
+                  onClick={toggleTheme}
+               >
                   <i className="fa-solid fa-moon" />
                </div>
                <div

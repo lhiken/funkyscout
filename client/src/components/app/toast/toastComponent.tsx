@@ -16,11 +16,18 @@ const Notification = (
                   initial={{ y: -20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: -20, opacity: 0 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                  transition={{
+                     type: "spring",
+                     stiffness: 400,
+                     damping: 20,
+                  }}
                   id={styles.notificationContainer}
                   className={type}
                >
-                  <div id={styles.notificationIcon} className={styles[type]}>
+                  <div
+                     id={styles.notificationIcon}
+                     className={styles[type]}
+                  >
                      {type == "success"
                         ? <i className="fa-regular fa-circle-check" />
                         : type == "error"
@@ -35,7 +42,10 @@ const Notification = (
                      id={styles.notificationSeperator}
                      className={styles[type]}
                   />
-                  <div id={styles.notificationMessage} className={styles[type]}>
+                  <div
+                     id={styles.notificationMessage}
+                     className={styles[type]}
+                  >
                      {message}
                   </div>
                </motion.div>

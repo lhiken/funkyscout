@@ -13,7 +13,11 @@ function InfoCard({
    icon: JSX.Element;
 }) {
    return (
-      <div className={`${styles.teamCard} ${title == "Team Record" && styles.hide}`}>
+      <div
+         className={`${styles.teamCard} ${
+            title == "Team Record" && styles.hide
+         }`}
+      >
          <div className={styles.cardHeader}>
             {title}{" "}
             <div className={styles.icon}>

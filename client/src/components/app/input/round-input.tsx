@@ -20,7 +20,6 @@ function RoundInput({
    icon?: JSX.Element;
    iconActive?: boolean;
 }) {
-
    return (
       <div className={styles.inputWrapper}>
          <input

@@ -133,12 +133,16 @@ function SchedulePage() {
                      usersResult.data
                         ? usersResult.data.filter((val) =>
                            val.role == "scouter"
-                        ).map((val) => val.uid).includes(
+                        ).map((
+                           val,
+                        ) => val.uid).includes(
                            val.uid || "",
                         )
                         : ""
                   )
-                  .map((val) => [val.uid, { name: val.name!, uid: val.uid! }]),
+                  .map((
+                     val,
+                  ) => [val.uid, { name: val.name!, uid: val.uid! }]),
             ).values(),
          ),
       }));

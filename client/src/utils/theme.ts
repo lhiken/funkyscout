@@ -1,4 +1,4 @@
-type theme = "theme-dark" | "theme-light"
+type theme = "theme-dark" | "theme-light";
 
 const setTheme = (theme: theme) => {
    localStorage.setItem("current_theme", theme);
@@ -34,10 +34,10 @@ const toggleTheme = () => {
    const theme = localStorage.getItem("current_theme");
 
    if (theme == "theme-dark") {
-      setTheme("theme-light")
+      setTheme("theme-light");
    } else {
-      setTheme("theme-dark")
+      setTheme("theme-dark");
    }
-}
+};
 
-export { setTheme, updateTheme, toggleTheme };
+export { setTheme, toggleTheme, updateTheme };

@@ -2,7 +2,7 @@ import { changeName, getLocalUserData } from "../../../lib/supabase/auth";
 import { useState } from "react";
 import { motion } from "motion/react";
 import Tippy from "@tippyjs/react";
-import styles from "./styles.module.css"
+import styles from "./styles.module.css";
 
 function UsernameChangeCard() {
    const [name, setName] = useState("");
@@ -11,14 +11,14 @@ function UsernameChangeCard() {
 
    function handleNameChange() {
       if (name && !nameChangeStatus) {
-         setNameChangeStatus("changing")
+         setNameChangeStatus("changing");
          changeName(name, getLocalUserData().uid).then((res) => {
             if (res) {
                setNameChangeStatus("Changed name!");
             } else {
-               setNameChangeStatus("An error occured")
+               setNameChangeStatus("An error occured");
             }
-         })
+         });
       }
    }
 
@@ -81,7 +81,7 @@ function UsernameChangeCard() {
                   {nameChangeStatus}
                   <i className="fa-solid fa-xmark" />
                </motion.div>
-         )}
+            )}
       </div>
    );
 }

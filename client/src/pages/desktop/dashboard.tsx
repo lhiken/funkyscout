@@ -17,10 +17,18 @@ function Dashboard() {
                <div className={styles.dashboardContent}>
                   <Switch>
                      <Route path={"/"} component={DashboardHome} />
-                     <Route path={"/schedule"} component={SchedulePage} />
-                     <Route path={"/picklist"} component={PicklistPage} />
+                     <Route
+                        path={"/schedule"}
+                        component={SchedulePage}
+                     />
+                     <Route
+                        path={"/picklist"}
+                        component={PicklistPage}
+                     />
                      <Route>
-                        <ErrorPage style={{ margin: "0.75rem 0 1rem 0" }} />
+                        <ErrorPage
+                           style={{ margin: "0.75rem 0 1rem 0" }}
+                        />
                      </Route>
                   </Switch>
                </div>

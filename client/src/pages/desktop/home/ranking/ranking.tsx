@@ -10,7 +10,9 @@ import Skeleton from "../../../../components/app/skeleton/skeleton";
 type sortDirection = "highlow" | "lowhigh";
 
 function RankingTab() {
-   const [sortDirection, setSortDirection] = useState<sortDirection>("highlow");
+   const [sortDirection, setSortDirection] = useState<sortDirection>(
+      "highlow",
+   );
 
    const { isPending, error, data } = useQuery({
       queryKey: ["rankingTabFetchTeams"],
@@ -43,31 +45,37 @@ function RankingTab() {
             </button>
          </div>
          <div className={styles.seperator} />
-         {!error && <SimpleBar className={styles.cardContainer}>
-            {sortedTeams &&
-               sortedTeams.map((team, index) => (
-                  <RankingCard key={index} team={team} />
-               ))}
-            {isPending && (
-               <>
-                  <Skeleton
-                     style={{
-                        height: "4rem",
-                        borderRadius: "0",
-                        marginBottom: "1rem",
-                     }}
-                  />
-                  <Skeleton
-                     style={{
-                        height: "4rem",
-                        borderRadius: "0",
-                        marginBottom: "1rem",
-                     }}
-                  />
-               </>
-            )}
-         </SimpleBar> }
-         {error && <div className={styles.rankingError}>Couldn't load rankings</div>}
+         {!error && (
+            <SimpleBar className={styles.cardContainer}>
+               {sortedTeams &&
+                  sortedTeams.map((team, index) => (
+                     <RankingCard key={index} team={team} />
+                  ))}
+               {isPending && (
+                  <>
+                     <Skeleton
+                        style={{
+                           height: "4rem",
+                           borderRadius: "0",
+                           marginBottom: "1rem",
+                        }}
+                     />
+                     <Skeleton
+                        style={{
+                           height: "4rem",
+                           borderRadius: "0",
+                           marginBottom: "1rem",
+                        }}
+                     />
+                  </>
+               )}
+            </SimpleBar>
+         )}
+         {error && (
+            <div className={styles.rankingError}>
+               Couldn't load rankings
+            </div>
+         )}
       </div>
    );
 }

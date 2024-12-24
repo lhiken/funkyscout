@@ -73,7 +73,8 @@ function RankingCard({
                         <div className={styles.detailsRow}>
                            Quals W-T-L
                            <div>
-                              {team.record.wins}-{team.record.ties}-{team.record
+                              {team.record.wins}-{team.record
+                                 .ties}-{team.record
                                  .losses}
                            </div>
                         </div>

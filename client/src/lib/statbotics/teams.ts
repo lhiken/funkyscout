@@ -34,22 +34,22 @@ interface StatboticsTeamData {
 }
 
 interface StatboticsTeamEPAs {
-   team: string,
-   year: number,
-   name: string,
-   country: string,
-   state: string,
-   district: string | null,
-   offseason: boolean,
+   team: string;
+   year: number;
+   name: string;
+   country: string;
+   state: string;
+   district: string | null;
+   offseason: boolean;
    epa: {
       total_points: {
-         mean: number,
-         sd: number,
-      }
-      unitless: number,
-      norm: number,
-      conf: number[]
-   },
+         mean: number;
+         sd: number;
+      };
+      unitless: number;
+      norm: number;
+      conf: number[];
+   };
    record: {
       season: {
          wins: number;

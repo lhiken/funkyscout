@@ -8,8 +8,6 @@ import UsernameChangeCard from "../../../components/app/user-settings/username-c
 function UserSettings(
    { setShowSettings }: { setShowSettings: Dispatch<SetStateAction<boolean>> },
 ) {
-
-
    return (
       <motion.div
          initial={{ y: -20, opacity: 0 }}
@@ -24,10 +22,13 @@ function UserSettings(
                onClick={() => setShowSettings(false)}
                style={{ fontSize: "1.1rem" }}
             >
-               <i className="fa-regular fa-circle-xmark" style={{cursor: "pointer"}}/>
+               <i
+                  className="fa-regular fa-circle-xmark"
+                  style={{ cursor: "pointer" }}
+               />
             </div>
          </div>
-         <div style={{ color: "var(--text-secondary)", height: "0.5rem"}}>
+         <div style={{ color: "var(--text-secondary)", height: "0.5rem" }}>
             {getLocalUserData().email}
          </div>
          <div className={styles.seperator} />

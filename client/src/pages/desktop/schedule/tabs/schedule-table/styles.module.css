@@ -1,307 +1,307 @@
 .container {
-  height: 100%;
-  width: 1rem;
-  flex-grow: 1;
-  background-color: var(--surface);
-  border-radius: 1rem;
-  padding: 1.75rem;
-  padding-bottom: 0;
-  display: flex;
-  flex-direction: column;
+   height: 100%;
+   width: 1rem;
+   flex-grow: 1;
+   background-color: var(--surface);
+   border-radius: 1rem;
+   padding: 1.75rem;
+   padding-bottom: 0;
+   display: flex;
+   flex-direction: column;
 }
 
 .header {
-  color: var(--primary);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.25rem;
-  height: 1.25rem;
-  margin-bottom: 1rem;
+   color: var(--primary);
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   margin-bottom: 0.25rem;
+   height: 1.25rem;
+   margin-bottom: 1rem;
 }
 
 .matchContainer {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  overflow: scroll;
-  scroll-snap-type: y mandatory;
-  padding-bottom: 2.5rem;
+   display: flex;
+   flex-direction: column;
+   width: 100%;
+   overflow: scroll;
+   scroll-snap-type: y mandatory;
+   padding-bottom: 2.5rem;
 }
 
 .matchContainer::-webkit-scrollbar {
-  display: none;
+   display: none;
 }
 
 .seperator {
-  height: 0.15rem;
-  flex-shrink: 0;
-  width: 100%;
-  background-color: var(--text-background);
-  border-radius: 1rem;
-  margin-bottom: 0.25rem;
+   height: 0.15rem;
+   flex-shrink: 0;
+   width: 100%;
+   background-color: var(--text-background);
+   border-radius: 1rem;
+   margin-bottom: 0.25rem;
 }
 
 .matchCard {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  scroll-snap-align: start;
-  user-select: none;
+   width: 100%;
+   display: flex;
+   flex-direction: column;
+   scroll-snap-align: start;
+   user-select: none;
 }
 
 .matchInfo {
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  height: 2rem;
-  justify-content: space-between;
-  align-items: center;
+   width: 100%;
+   display: flex;
+   flex-direction: row;
+   height: 2rem;
+   justify-content: space-between;
+   align-items: center;
 }
 
 .matchTitle {
-  width: 5rem;
-  color: var(--primary);
-  display: flex;
-  flex-shrink: 0;
-  gap: 0.25rem;
+   width: 5rem;
+   color: var(--primary);
+   display: flex;
+   flex-shrink: 0;
+   gap: 0.25rem;
 }
 
 .matchTime {
-  font-family: 'Ubuntu Mono';
-  width: 5rem;
-  font-size: 1.1rem;
-  flex-shrink: 0;
-  text-align: right;
-  color: var(--text-secondary);
+   font-family: "Ubuntu Mono";
+   width: 5rem;
+   font-size: 1.1rem;
+   flex-shrink: 0;
+   text-align: right;
+   color: var(--text-secondary);
 }
 
 .matchTeams {
-  display: flex;
-  flex-direction: row;
-  flex-grow: 0.5;
-  gap: 2rem;
-  height: 100%;
+   display: flex;
+   flex-direction: row;
+   flex-grow: 0.5;
+   gap: 2rem;
+   height: 100%;
 }
 
 .redTeams {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  justify-content: space-between;
+   display: flex;
+   flex-direction: row;
+   width: 100%;
+   justify-content: space-between;
 }
 
 .blueTeams {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  justify-content: space-between;
+   display: flex;
+   flex-direction: row;
+   width: 100%;
+   justify-content: space-between;
 }
 
 .teamCard {
-  display: flex;
-  width: 4rem;
-  box-sizing: border-box;
-  text-align: center;
-  height: 2rem;
-  justify-content: center;
-  align-items: center;
-  transition: 0.3s;
-  border: 2px solid rgba(0, 0, 0, 0);
-  border-radius: 0.25rem;
+   display: flex;
+   width: 4rem;
+   box-sizing: border-box;
+   text-align: center;
+   height: 2rem;
+   justify-content: center;
+   align-items: center;
+   transition: 0.3s;
+   border: 2px solid rgba(0, 0, 0, 0);
+   border-radius: 0.25rem;
 }
 
 .teamCard.priority {
-  border: 2px solid var(--primary);
+   border: 2px solid var(--primary);
 }
 
 .titles {
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  gap: 3rem;
-  color: var(--text-secondary);
-  margin-bottom: 0.5rem;
+   display: flex;
+   width: 100%;
+   justify-content: space-between;
+   gap: 3rem;
+   color: var(--text-secondary);
+   margin-bottom: 0.5rem;
 }
 
 .loadBox {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 2px solid var(--text-background);
-  border-radius: 1rem;
-  margin-bottom: 1.75rem;
+   width: 100%;
+   height: 100%;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   border: 2px solid var(--text-background);
+   border-radius: 1rem;
+   margin-bottom: 1.75rem;
 }
 
 .scouted {
-  color: var(--primary-variant);
+   color: var(--primary-variant);
 }
 
 .teamCard:hover {
-  color: var(--primary-variant);
+   color: var(--primary-variant);
 }
 
 .teamTooltip {
-  position: absolute;
-  padding: 0.5rem 1rem;
-  border-radius: 1rem;
-  background-color: var(--inset);
-  border: 2px solid var(--text-background);
-  color: var(--text-secondary);
-  margin-top: 2rem;
-  z-index: 5;
-  width: max-content;
+   position: absolute;
+   padding: 0.5rem 1rem;
+   border-radius: 1rem;
+   background-color: var(--inset);
+   border: 2px solid var(--text-background);
+   color: var(--text-secondary);
+   margin-top: 2rem;
+   z-index: 5;
+   width: max-content;
 }
 
 .teamCardWrapper {
-  display: flex;
-  justify-content: center;
-  position: relative;
-  width: 100%;
+   display: flex;
+   justify-content: center;
+   position: relative;
+   width: 100%;
 }
 
 .scouterCalendar {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  justify-content: space-between;
-  align-items: flex-start;
-  overflow: scroll;
-  margin-top: 0.35rem;
-  user-select: none;
+   display: flex;
+   flex-direction: row;
+   width: 100%;
+   justify-content: space-between;
+   align-items: flex-start;
+   overflow: scroll;
+   margin-top: 0.35rem;
+   user-select: none;
 }
 
 .userSchedule {
-  display: flex;
-  flex-direction: column;
-  width: 5rem;
-  border: 2px dotted var(--inset);
+   display: flex;
+   flex-direction: column;
+   width: 5rem;
+   border: 2px dotted var(--inset);
 }
 
 .scouterCalendar::-webkit-scrollbar {
-  display: none;
+   display: none;
 }
 
 .userHeader {
-  color: var(--text-secondary);
-  height: 3rem;
-  width: 5rem;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  text-wrap: nowrap;
-  overflow: hidden;
+   color: var(--text-secondary);
+   height: 3rem;
+   width: 5rem;
+   align-items: center;
+   justify-content: center;
+   flex-shrink: 0;
+   text-wrap: nowrap;
+   overflow: hidden;
 }
 
 .matchUserCard {
-  height: 2rem;
-  color: var(--inset);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  flex-shrink: 0;
+   height: 2rem;
+   color: var(--inset);
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   width: 100%;
+   flex-shrink: 0;
 }
 
 .matchUserCard.enabled {
-  color: var(--text-primary);
-  border-left: 2px solid var(--primary);
-  border-right: 2px solid var(--primary);
+   color: var(--text-primary);
+   border-left: 2px solid var(--primary);
+   border-right: 2px solid var(--primary);
 }
 
 .matchUserCard.disabled {
-  width: 4rem;
-  border-radius: 0 !important;
-  border-left: 2px dotted var(--inset);
-  border-right: 2px dotted var(--inset);
-  margin: auto;
+   width: 4rem;
+   border-radius: 0 !important;
+   border-left: 2px dotted var(--inset);
+   border-right: 2px dotted var(--inset);
+   margin: auto;
 }
 
 .matchUserCard.end {
-  border-radius: 0 0 0.5rem 0.5rem;
-  border-bottom: 2px solid var(--primary);
+   border-radius: 0 0 0.5rem 0.5rem;
+   border-bottom: 2px solid var(--primary);
 }
 
 .matchUserCard.start {
-  border-radius: 0.5rem 0.5rem 0 0;
-  border-top: 2px solid var(--primary);
+   border-radius: 0.5rem 0.5rem 0 0;
+   border-top: 2px solid var(--primary);
 }
 
 .matchDetailCard {
-  height: 2rem;
-  flex-shrink: 0;
-  color: var(--primary);
-  width: 6rem;
-  display: flex;
-  gap: 0.25rem;
+   height: 2rem;
+   flex-shrink: 0;
+   color: var(--primary);
+   width: 6rem;
+   display: flex;
+   gap: 0.25rem;
 }
 
 .headerCards {
-  display: flex;
-  height: 1.75rem;
-  justify-content: space-between;
-  flex-shrink: 0;
-  flex-grow: 1;
-  color: var(--text-secondary);
+   display: flex;
+   height: 1.75rem;
+   justify-content: space-between;
+   flex-shrink: 0;
+   flex-grow: 1;
+   color: var(--text-secondary);
 }
 
 .headerTime {
-  width: 4rem;
-  flex-shrink: 0;
-  text-align: right;
+   width: 4rem;
+   flex-shrink: 0;
+   text-align: right;
 }
 
 .usersHeaderInfo {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  justify-content: space-between;
-  gap: 0.5rem;
+   display: flex;
+   flex-direction: row;
+   width: 100%;
+   justify-content: space-between;
+   gap: 0.5rem;
 }
 
 .matchHeaderInfo {
-  width: 4rem;
-  flex-shrink: 0;
+   width: 4rem;
+   flex-shrink: 0;
 }
 
 .scoutersInfo {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  justify-content: space-between;
+   display: flex;
+   flex-direction: row;
+   width: 100%;
+   justify-content: space-between;
 }
 
 .userHeaderCard {
-  width: 6rem;
+   width: 6rem;
 
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-align: center;
-  align-items: center;
+   white-space: nowrap;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   text-align: center;
+   align-items: center;
 }
 
 .pageButton {
-  width: 1rem;
-  color: var(--text-primary);
-  transition: color 0.2s;
-  cursor: pointer;
+   width: 1rem;
+   color: var(--text-primary);
+   transition: color 0.2s;
+   cursor: pointer;
 }
 
 .pageButton:hover {
-  color: var(--primary);
+   color: var(--primary);
 }
 
 .scouterHeaders {
-  display: flex;
-  width: 100%;
-  flex-direction: row;
-  justify-content: space-between;
+   display: flex;
+   width: 100%;
+   flex-direction: row;
+   justify-content: space-between;
 }
 
 .scheduleChangeButton {
-  user-select: none;
-  cursor: pointer;
+   user-select: none;
+   cursor: pointer;
 }

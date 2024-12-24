@@ -17,7 +17,7 @@ function ScouterScheduleCard({
       .sort(
          (a, b) =>
             Number(a.substring(a.indexOf("qm") + 2)) -
-            Number(b.substring(b.indexOf("qm") + 2))
+            Number(b.substring(b.indexOf("qm") + 2)),
       );
 
    return (
@@ -57,22 +57,22 @@ function MatchCard({
       m.match === match
    ).find((m) => m.uid === scouter.uid);
 
-   const isPrevBlank =
-      !prevMatch ||
+   const isPrevBlank = !prevMatch ||
       !assignmentData.val?.matchData.some(
-         (m) => m.match === prevMatch && m.uid === scouter.uid
+         (m) => m.match === prevMatch && m.uid === scouter.uid,
       );
-   const isNextBlank =
-      !nextMatch ||
+   const isNextBlank = !nextMatch ||
       !assignmentData.val?.matchData.some(
-         (m) => m.match === nextMatch && m.uid === scouter.uid
+         (m) => m.match === nextMatch && m.uid === scouter.uid,
       );
 
    return (
       <div
          className={`${styles.matchUserCard} ${
             matchEntry ? styles.enabled : styles.disabled
-         } ${isPrevBlank && matchEntry?.team ? styles.start : ""} ${isNextBlank && matchEntry?.team ? styles.end : ""}`}
+         } ${isPrevBlank && matchEntry?.team ? styles.start : ""} ${
+            isNextBlank && matchEntry?.team ? styles.end : ""
+         }`}
       >
          {matchEntry?.team.substring(3) ? matchEntry?.team.substring(3) : "N/A"}
       </div>
