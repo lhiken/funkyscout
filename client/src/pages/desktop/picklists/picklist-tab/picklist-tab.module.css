@@ -123,7 +123,6 @@
 .editTabContainer {
    display: flex;
    flex-direction: column;
-   gap: 1rem;
    flex-grow: 1;
    margin-bottom: 1.75rem;
 }
@@ -172,12 +171,12 @@
 .teamsContainer {
    display: flex;
    flex-direction: column;
-   gap: 0.5rem;
-   font-size: 0.935rem;
+   font-size: 1rem;
    flex-grow: 1;
    height: 1rem;
    overflow-y: scroll;
-   scroll-snap-type: y mandatory;
+   padding: 0;
+   margin-top: 1rem;
 }
 
 .teamsContainer::-webkit-scrollbar {
@@ -187,12 +186,16 @@
 .teamCardContainer {
    display: flex;
    flex-direction: column;
-   padding: 1.25rem 1rem;
+   padding: 1.25rem 1rem 1.15rem 1rem;
    justify-content: center;
    align-items: space-between;
+   gap: 0.6rem;
    border: 2px solid var(--text-background);
    border-radius: 1rem;
-   scroll-snap-align: start;
+   background-color: var(--surface);
+   margin-bottom: 0.75rem;
+   user-select: none;
+   transition: 0.2s;
 }
 
 .teamHeader {
@@ -202,6 +205,78 @@
 
 .teamDetailsMono {
    font-family: "Ubuntu Mono";
-   font-size: 1.1rem;
+   font-size: 1.15rem;
+   line-height: 1.25rem;
    color: var(--primary);
+}
+
+.teamSettingIcon {
+   color: var(--text-secondary);
+   font-size: 1.05rem;
+   cursor: pointer;
+   transition: 0.2s;
+}
+
+.teamSettingIcon:hover {
+   color: var(--primary);
+}
+
+.teamDetails {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+}
+
+.teamOptions {
+   display: flex;
+   flex-direction: row;
+   gap: 0.5rem;
+   flex-grow: 1;
+   margin-right: 1rem;
+   height: 1.2rem;
+   background-color: var(--surface);
+   border-radius: 10rem;
+}
+
+.teamDragIcon {
+   color: var(--text-secondary);
+   line-height: 1rem;
+   font-size: 1.3rem;
+   transform: translateY(0.05rem);
+   transition: 0.2s;
+   cursor: move;
+   cursor: grab;
+   cursor: -moz-grab;
+   cursor: -webkit-grab;
+}
+
+.teamDragIcon:hover {
+   color: var(--primary);
+}
+
+.teamDragIcon:active {
+   cursor: grabbing;
+   cursor: -moz-grabbing;
+   cursor: -webkit-grabbing;
+}
+
+.teamCards {
+   display: flex;
+   gap: 0.35rem;
+}
+
+.statCard {
+   display: flex;
+   font-size: 0.935rem;
+   background-color: var(--primary);
+   color: var(--text-background);
+   width: 2.75rem;
+   height: 100%;
+   align-items: center;
+   justify-content: center;
+   border-radius: 10rem;
+}
+
+.teamBanIcon:hover {
+   color: var(--error);
 }

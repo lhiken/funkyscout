@@ -11,9 +11,10 @@ import { getLocalUserData } from "../../../../lib/supabase/auth";
 import { getEvent, parseTeamKey } from "../../../../utils/logic/app";
 import { fetchTeamsByEvent } from "../../../../lib/supabase/data";
 import throwNotification from "../../../../components/app/toast/toast";
-import { motion } from "motion/react";
+import { AnimatePresence, motion, useDragControls } from "motion/react";
 import { Picklist } from "../../../../schemas/schema";
 import { GlobalTeamDataContext } from "../../../../app-global-ctx";
+import { Reorder } from "motion/react";
 
 function PicklistTab() {
    const targetPicklist = useContext(TargetPicklistContext);
@@ -127,8 +128,12 @@ function PicklistEditingTab() {
    const targetPicklist = useContext(TargetPicklistContext);
 
    const picklist: Picklist = targetPicklist.val
-      ? targetPicklist.val.picklist as Picklist
+      ? (targetPicklist.val.picklist as Picklist)
       : [];
+
+   const setPicklist = (newPicklist: Picklist) =>
+      targetPicklist.setVal && targetPicklist.val &&
+      targetPicklist.setVal({ ...targetPicklist.val, picklist: newPicklist });
 
    return (
       <div className={styles.editTabContainer}>
@@ -144,11 +149,19 @@ function PicklistEditingTab() {
                border: "2px solid var(--text-background)",
             }}
          />
-         <div className={styles.teamsContainer}>
-            {picklist.map((val, index) => {
-               return <PicklistTeamCard key={index} team={val} />;
-            })}
-         </div>
+         <Reorder.Group
+            axis="y"
+            values={picklist}
+            onReorder={setPicklist}
+            layoutScroll
+            style={{ overflowY: "scroll" }}
+            className={styles.teamsContainer}
+            as="div"
+         >
+            {picklist.map((val) => (
+               <PicklistTeamCard key={val.teamKey} team={val} />
+            ))}
+         </Reorder.Group>
          <div className={styles.actionButtons}>
             <div className={styles.squareButton}>
                <i className="fa-solid fa-arrow-left" />
@@ -174,8 +187,28 @@ function PicklistEditingTab() {
 function PicklistTeamCard(
    { team }: { team: { teamKey: string; comment?: string; excluded: boolean } },
 ) {
-   const teamEPAData = useContext(GlobalTeamDataContext).EPAdata[team.teamKey];
+   /* Team stat cards calculations go here;
+    * For each stat, we need the actual value + a percentage (it could be
+    * percentile or % of max, whichever is more useful)
+    */
 
+   //Team EPA stat card
+   const teamEPAData = useContext(GlobalTeamDataContext).EPAdata[team.teamKey];
+   const teamEPA = teamEPAData.epa.total_points.mean;
+   const teamEPAPercentage = teamEPA /
+      Math.max(
+         ...Object.values(useContext(GlobalTeamDataContext).EPAdata).map(
+            (data) => data.epa.total_points.mean,
+         ),
+      );
+
+   //Team rank stat card
+   const teamTBAData = useContext(GlobalTeamDataContext).TBAdata.find((val) =>
+      val.key == team.teamKey
+   );
+   const teamRank = teamTBAData ? teamTBAData.rank : 0;
+   const teamRankPercentage = 1 -
+      ((teamRank - 1) / (useContext(GlobalTeamDataContext).TBAdata.length));
    const targetPicklist = useContext(TargetPicklistContext);
 
    const picklist: Picklist = targetPicklist.val
@@ -184,45 +217,149 @@ function PicklistTeamCard(
 
    const rank = picklist.findIndex((val) => val.teamKey == team.teamKey) + 1;
 
+   const controls = useDragControls();
+
+   const [showAllSettings, setShowAllSettings] = useState(false);
+
    return (
-      <div className={styles.teamCardContainer}>
-         <div className={styles.teamHeader}>
-            <div style={{ display: "flex" }}>
-               <div className={styles.teamDetailsMono}>{rank}</div>&nbsp;
-               <div
-                  style={{ color: "var(--text-secondary)" }}
-               >
-                  |
-               </div>&nbsp;
-               <div
-                  style={{
-                     whiteSpace: "nowrap",
-                     overflow: "hidden",
-                     textOverflow: "ellipsis",
-                     width: "10rem",
-                  }}
-                  title={teamEPAData?.name}
-               >
-                  {teamEPAData?.name}
+      <Reorder.Item
+         key={team.teamKey}
+         value={team}
+         dragListener={false}
+         dragControls={controls}
+         as="div"
+      >
+         <div
+            className={styles.teamCardContainer}
+            style={{
+               opacity: (team.excluded ? 0.25 : 1),
+            }}
+         >
+            <div className={styles.teamHeader}>
+               <div style={{ display: "flex" }}>
+                  <div className={styles.teamDetailsMono}>{rank}</div>&nbsp;
+                  <div
+                     style={{ color: "var(--text-secondary)" }}
+                  >
+                     |
+                  </div>&nbsp;
+                  <div
+                     style={{
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        width: "10rem",
+                     }}
+                     title={teamEPAData?.name}
+                  >
+                     {teamEPAData?.name}
+                  </div>
+               </div>
+               <div className={styles.teamDetailsMono}>
+                  {parseTeamKey(team.teamKey)}
                </div>
             </div>
-            <div className={styles.teamDetailsMono}>
-               {parseTeamKey(team.teamKey)}
+            <div className={styles.teamDetails}>
+               <div
+                  className={styles.teamOptions}
+                  onMouseEnter={() => setShowAllSettings(true)}
+                  onMouseLeave={() => setShowAllSettings(false)}
+               >
+                  <i
+                     className={`fa-solid fa-grip-vertical ${styles.teamDragIcon}`}
+                     onPointerDown={(e) => controls.start(e)}
+                  />
+                  <Tippy content="Compare" placement="bottom">
+                     <i
+                        className={`fa-solid fa-scale-unbalanced-flip ${styles.teamSettingIcon}`}
+                     />
+                  </Tippy>
+                  <AnimatePresence>
+                     {showAllSettings &&
+                        (
+                           <motion.div
+                              initial={{ x: -20, opacity: 0 }}
+                              animate={{ x: 0, opacity: 1 }}
+                              exit={{ x: -20, opacity: 0 }}
+                              transition={{
+                                 duration: 0.1,
+                              }}
+                              className={styles.teamOptions}
+                           >
+                              <Tippy content="Move up" placement="bottom">
+                                 <i
+                                    className={`fa-solid fa-arrow-up ${styles.teamSettingIcon}`}
+                                 />
+                              </Tippy>
+                              <Tippy content="Move down" placement="bottom">
+                                 <i
+                                    className={`fa-solid fa-arrow-down ${styles.teamSettingIcon}`}
+                                 />
+                              </Tippy>
+                              <Tippy content="Exclude" placement="bottom">
+                                 <i
+                                    className={`fa-solid fa-ban ${styles.teamBanIcon} ${styles.teamSettingIcon}`}
+                                 />
+                              </Tippy>
+                           </motion.div>
+                        )}
+                  </AnimatePresence>
+               </div>
+               <div className={styles.teamCards}>
+                  <PicklistStatCard
+                     value={"#" + Math.round(teamRank)}
+                     percentage={teamRankPercentage}
+                     width={2.75}
+                     comment={"Rank"}
+                     display
+                  />
+                  <PicklistStatCard
+                     value={teamEPA.toFixed(1)}
+                     percentage={teamEPAPercentage}
+                     width={2.75}
+                     comment={"EPA"}
+                     display
+                  />
+               </div>
             </div>
          </div>
-         <div className={styles.teamDetails}>
-            <div className={styles.teamOptions}>
-            </div>
-            <div className={styles.teamCards}>
-            </div>
+      </Reorder.Item>
+   );
+}
+
+function PicklistStatCard(
+   { value, percentage, comment, width, display }: {
+      value: string | number;
+      percentage: number;
+      comment: string;
+      width?: number;
+      display: boolean;
+   },
+) {
+   if (!display) return;
+
+   return (
+      <Tippy
+         content={`${comment} | ${(percentage * 100).toFixed()}% of best`}
+         placement="bottom"
+      >
+         <div
+            className={styles.statCard}
+            style={{
+               width: width ? width + "rem" : "unset",
+               opacity: 0.9 * percentage + 0.1,
+            }}
+         >
+            {value}
          </div>
-      </div>
+      </Tippy>
    );
 }
 
 function PicklistSelectionTab() {
    const [picklistQuery, setPicklistQuery] = useState("");
    const picklistData = useContext(PicklistDataContext);
+   const teamData = useContext(GlobalTeamDataContext).TBAdata;
 
    function handleNewPicklist() {
       throwNotification("info", "Creating new picklist...");
@@ -234,7 +371,10 @@ function PicklistSelectionTab() {
          const newPicklist: Tables<"event_picklist"> = {
             event: getEvent() || "",
             id: btoa(getLocalUserData().uid + Date.now()),
-            picklist: res!.map((val) => ({
+            picklist: res!.sort((a, b) =>
+               (teamData.find((val) => val.key == a.team)?.rank ||
+                  0) - (teamData.find((val) => val.key == b.team)?.rank || 0)
+            ).map((val) => ({
                teamKey: val.team,
                excluded: false,
             })),
