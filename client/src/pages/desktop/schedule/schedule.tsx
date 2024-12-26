@@ -146,9 +146,6 @@ function SchedulePage() {
             ).values(),
          ),
       }));
-
-      console.log(assignmentData);
-
       // This is valid as it only updates when data changes.
       // We could do it some other way but oh well!
       // eslint-disable-next-line react-hooks/exhaustive-deps

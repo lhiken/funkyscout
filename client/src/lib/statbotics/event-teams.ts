@@ -17,7 +17,6 @@ async function fetchEventTeamEPAs(
    force?: boolean,
 ): Promise<Record<string, StatboticsTeamEPAs>> {
    console.log("Fetch team EPAs: Started");
-   console.log(event);
 
    const data = localStorage.getItem("statboticsTeamData");
    const fetchEvent = localStorage.getItem("statboticsTeamDataFetchEvent");

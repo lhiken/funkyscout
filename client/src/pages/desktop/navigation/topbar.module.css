@@ -90,3 +90,26 @@
    position: relative;
    display: inline-block;
 }
+
+.topbarRight {
+   display: flex;
+   flex-direction: row;
+   gap: 0.5rem;
+}
+
+.refreshButton {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   height: 100%;
+   aspect-ratio: 1;
+   border: 2px solid var(--surface);
+   border-radius: 1rem;
+   user-select: none;
+   cursor: pointer;
+   transition: 0.2s;
+}
+
+.refreshButton:hover {
+   color: var(--primary);
+}

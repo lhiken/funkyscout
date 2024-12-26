@@ -8,7 +8,7 @@ import RoundInput from "../../../../components/app/input/round-input";
 import { Tables } from "../../../../lib/supabase/database.types";
 import Tippy from "@tippyjs/react";
 import { getLocalUserData } from "../../../../lib/supabase/auth";
-import { getEvent } from "../../../../utils/logic/app";
+import { getEvent, parseTeamKey } from "../../../../utils/logic/app";
 import { fetchTeamsByEvent } from "../../../../lib/supabase/data";
 import throwNotification from "../../../../components/app/toast/toast";
 import { motion } from "motion/react";
@@ -72,6 +72,7 @@ function PicklistTab() {
                            style={{
                               position: "relative",
                               display: "inline-block",
+                              height: "1.25rem",
                            }}
                         >
                            <input
@@ -97,7 +98,7 @@ function PicklistTab() {
                            <div
                               style={{
                                  position: "absolute",
-                                 bottom: "0",
+                                 bottom: "-2px",
                                  border: "1px dashed var(--text-secondary)",
                                  width: `${inputWidth}px`,
                                  maxWidth: "14rem",
@@ -173,14 +174,48 @@ function PicklistEditingTab() {
 function PicklistTeamCard(
    { team }: { team: { teamKey: string; comment?: string; excluded: boolean } },
 ) {
-   const teamTBAData = useContext(GlobalTeamDataContext).TBAdata.find((val) =>
-      val.key == team.teamKey
-   );
+   const teamEPAData = useContext(GlobalTeamDataContext).EPAdata[team.teamKey];
+
+   const targetPicklist = useContext(TargetPicklistContext);
+
+   const picklist: Picklist = targetPicklist.val
+      ? targetPicklist.val.picklist as Picklist
+      : [];
+
+   const rank = picklist.findIndex((val) => val.teamKey == team.teamKey) + 1;
 
    return (
       <div className={styles.teamCardContainer}>
-         {teamTBAData?.team}
-         {teamTBAData?.name}
+         <div className={styles.teamHeader}>
+            <div style={{ display: "flex" }}>
+               <div className={styles.teamDetailsMono}>{rank}</div>&nbsp;
+               <div
+                  style={{ color: "var(--text-secondary)" }}
+               >
+                  |
+               </div>&nbsp;
+               <div
+                  style={{
+                     whiteSpace: "nowrap",
+                     overflow: "hidden",
+                     textOverflow: "ellipsis",
+                     width: "10rem",
+                  }}
+                  title={teamEPAData?.name}
+               >
+                  {teamEPAData?.name}
+               </div>
+            </div>
+            <div className={styles.teamDetailsMono}>
+               {parseTeamKey(team.teamKey)}
+            </div>
+         </div>
+         <div className={styles.teamDetails}>
+            <div className={styles.teamOptions}>
+            </div>
+            <div className={styles.teamCards}>
+            </div>
+         </div>
       </div>
    );
 }

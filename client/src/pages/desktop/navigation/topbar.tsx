@@ -2,10 +2,11 @@ import { useLocation, useRoute } from "wouter";
 import { getLocalUserData } from "../../../lib/supabase/auth";
 import styles from "./topbar.module.css";
 import throwNotification from "../../../components/app/toast/toast";
-import { useState } from "react";
+import { useContext, useRef, useState } from "react";
 import UserSettings from "./user-settings";
 import { AnimatePresence } from "motion/react";
 import EventInfo from "./event-info";
+import { GlobalTeamDataContext } from "../../../app-global-ctx";
 
 function Path({ path }: { path: string }) {
    const [location, navigate] = useLocation();
@@ -68,6 +69,27 @@ function Topbar() {
    const [showSettings, setShowSettings] = useState(false);
    const [showEventInfo, setShowEventInfo] = useState(false);
 
+   const refetch = useContext(GlobalTeamDataContext).refetch;
+
+   const refetchTime = useRef<number>(Date.now() - 30000);
+
+   function handleRefresh() {
+      const currentTime = Date.now();
+      const elapsedTime = (currentTime - refetchTime.current) / 1000;
+
+      if (elapsedTime >= 30) {
+         refetchTime.current = currentTime;
+         refetch();
+         throwNotification("info", "Refreshing data");
+      } else {
+         const waitTime = Math.ceil(30 - elapsedTime);
+         throwNotification(
+            "info",
+            `Please wait ${waitTime}s to avoid spamming the servers :(`,
+         );
+      }
+   }
+
    return (
       <>
          <div className={styles.topbar}>
@@ -102,29 +124,34 @@ function Topbar() {
                <div style={{ color: "var(--text-background)" }}>/</div>
                {path == "/" ? <Path path={"/home"} /> : <Path path={path} />}
             </div>
-            <div
-               className={`${styles.user} noselect`}
-               onClick={() => setShowSettings(!showSettings)}
-            >
-               <div>
-                  <i
-                     className={`fa-solid fa-bars ${styles.icon}`}
-                     style={{ fontSize: "0.9rem" }}
-                  />
+            <div className={styles.topbarRight}>
+               <div className={styles.refreshButton} onClick={handleRefresh}>
+                  <i className="fa-solid fa-arrows-rotate" />
                </div>
-               <div>{user.name}</div>
                <div
-                  className={styles.userBreadcrumb}
+                  className={`${styles.user} noselect`}
+                  onClick={() => setShowSettings(!showSettings)}
                >
-                  {user.role.charAt(0).toUpperCase() +
-                     user.role.substring(1)}
+                  <div>
+                     <i
+                        className={`fa-solid fa-bars ${styles.icon}`}
+                        style={{ fontSize: "0.9rem" }}
+                     />
+                  </div>
+                  <div>{user.name}</div>
+                  <div
+                     className={styles.userBreadcrumb}
+                  >
+                     {user.role.charAt(0).toUpperCase() +
+                        user.role.substring(1)}
+                  </div>
                </div>
+               <AnimatePresence>
+                  {showSettings && (
+                     <UserSettings setShowSettings={setShowSettings} />
+                  )}
+               </AnimatePresence>
             </div>
-            <AnimatePresence>
-               {showSettings && (
-                  <UserSettings setShowSettings={setShowSettings} />
-               )}
-            </AnimatePresence>
          </div>
       </>
    );

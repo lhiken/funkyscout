@@ -27,6 +27,17 @@ export interface GlobalTeamData {
    TBAdata: TeamRank[];
    InternalMatchData: Tables<"event_match_data">[];
    InternalTeamData: Tables<"event_team_data">[];
+   progress: {
+      EPAloading: boolean;
+      EPAerror: boolean;
+      TBAloading: boolean;
+      TBAerror: boolean;
+      MatchLoading: boolean;
+      MatchError: boolean;
+      TeamLoading: boolean;
+      TeamError: boolean;
+   };
+   refetch: () => void;
 }
 
 export default function App() {
@@ -59,6 +70,17 @@ export default function App() {
       TBAdata: [],
       InternalMatchData: [],
       InternalTeamData: [],
+      progress: {
+         EPAloading: true,
+         EPAerror: false,
+         TBAloading: true,
+         TBAerror: false,
+         MatchLoading: true,
+         MatchError: false,
+         TeamLoading: true,
+         TeamError: false,
+      },
+      refetch: () => {},
    });
 
    const results = useQueries({
@@ -91,20 +113,32 @@ export default function App() {
    });
 
    useEffect(() => {
-      const [
-         EPAdata,
-         TBAdata,
-         InternalMatchData,
-         InternalTeamData,
-      ] = results;
+      const [EPAdata, TBAdata, InternalMatchData, InternalTeamData] = results;
 
       setTeamData({
          EPAdata: EPAdata.data || {},
          TBAdata: TBAdata.data || [],
          InternalMatchData: InternalMatchData.data || [],
          InternalTeamData: InternalTeamData.data || [],
+         progress: {
+            EPAloading: EPAdata.isLoading,
+            EPAerror: EPAdata.isError,
+            TBAloading: TBAdata.isLoading,
+            TBAerror: TBAdata.isError,
+            MatchLoading: InternalMatchData.isLoading,
+            MatchError: InternalMatchData.isError,
+            TeamLoading: InternalTeamData.isLoading,
+            TeamError: InternalTeamData.isError,
+         },
+         refetch: () => {
+            TBAdata.refetch();
+            InternalMatchData.refetch();
+            InternalTeamData.refetch();
+            fetchEventTeamEPAs(getEvent() || "", () => {}, true).then(() =>
+               EPAdata.refetch()
+            );
+         },
       });
-
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [results.map((res) => res.isFetching).join()]);
 
