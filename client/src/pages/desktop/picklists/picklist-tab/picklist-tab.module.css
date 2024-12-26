@@ -186,7 +186,7 @@
 .teamCardContainer {
    display: flex;
    flex-direction: column;
-   padding: 1.25rem 1rem 1.15rem 1rem;
+   padding: 1.15rem 1rem 0rem 1rem;
    justify-content: center;
    align-items: space-between;
    gap: 0.6rem;
@@ -225,6 +225,7 @@
    display: flex;
    justify-content: space-between;
    align-items: center;
+   padding-bottom: 1.1rem;
 }
 
 .teamOptions {

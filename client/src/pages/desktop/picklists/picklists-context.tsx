@@ -1,5 +1,5 @@
 import { createContext, Dispatch, SetStateAction } from "react";
-import { PicklistData } from "./picklists";
+import { PicklistCommands, PicklistData } from "./picklists";
 import { Tables } from "../../../lib/supabase/database.types";
 
 export const PicklistDataContext = createContext<{
@@ -16,3 +16,11 @@ export const ComparedTeamKeysContext = createContext<{
    val?: string[];
    setVal?: Dispatch<SetStateAction<string[]>>;
 }>({});
+
+export const PicklistCommandContext = createContext<PicklistCommands>({
+   moveTeamUp: () => {},
+   moveTeamDown: () => {},
+   excludeTeam: () => {},
+   renamePicklist: () => {},
+   deletePicklist: () => {},
+});

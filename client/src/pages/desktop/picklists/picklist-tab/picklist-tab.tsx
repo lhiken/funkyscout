@@ -1,6 +1,7 @@
 import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
 import styles from "./picklist-tab.module.css";
 import {
+   PicklistCommandContext,
    PicklistDataContext,
    TargetPicklistContext,
 } from "../picklists-context";
@@ -9,7 +10,10 @@ import { Tables } from "../../../../lib/supabase/database.types";
 import Tippy from "@tippyjs/react";
 import { getLocalUserData } from "../../../../lib/supabase/auth";
 import { getEvent, parseTeamKey } from "../../../../utils/logic/app";
-import { fetchTeamsByEvent } from "../../../../lib/supabase/data";
+import {
+   fetchTeamsByEvent,
+   updatePicklist,
+} from "../../../../lib/supabase/data";
 import throwNotification from "../../../../components/app/toast/toast";
 import { AnimatePresence, motion, useDragControls } from "motion/react";
 import { Picklist } from "../../../../schemas/schema";
@@ -126,6 +130,7 @@ function PicklistEditingTab() {
    const [teamQuery, setTeamQuery] = useState("");
 
    const targetPicklist = useContext(TargetPicklistContext);
+   const picklistCommands = useContext(PicklistCommandContext);
 
    const picklist: Picklist = targetPicklist.val
       ? (targetPicklist.val.picklist as Picklist)
@@ -134,6 +139,40 @@ function PicklistEditingTab() {
    const setPicklist = (newPicklist: Picklist) =>
       targetPicklist.setVal && targetPicklist.val &&
       targetPicklist.setVal({ ...targetPicklist.val, picklist: newPicklist });
+
+   function handleBack() {
+      if (targetPicklist.setVal) {
+         targetPicklist.setVal(undefined);
+      }
+   }
+
+   function handleSave() {
+      if (targetPicklist.val) {
+         updatePicklist(targetPicklist.val);
+      }
+   }
+
+   function handleDelete() {
+      if (targetPicklist.val && targetPicklist.setVal && picklistCommands) {
+         picklistCommands.deletePicklist();
+         targetPicklist.setVal(undefined);
+      }
+   }
+
+   const sortedPicklist = picklist.slice().sort((a, b) =>
+      Number(a.excluded) - Number(b.excluded)
+   );
+
+   const teamDataCtx = useContext(GlobalTeamDataContext);
+
+   const filteredPicklist = teamQuery == ""
+      ? sortedPicklist
+      : sortedPicklist.filter((val) =>
+         teamDataCtx.TBAdata.filter((e) => e.key == val.teamKey).some((e) =>
+            e.name.toLowerCase().includes(teamQuery.toLowerCase()) ||
+            e.key.includes(teamQuery.toLowerCase())
+         )
+      );
 
    return (
       <div className={styles.editTabContainer}>
@@ -158,22 +197,22 @@ function PicklistEditingTab() {
             className={styles.teamsContainer}
             as="div"
          >
-            {picklist.map((val) => (
-               <PicklistTeamCard key={val.teamKey} team={val} />
+            {filteredPicklist.map((val, index) => (
+               <PicklistTeamCard key={val.teamKey} team={val} idx={index} />
             ))}
          </Reorder.Group>
          <div className={styles.actionButtons}>
-            <div className={styles.squareButton}>
+            <div className={styles.squareButton} onClick={handleBack}>
                <i className="fa-solid fa-arrow-left" />
             </div>
-            <div className={styles.saveButton}>
+            <div className={styles.saveButton} onClick={handleSave}>
                Save picklist
                <i
                   className="fa-solid fa-floppy-disk"
                   style={{ fontSize: "1.15rem", color: "var(--primary)" }}
                />
             </div>
-            <div className={styles.squareButton}>
+            <div className={styles.squareButton} onClick={handleDelete}>
                <i
                   className="fa-solid fa-trash-can"
                   style={{ color: "var(--error)" }}
@@ -185,41 +224,56 @@ function PicklistEditingTab() {
 }
 
 function PicklistTeamCard(
-   { team }: { team: { teamKey: string; comment?: string; excluded: boolean } },
+   { team, idx }: {
+      team: { teamKey: string; comment?: string; excluded: boolean };
+      idx: number;
+   },
 ) {
+   const picklistCommands = useContext(PicklistCommandContext);
+   const teamDataCtx = useContext(GlobalTeamDataContext);
+
    /* Team stat cards calculations go here;
     * For each stat, we need the actual value + a percentage (it could be
     * percentile or % of max, whichever is more useful)
     */
 
    //Team EPA stat card
-   const teamEPAData = useContext(GlobalTeamDataContext).EPAdata[team.teamKey];
-   const teamEPA = teamEPAData.epa.total_points.mean;
-   const teamEPAPercentage = teamEPA /
-      Math.max(
-         ...Object.values(useContext(GlobalTeamDataContext).EPAdata).map(
-            (data) => data.epa.total_points.mean,
-         ),
-      );
+   const teamEPAData = teamDataCtx.EPAdata[team.teamKey];
+   const teamEPA = teamEPAData ? teamEPAData.epa.total_points.mean : 0;
+   const teamEPAPercentage = teamEPAData
+      ? teamEPA /
+         Math.max(
+            ...Object.values(teamDataCtx.EPAdata).map(
+               (data) => data.epa.total_points.mean,
+            ),
+         )
+      : 0;
 
    //Team rank stat card
-   const teamTBAData = useContext(GlobalTeamDataContext).TBAdata.find((val) =>
+   const teamTBAData = teamDataCtx.TBAdata.find((val) =>
       val.key == team.teamKey
    );
    const teamRank = teamTBAData ? teamTBAData.rank : 0;
-   const teamRankPercentage = 1 -
-      ((teamRank - 1) / (useContext(GlobalTeamDataContext).TBAdata.length));
-   const targetPicklist = useContext(TargetPicklistContext);
-
-   const picklist: Picklist = targetPicklist.val
-      ? targetPicklist.val.picklist as Picklist
-      : [];
-
-   const rank = picklist.findIndex((val) => val.teamKey == team.teamKey) + 1;
+   const teamRankPercentage = teamTBAData
+      ? 1 -
+         ((teamRank + 1) / (teamDataCtx.TBAdata.length))
+      : 0;
 
    const controls = useDragControls();
 
    const [showAllSettings, setShowAllSettings] = useState(false);
+
+   function handleMoveUp() {
+      picklistCommands.moveTeamUp(team.teamKey);
+   }
+
+   function handleMoveDown() {
+      picklistCommands.moveTeamDown(team.teamKey);
+   }
+
+   function handleExclude() {
+      picklistCommands.excludeTeam(team.teamKey);
+   }
 
    return (
       <Reorder.Item
@@ -237,7 +291,7 @@ function PicklistTeamCard(
          >
             <div className={styles.teamHeader}>
                <div style={{ display: "flex" }}>
-                  <div className={styles.teamDetailsMono}>{rank}</div>&nbsp;
+                  <div className={styles.teamDetailsMono}>{idx + 1}</div>&nbsp;
                   <div
                      style={{ color: "var(--text-secondary)" }}
                   >
@@ -250,20 +304,30 @@ function PicklistTeamCard(
                         textOverflow: "ellipsis",
                         width: "10rem",
                      }}
-                     title={teamEPAData?.name}
+                     title={teamEPAData
+                        ? teamEPAData.name
+                        : teamTBAData
+                        ? teamTBAData.name
+                        : "N/A"}
                   >
-                     {teamEPAData?.name}
+                     {teamEPAData
+                        ? teamEPAData.name
+                        : teamTBAData
+                        ? teamTBAData.name
+                        : "N/A"}
                   </div>
                </div>
                <div className={styles.teamDetailsMono}>
                   {parseTeamKey(team.teamKey)}
                </div>
             </div>
-            <div className={styles.teamDetails}>
+            <div
+               className={styles.teamDetails}
+               onMouseEnter={() => setShowAllSettings(true)}
+               onMouseLeave={() => setShowAllSettings(false)}
+            >
                <div
                   className={styles.teamOptions}
-                  onMouseEnter={() => setShowAllSettings(true)}
-                  onMouseLeave={() => setShowAllSettings(false)}
                >
                   <i
                      className={`fa-solid fa-grip-vertical ${styles.teamDragIcon}`}
@@ -289,16 +353,19 @@ function PicklistTeamCard(
                               <Tippy content="Move up" placement="bottom">
                                  <i
                                     className={`fa-solid fa-arrow-up ${styles.teamSettingIcon}`}
+                                    onClick={handleMoveUp}
                                  />
                               </Tippy>
                               <Tippy content="Move down" placement="bottom">
                                  <i
                                     className={`fa-solid fa-arrow-down ${styles.teamSettingIcon}`}
+                                    onClick={handleMoveDown}
                                  />
                               </Tippy>
                               <Tippy content="Exclude" placement="bottom">
                                  <i
                                     className={`fa-solid fa-ban ${styles.teamBanIcon} ${styles.teamSettingIcon}`}
+                                    onClick={handleExclude}
                                  />
                               </Tippy>
                            </motion.div>
