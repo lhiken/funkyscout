@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { TeamRank } from "../../../../lib/tba/events";
 import { AnimatePresence, motion } from "motion/react";
 import styles from "./ranking.module.css";
-import { TeamDataContext } from "../dashboard-team-context";
+import { GlobalTeamDataContext } from "../../../../app-global-ctx";
 
 function RankingCard({
    team,
@@ -10,7 +10,7 @@ function RankingCard({
    const [showDetails, setShowDetails] = useState(false);
    const [EPA, setEPA] = useState<number>(0);
 
-   const teamEPAs = useContext(TeamDataContext);
+   const teamEPAs = useContext(GlobalTeamDataContext).EPAdata;
 
    useEffect(() => {
       setEPA(

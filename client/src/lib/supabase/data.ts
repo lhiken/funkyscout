@@ -142,13 +142,49 @@ async function deletePicklist(picklist: Tables<"event_picklist">) {
    }
 }
 
+async function fetchMatchDataByEvent(event: string) {
+   try {
+      const { data: event_match_data, error } = await supabase
+         .from("event_match_data")
+         .select("*")
+         .eq("event", event);
+
+      if (error) {
+         throw new Error(error.message);
+      }
+
+      return event_match_data;
+   } catch (error) {
+      handleError(error);
+   }
+}
+
+async function fetchTeamDataByEvent(event: string) {
+   try {
+      const { data: event_team_data, error } = await supabase
+         .from("event_team_data")
+         .select("*")
+         .eq("event", event);
+
+      if (error) {
+         throw new Error(error.message);
+      }
+
+      return event_team_data;
+   } catch (error) {
+      handleError(error);
+   }
+}
+
 export {
    deletePicklist,
    fetchEventByKey,
    fetchEvents,
    fetchMatchAssignments,
+   fetchMatchDataByEvent,
    fetchPicklists,
    fetchTeamAssignments,
+   fetchTeamDataByEvent,
    fetchTeamsByEvent,
    updatePicklist,
 };

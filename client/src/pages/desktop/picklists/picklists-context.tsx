@@ -1,15 +1,10 @@
 import { createContext, Dispatch, SetStateAction } from "react";
-import { FetchedTeamData, PicklistData } from "./picklists";
+import { PicklistData } from "./picklists";
 import { Tables } from "../../../lib/supabase/database.types";
 
 export const PicklistDataContext = createContext<{
    val?: PicklistData;
    setVal?: Dispatch<SetStateAction<PicklistData>>;
-}>({});
-
-export const TeamFetchedDataContext = createContext<{
-   val?: FetchedTeamData;
-   setVal?: Dispatch<SetStateAction<FetchedTeamData>>;
 }>({});
 
 export const TargetPicklistContext = createContext<{

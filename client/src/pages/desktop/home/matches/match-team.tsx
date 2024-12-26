@@ -1,11 +1,11 @@
 import { useContext } from "react";
-import { TeamDataContext } from "../dashboard-team-context";
 import styles from "./styles.module.css";
+import { GlobalTeamDataContext } from "../../../../app-global-ctx";
 
 function MatchTeamInfo({
    team,
 }: { team: string }) {
-   const teamEPAs = useContext(TeamDataContext);
+   const teamEPAs = useContext(GlobalTeamDataContext).EPAdata;
 
    return (
       <div className={styles.allianceTeam}>

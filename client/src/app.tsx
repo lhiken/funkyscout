@@ -1,19 +1,33 @@
 import { Route, Switch, useLocation } from "wouter";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { updateTheme } from "./utils/theme";
 import AuthPage from "./pages/main/auth/auth";
 import Dashboard from "./pages/desktop/dashboard";
 import { getLocalUserData } from "./lib/supabase/auth";
 import ErrorPage from "./pages/main/error/error";
 import EventSelector from "./pages/main/event-selector/event-selector";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import "tippy.js/dist/tippy.css";
 import "simplebar-react/dist/simplebar.min.css";
 import MobileApp from "./pages/mobile/mobile";
 import isMobile from "./utils/device";
-import { getFocusTeam, setFocusTeam } from "./utils/logic/app";
+import { getEvent, getFocusTeam, setFocusTeam } from "./utils/logic/app";
+import { fetchEventTeamEPAs } from "./lib/statbotics/event-teams";
+import { fetchTBAEventTeams, TeamRank } from "./lib/tba/events";
+import {
+   fetchMatchDataByEvent,
+   fetchTeamDataByEvent,
+} from "./lib/supabase/data";
+import { StatboticsTeamEPAs } from "./lib/statbotics/teams";
+import { Tables } from "./lib/supabase/database.types";
+import { GlobalTeamDataContext } from "./app-global-ctx";
 
-const queryClient = new QueryClient();
+export interface GlobalTeamData {
+   EPAdata: Record<string, StatboticsTeamEPAs>;
+   TBAdata: TeamRank[];
+   InternalMatchData: Tables<"event_match_data">[];
+   InternalTeamData: Tables<"event_team_data">[];
+}
 
 export default function App() {
    useEffect(() => {
@@ -40,9 +54,63 @@ export default function App() {
       }
    }, [location, setLocation]);
 
+   const [teamData, setTeamData] = useState<GlobalTeamData>({
+      EPAdata: {},
+      TBAdata: [],
+      InternalMatchData: [],
+      InternalTeamData: [],
+   });
+
+   const results = useQueries({
+      queries: [
+         {
+            queryKey: [`appFetchEPA/${getEvent()}`],
+            queryFn: () => fetchEventTeamEPAs(getEvent() || ""),
+            refetchOnWindowFocus: false,
+            refetchInterval: 120000,
+         },
+         {
+            queryKey: [`appFetchTBA/${getEvent()}`],
+            queryFn: () => fetchTBAEventTeams(getEvent() || ""),
+            refetchOnWindowFocus: false,
+            refetchInterval: 120000,
+         },
+         {
+            queryKey: [`appFetchMatchData/${getEvent()}`],
+            queryFn: () => fetchMatchDataByEvent(getEvent() || ""),
+            refetchOnWindowFocus: false,
+            refetchInterval: 120000,
+         },
+         {
+            queryKey: [`appFetchTeamData/${getEvent()}`],
+            queryFn: () => fetchTeamDataByEvent(getEvent() || ""),
+            refetchOnWindowFocus: false,
+            refetchInterval: 120000,
+         },
+      ],
+   });
+
+   useEffect(() => {
+      const [
+         EPAdata,
+         TBAdata,
+         InternalMatchData,
+         InternalTeamData,
+      ] = results;
+
+      setTeamData({
+         EPAdata: EPAdata.data || {},
+         TBAdata: TBAdata.data || [],
+         InternalMatchData: InternalMatchData.data || [],
+         InternalTeamData: InternalTeamData.data || [],
+      });
+
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [results.map((res) => res.isFetching).join()]);
+
    return (
       <>
-         <QueryClientProvider client={queryClient}>
+         <GlobalTeamDataContext.Provider value={teamData}>
             <div className="app">
                <Switch>
                   <Route path="/auth" component={AuthPage} />
@@ -56,7 +124,7 @@ export default function App() {
                   </Route>
                </Switch>
             </div>
-         </QueryClientProvider>
+         </GlobalTeamDataContext.Provider>
       </>
    );
 }

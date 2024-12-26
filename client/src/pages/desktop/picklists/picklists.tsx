@@ -1,7 +1,6 @@
 import styles from "./picklists.module.css";
 import { useEffect, useState } from "react";
 import { useQueries } from "@tanstack/react-query";
-import { fetchTBAEventTeams } from "../../../lib/tba/events";
 import { getEvent } from "../../../utils/logic/app";
 import { fetchPicklists } from "../../../lib/supabase/data";
 import { Tables } from "../../../lib/supabase/database.types";
@@ -9,7 +8,6 @@ import {
    ComparedTeamKeysContext,
    PicklistDataContext,
    TargetPicklistContext,
-   TeamFetchedDataContext,
 } from "./picklists-context";
 import PicklistTab from "./picklist-tab/picklist-tab";
 import ComparisonTab from "./comparison-box/comparison";
@@ -39,14 +37,6 @@ function PicklistPage() {
       },
    });
 
-   const [fetchedTeamData, setFetchedTeamData] = useState<FetchedTeamData>({
-      teamKeys: [],
-      queryProgress: {
-         isLoading: true,
-         isError: false,
-      },
-   });
-
    const [comparedTeamKeys, setComparedTeamKeys] = useState<string[]>([]);
 
    const [targetPicklist, setTargetPicklist] = useState<
@@ -60,18 +50,12 @@ function PicklistPage() {
             queryFn: () => fetchPicklists(getEvent() || ""),
             refetchOnWindowFocus: false,
          },
-         {
-            queryKey: [`picklistFetchTeams/${getEvent()}`],
-            queryFn: () => fetchTBAEventTeams(getEvent() || ""),
-            refetchOnWindowFocus: false,
-         },
       ],
    });
 
    useEffect(() => {
       const [
          picklistsResult,
-         teamsResult,
       ] = results;
 
       setPicklistData((prev) => ({
@@ -80,15 +64,6 @@ function PicklistPage() {
          queryProgress: {
             isLoading: picklistsResult.isLoading,
             isError: picklistsResult.isError,
-         },
-      }));
-
-      setFetchedTeamData((prev) => ({
-         ...prev,
-         teamKeys: teamsResult.data?.map((val) => val.key) || [],
-         queryProgress: {
-            isLoading: teamsResult.isLoading,
-            isError: teamsResult.isError,
          },
       }));
 
@@ -104,31 +79,24 @@ function PicklistPage() {
             setVal: setPicklistData,
          }}
       >
-         <TeamFetchedDataContext.Provider
+         <TargetPicklistContext.Provider
             value={{
-               val: fetchedTeamData,
-               setVal: setFetchedTeamData,
+               val: targetPicklist,
+               setVal: setTargetPicklist,
             }}
          >
-            <TargetPicklistContext.Provider
+            <ComparedTeamKeysContext.Provider
                value={{
-                  val: targetPicklist,
-                  setVal: setTargetPicklist,
+                  val: comparedTeamKeys,
+                  setVal: setComparedTeamKeys,
                }}
             >
-               <ComparedTeamKeysContext.Provider
-                  value={{
-                     val: comparedTeamKeys,
-                     setVal: setComparedTeamKeys,
-                  }}
-               >
-                  <div className={styles.container}>
-                     <PicklistTab />
-                     <ComparisonTab />
-                  </div>
-               </ComparedTeamKeysContext.Provider>
-            </TargetPicklistContext.Provider>
-         </TeamFetchedDataContext.Provider>
+               <div className={styles.container}>
+                  <PicklistTab />
+                  <ComparisonTab />
+               </div>
+            </ComparedTeamKeysContext.Provider>
+         </TargetPicklistContext.Provider>
       </PicklistDataContext.Provider>
    );
 }

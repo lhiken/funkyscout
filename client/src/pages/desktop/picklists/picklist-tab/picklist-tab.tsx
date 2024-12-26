@@ -12,6 +12,8 @@ import { getEvent } from "../../../../utils/logic/app";
 import { fetchTeamsByEvent } from "../../../../lib/supabase/data";
 import throwNotification from "../../../../components/app/toast/toast";
 import { motion } from "motion/react";
+import { Picklist } from "../../../../schemas/schema";
+import { GlobalTeamDataContext } from "../../../../app-global-ctx";
 
 function PicklistTab() {
    const targetPicklist = useContext(TargetPicklistContext);
@@ -119,7 +121,68 @@ function PicklistTab() {
 }
 
 function PicklistEditingTab() {
-   return <div></div>;
+   const [teamQuery, setTeamQuery] = useState("");
+
+   const targetPicklist = useContext(TargetPicklistContext);
+
+   const picklist: Picklist = targetPicklist.val
+      ? targetPicklist.val.picklist as Picklist
+      : [];
+
+   return (
+      <div className={styles.editTabContainer}>
+         <RoundInput
+            value={teamQuery}
+            setValue={setTeamQuery}
+            placeholder="Search teams..."
+            icon={<i className="fa-solid fa-magnifying-glass" />}
+            type="text"
+            style={{
+               height: "3.25rem",
+               backgroundColor: "var(--inset)",
+               border: "2px solid var(--text-background)",
+            }}
+         />
+         <div className={styles.teamsContainer}>
+            {picklist.map((val, index) => {
+               return <PicklistTeamCard key={index} team={val} />;
+            })}
+         </div>
+         <div className={styles.actionButtons}>
+            <div className={styles.squareButton}>
+               <i className="fa-solid fa-arrow-left" />
+            </div>
+            <div className={styles.saveButton}>
+               Save picklist
+               <i
+                  className="fa-solid fa-floppy-disk"
+                  style={{ fontSize: "1.15rem", color: "var(--primary)" }}
+               />
+            </div>
+            <div className={styles.squareButton}>
+               <i
+                  className="fa-solid fa-trash-can"
+                  style={{ color: "var(--error)" }}
+               />
+            </div>
+         </div>
+      </div>
+   );
+}
+
+function PicklistTeamCard(
+   { team }: { team: { teamKey: string; comment?: string; excluded: boolean } },
+) {
+   const teamTBAData = useContext(GlobalTeamDataContext).TBAdata.find((val) =>
+      val.key == team.teamKey
+   );
+
+   return (
+      <div className={styles.teamCardContainer}>
+         {teamTBAData?.team}
+         {teamTBAData?.name}
+      </div>
+   );
 }
 
 function PicklistSelectionTab() {
@@ -137,7 +200,7 @@ function PicklistSelectionTab() {
             event: getEvent() || "",
             id: btoa(getLocalUserData().uid + Date.now()),
             picklist: res!.map((val) => ({
-               teamKey: val,
+               teamKey: val.team,
                excluded: false,
             })),
             timestamp: new Date(Date.now()).toUTCString(),
@@ -193,7 +256,8 @@ function PicklistSelectionTab() {
                   &nbsp;Could not load picklists
                </div>
             )}
-            {queriedPicklists.length == 0 && (
+            {queriedPicklists.length == 0 &&
+               !picklistData.val?.queryProgress.isLoading && (
                <div className={styles.loadBox}>
                   <i className="fa-regular fa-circle-xmark" />
                   &nbsp;No picklists found

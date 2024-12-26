@@ -1,18 +1,14 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import styles from "./epa-chart.module.css";
-import {
-   TeamDataContext,
-   TeamDataProgressContext,
-} from "../../../dashboard-team-context";
 import { AnimatePresence, motion } from "motion/react";
 import { BarDatum, ResponsiveBar } from "@nivo/bar";
 import { NivoChartTheme } from "../../../../../../lib/nivo/theme";
 import { getFocusTeam } from "../../../../../../utils/logic/app";
 import Checkbox from "../../../../../../components/app/buttons/checkbox";
+import { GlobalTeamDataContext } from "../../../../../../app-global-ctx";
 
 function TeamEPAChart() {
-   const rawTeamData = useContext(TeamDataContext);
-   const teamFetchProgress = useContext(TeamDataProgressContext);
+   const rawTeamData = useContext(GlobalTeamDataContext).EPAdata;
 
    const teamData = useMemo(() => {
       if (!rawTeamData) return [];
@@ -176,42 +172,19 @@ function TeamEPAChart() {
                   </div>
                </>
             )
-            : (!(teamFetchProgress.errors == teamFetchProgress.fetched &&
-                  teamFetchProgress.fetched > 4)
-               ? (
-                  <motion.div
-                     initial={{ opacity: 0 }}
-                     animate={{ opacity: 1 }}
-                     exit={{ opacity: 0 }}
-                     transition={{
-                        duration: 0.2,
-                     }}
-                     className={styles.loadingBox}
-                  >
-                     <div className={styles.loadingSpinner} />Loading team data
-                     {" "}
-                     {`(${
-                        ((teamFetchProgress.fetched /
-                           (teamFetchProgress.total
-                              ? teamFetchProgress.total
-                              : 1)) *
-                           100).toFixed(1)
-                     }%)`}
-                  </motion.div>
-               )
-               : (
-                  <motion.div
-                     initial={{ opacity: 0 }}
-                     animate={{ opacity: 1 }}
-                     exit={{ opacity: 0 }}
-                     transition={{
-                        duration: 0.2,
-                     }}
-                     className={styles.loadingBox}
-                  >
-                     Couldn't load team data
-                  </motion.div>
-               ))}
+            : (
+               <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{
+                     duration: 0.2,
+                  }}
+                  className={styles.loadingBox}
+               >
+                  <div className={styles.loadingSpinner} />Loading team data
+               </motion.div>
+            )}
       </div>
    );
 }

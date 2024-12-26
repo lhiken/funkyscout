@@ -1,19 +1,16 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import TeamEPAChart from "./cards/chart/epa-chart";
 import styles from "./styles.module.css";
-import {
-   TeamDataContext,
-   TeamDataProgressContext,
-} from "../dashboard-team-context";
+
 import { getEvent, getFocusTeam } from "../../../../utils/logic/app";
 import { useQueries } from "@tanstack/react-query";
 import { fetchTeamEventStatus } from "../../../../lib/tba/teams";
 import InfoCard from "./cards/info-card/card";
 import { getNexusEventStatus } from "../../../../lib/nexus/events";
+import { GlobalTeamDataContext } from "../../../../app-global-ctx";
 
 function InfoTab() {
-   const teamData = useContext(TeamDataContext);
-   const teamDataProgress = useContext(TeamDataProgressContext);
+   const teamData = useContext(GlobalTeamDataContext).EPAdata;
 
    const [teamStatusResult, eventStatusResult] = useQueries({
       queries: [
@@ -35,10 +32,6 @@ function InfoTab() {
          },
       ],
    });
-
-   const [updateStatus, setUpdateStatus] = useState<string>(
-      `Updating... ${teamDataProgress.fetched}/${teamDataProgress.total}`,
-   );
 
    const teamStatus = teamStatusResult.data;
    const eventStatus = eventStatusResult.data;
@@ -64,30 +57,12 @@ function InfoTab() {
       }
    }
 
-   useEffect(() => {
-      const updateInterval = setInterval(() => {
-         setUpdateStatus(
-            teamDataProgress.fetchTime && teamDataProgress.fetchTime > 0
-               ? `EPAs updated ${formatTime(teamDataProgress.fetchTime)}`
-               : `Updating... ${teamDataProgress.fetched}/${teamDataProgress.total}`,
-         );
-      }, 100);
-
-      return () => clearInterval(updateInterval);
-   }, [teamDataProgress]);
-
    return (
       <div className={styles.container}>
          <div className={styles.header}>
             <div>
                <i className="fa-solid fa-chart-line" />&nbsp;&nbsp; Event
                Information
-            </div>
-            <div className={styles.updateTime}>
-               {updateStatus}&nbsp;<i
-                  className="fa-solid fa-arrows-rotate"
-                  style={{ cursor: "pointer" }}
-               />
             </div>
          </div>
          <div className={styles.content}>
