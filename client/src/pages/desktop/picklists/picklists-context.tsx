@@ -21,6 +21,7 @@ export const PicklistCommandContext = createContext<PicklistCommands>({
    moveTeamUp: () => {},
    moveTeamDown: () => {},
    excludeTeam: () => {},
+   changePicklistVisibility: () => {},
    renamePicklist: () => {},
    deletePicklist: () => {},
 });

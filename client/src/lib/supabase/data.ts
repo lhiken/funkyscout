@@ -109,15 +109,15 @@ async function fetchPicklists(event: string) {
 
 async function updatePicklist(picklist: Tables<"event_picklist">) {
    try {
-      const { data: event_picklist, error } = await supabase
+      const { error } = await supabase
          .from("event_picklist")
          .upsert(picklist);
 
       if (error) {
          throw new Error(error.message);
+      } else {
+         return true;
       }
-
-      return event_picklist;
    } catch (error) {
       handleError(error);
    }

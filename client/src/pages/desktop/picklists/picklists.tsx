@@ -36,6 +36,9 @@ export interface PicklistCommands {
    moveTeamDown: (teamKey: string) => void;
    excludeTeam: (teamKey: string) => void;
    renamePicklist: (name: string) => void;
+   changePicklistVisibility: (
+      visibility: "default" | "private" | "public",
+   ) => void;
    deletePicklist: () => void;
 }
 
@@ -59,9 +62,7 @@ function PicklistPage() {
          setTargetPicklist((prev) => {
             if (!prev) return prev;
             const picklist = prev.picklist as Picklist;
-            const index = picklist.findIndex((team) =>
-               team.teamKey === teamKey
-            );
+            const index = picklist.findIndex((team) => team.teamKey == teamKey);
             if (index > 0) {
                const newPicklist = [...picklist];
                let targetIndex = index - 1;
@@ -84,9 +85,7 @@ function PicklistPage() {
          setTargetPicklist((prev) => {
             if (!prev) return prev;
             const picklist = prev.picklist as Picklist;
-            const index = picklist.findIndex((team) =>
-               team.teamKey === teamKey
-            );
+            const index = picklist.findIndex((team) => team.teamKey == teamKey);
             if (index < picklist.length - 1) {
                const newPicklist = [...picklist];
                let targetIndex = index + 1;
@@ -112,9 +111,7 @@ function PicklistPage() {
          setTargetPicklist((prev) => {
             if (!prev) return prev;
             const picklist = prev.picklist as Picklist;
-            const index = picklist.findIndex((team) =>
-               team.teamKey === teamKey
-            );
+            const index = picklist.findIndex((team) => team.teamKey == teamKey);
             if (index !== -1) {
                const newPicklist = [...picklist];
                newPicklist[index].excluded = !newPicklist[index].excluded;
@@ -124,11 +121,27 @@ function PicklistPage() {
          });
       },
 
+      changePicklistVisibility: (
+         visiblity: "default" | "private" | "public",
+      ) => {
+         setPicklistData((prev) => {
+            const newPicklists = prev.picklists.map((picklist) => {
+               if (targetPicklist && picklist.id == targetPicklist.id) {
+                  setTargetPicklist({ ...targetPicklist, type: visiblity });
+                  return { ...picklist, type: visiblity };
+               }
+               return picklist;
+            });
+            return { ...prev, picklists: newPicklists };
+         });
+      },
+
       renamePicklist: (name: string) => {
          setPicklistData((prev) => {
             const newPicklists = prev.picklists.map((picklist) => {
-               if (picklist === targetPicklist) {
-                  return { ...picklist, name };
+               if (targetPicklist && picklist.id == targetPicklist.id) {
+                  setTargetPicklist({ ...targetPicklist, title: name });
+                  return { ...picklist, title: name };
                }
                return picklist;
             });
@@ -186,6 +199,8 @@ function PicklistPage() {
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [results.map((res) => res.isFetching).join()]);
 
+   // sorry, but oh well!
+   // also it's not even that bad
    return (
       <PicklistDataContext.Provider
          value={{

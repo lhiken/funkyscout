@@ -19,9 +19,11 @@ import { AnimatePresence, motion, useDragControls } from "motion/react";
 import { Picklist } from "../../../../schemas/schema";
 import { GlobalTeamDataContext } from "../../../../app-global-ctx";
 import { Reorder } from "motion/react";
+import Checkbox from "../../../../components/app/buttons/checkbox";
 
 function PicklistTab() {
    const targetPicklist = useContext(TargetPicklistContext);
+   const picklistCommands = useContext(PicklistCommandContext);
 
    const inputRef = useRef(null);
    const [inputWidth, setInputWidth] = useState(0);
@@ -51,82 +53,89 @@ function PicklistTab() {
             newTitle = targetPicklist.val.title;
          }
 
-         targetPicklist.setVal({
-            ...targetPicklist.val,
-            title: newTitle,
-         });
+         picklistCommands.renamePicklist(newTitle);
       }
    }
+
+   const [showSettings, setShowSettings] = useState(false);
 
    return (
       <div className={styles.container}>
          <div className={styles.containerHeader}>
-            <div>
-               {!targetPicklist.val
-                  ? (
-                     <>
-                        <i className="fa-solid fa-list-ul" />
-                        &nbsp; Picklists
-                     </>
-                  )
-                  : (
-                     <>
-                        <i className="fa-solid fa-list-ul" />
-                        &nbsp;{" "}
-                        <div
-                           style={{
-                              position: "relative",
-                              display: "inline-block",
-                              height: "1.25rem",
-                           }}
-                        >
-                           <input
-                              ref={inputRef}
-                              type="text"
-                              placeholder="Picklist name..."
-                              value={targetPicklist.val.title}
-                              onChange={handleInputChange}
-                              style={{
-                                 textDecoration: "none",
-                                 border: "none",
-                                 outline: "none",
-                                 fontSize: "inherit",
-                                 paddingBottom: "3px",
-                                 width: `${
-                                    inputWidth > 0 ? inputWidth + 20 : 120
-                                 }px`,
-                                 maxWidth: "14rem",
-                                 display: "inline-block",
-                                 whiteSpace: "nowrap",
-                              }}
-                           />
+            {!targetPicklist.val
+               ? (
+                  <>
+                     <i className="fa-solid fa-list-ul" />
+                     &nbsp; Picklists
+                  </>
+               )
+               : (
+                  <>
+                     <div className={styles.headerElements}>
+                        <div>
+                           <i className="fa-solid fa-list-ul" />
+                           &nbsp;{" "}
                            <div
                               style={{
-                                 position: "absolute",
-                                 bottom: "-2px",
-                                 border: "1px dashed var(--text-secondary)",
-                                 width: `${inputWidth}px`,
-                                 maxWidth: "14rem",
-                                 display: `${
-                                    inputWidth == 0 ? "none" : "block"
-                                 }`,
+                                 position: "relative",
+                                 display: "inline-block",
+                                 height: "1.25rem",
                               }}
-                           />
+                           >
+                              <input
+                                 ref={inputRef}
+                                 type="text"
+                                 placeholder="Picklist name..."
+                                 value={targetPicklist.val.title}
+                                 onChange={handleInputChange}
+                                 style={{
+                                    textDecoration: "none",
+                                    border: "none",
+                                    outline: "none",
+                                    fontSize: "inherit",
+                                    paddingBottom: "3px",
+                                    width: `${
+                                       inputWidth > 0 ? inputWidth + 20 : 120
+                                    }px`,
+                                    maxWidth: "14rem",
+                                    display: "inline-block",
+                                    whiteSpace: "nowrap",
+                                 }}
+                              />
+                              <div
+                                 style={{
+                                    position: "absolute",
+                                    bottom: "-2px",
+                                    border: "1px dashed var(--text-secondary)",
+                                    width: `${inputWidth}px`,
+                                    maxWidth: "14rem",
+                                    display: `${
+                                       inputWidth == 0 ? "none" : "block"
+                                    }`,
+                                 }}
+                              />
+                           </div>
+                        </div>{" "}
+                        <div
+                           className={styles.settingsIcon}
+                           onClick={() => setShowSettings(!showSettings)}
+                        >
+                           <i className="fa-solid fa-gear" />
                         </div>
-                     </>
-                  )}
-            </div>
+                     </div>
+                  </>
+               )}
          </div>
          <div className={styles.contentContainer}>
             {!targetPicklist.val
                ? <PicklistSelectionTab />
-               : <PicklistEditingTab />}
+               : <PicklistEditingTab showSettings={showSettings} />}
          </div>
       </div>
    );
 }
 
-function PicklistEditingTab() {
+function PicklistEditingTab({ showSettings }: { showSettings: boolean }) {
    const [teamQuery, setTeamQuery] = useState("");
 
    const targetPicklist = useContext(TargetPicklistContext);
@@ -146,9 +155,16 @@ function PicklistEditingTab() {
       }
    }
 
-   function handleSave() {
+   function handleSave(notify: boolean) {
       if (targetPicklist.val) {
-         updatePicklist(targetPicklist.val);
+         if (notify) throwNotification("info", "Saving changes...");
+         updatePicklist(targetPicklist.val).then((res) => {
+            if (res) {
+               if (notify) throwNotification("success", "Saved changes");
+            } else {
+               if (notify) throwNotification("error", "Error saving changes");
+            }
+         });
       }
    }
 
@@ -159,9 +175,15 @@ function PicklistEditingTab() {
       }
    }
 
-   const sortedPicklist = picklist.slice().sort((a, b) =>
-      Number(a.excluded) - Number(b.excluded)
-   );
+   function handleChangeVisibility(vis: "default" | "public" | "private") {
+      picklistCommands.changePicklistVisibility(vis);
+   }
+
+   const [seperateExcluded, setSeperateExcluded] = useState(true);
+
+   const sortedPicklist = seperateExcluded
+      ? picklist.slice().sort((a, b) => Number(a.excluded) - Number(b.excluded))
+      : picklist;
 
    const teamDataCtx = useContext(GlobalTeamDataContext);
 
@@ -174,8 +196,113 @@ function PicklistEditingTab() {
          )
       );
 
+   const [saveOnEdit, setSaveOnEdit] = useState(true);
+
+   useEffect(() => {
+      handleSave(false);
+      // just let me do it i know what im doing :(
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [targetPicklist.val]);
+
+   const [showDropdown, setShowDropdown] = useState(false);
+
    return (
       <div className={styles.editTabContainer}>
+         <AnimatePresence>
+            {showSettings &&
+               (
+                  <motion.div
+                     initial={{ height: 0, opacity: 0 }}
+                     animate={{
+                        height: "7.75rem",
+                        opacity: 1,
+                        marginBottom: "1.15rem",
+                     }}
+                     exit={{ height: 0, opacity: 0, marginBottom: 0 }}
+                     transition={{
+                        duration: 0.2,
+                     }}
+                     className={styles.picklistOptionBox}
+                  >
+                     <div
+                        className={styles.singleOption}
+                     >
+                        Picklist visibility{" "}
+                        <div
+                           className={styles.visibilityCard}
+                           onClick={() => setShowDropdown(!showDropdown)}
+                        >
+                           {targetPicklist.val?.type}
+                           <div>
+                              <i className="fa-solid fa-caret-down" />
+                           </div>
+                           <AnimatePresence>
+                              {showDropdown && (
+                                 <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    className={styles.optionsDropdown}
+                                 >
+                                    <Tippy
+                                       placement="right"
+                                       content="Only admins and you can view/edit this picklist"
+                                    >
+                                       <div
+                                          className={styles.optionText}
+                                          onClick={() =>
+                                             handleChangeVisibility("default")}
+                                       >
+                                          default
+                                       </div>
+                                    </Tippy>
+                                    <Tippy
+                                       placement="right"
+                                       content="Default permissions, but anyone can view"
+                                    >
+                                       <div
+                                          className={styles.optionText}
+                                          onClick={() =>
+                                             handleChangeVisibility("private")}
+                                       >
+                                          private
+                                       </div>
+                                    </Tippy>{" "}
+                                    <Tippy
+                                       placement="right"
+                                       content="Only you can view/edit this picklist"
+                                    >
+                                       <div
+                                          className={styles.optionText}
+                                          onClick={() =>
+                                             handleChangeVisibility("public")}
+                                       >
+                                          public
+                                       </div>
+                                    </Tippy>
+                                 </motion.div>
+                              )}
+                           </AnimatePresence>
+                        </div>
+                     </div>
+                     <div className={styles.singleOption}>
+                        Move excluded teams
+                        <Checkbox
+                           enabled={seperateExcluded}
+                           setEnabled={setSeperateExcluded}
+                        />
+                     </div>
+                     <div className={styles.singleOption}>
+                        Save on edit
+                        <Checkbox
+                           enabled={saveOnEdit}
+                           setEnabled={setSaveOnEdit}
+                        />
+                     </div>
+                  </motion.div>
+               )}
+         </AnimatePresence>
          <RoundInput
             value={teamQuery}
             setValue={setTeamQuery}
@@ -205,7 +332,7 @@ function PicklistEditingTab() {
             <div className={styles.squareButton} onClick={handleBack}>
                <i className="fa-solid fa-arrow-left" />
             </div>
-            <div className={styles.saveButton} onClick={handleSave}>
+            <div className={styles.saveButton} onClick={() => handleSave(true)}>
                Save picklist
                <i
                   className="fa-solid fa-floppy-disk"

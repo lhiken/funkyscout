@@ -118,6 +118,58 @@
    color: var(--text-primary);
 }
 
+.headerElements {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   flex-grow: 1;
+}
+
+.settingsIcon {
+   color: var(--text-secondary);
+   transition: 0.2s;
+   font-size: 1.25rem;
+   line-height: 1rem;
+   cursor: pointer;
+}
+
+.settingsIcon:hover {
+   color: var(--primary);
+}
+
+.visibilityCard {
+   display: flex;
+   flex-direction: row;
+   background-color: var(--text-background);
+   padding-inline: 0.75rem;
+   font-size: 0.935rem;
+   width: 5.5rem;
+   justify-content: space-between;
+   border-radius: 10rem;
+   cursor: pointer;
+}
+
+.optionsDropdown {
+   margin-top: 1.5rem;
+   position: absolute;
+   display: flex;
+   flex-direction: column;
+   background-color: var(--text-background);
+   width: 5.5rem;
+   padding: 0.5rem 0.75rem;
+   transform: translateX(-0.75rem);
+   border-radius: 0.5rem;
+   gap: 0.25rem;
+}
+
+.optionText {
+   transition: 0.2s;
+}
+
+.optionText:hover {
+   color: var(--primary);
+}
+
 /* Edit tab styles */
 
 .editTabContainer {
@@ -280,4 +332,20 @@
 
 .teamBanIcon:hover {
    color: var(--error);
+}
+
+.picklistOptionBox {
+   display: flex;
+   flex-direction: column;
+   border: 2px solid var(--text-background);
+   border-radius: 1rem;
+   gap: 0.5rem;
+   justify-content: center;
+   overflow: hidden;
+   user-select: none;
+}
+.singleOption {
+   margin-inline: 1rem;
+   display: flex;
+   justify-content: space-between;
 }
