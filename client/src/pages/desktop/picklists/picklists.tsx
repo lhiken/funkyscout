@@ -51,7 +51,9 @@ function PicklistPage() {
       },
    });
 
-   const [comparedTeamKeys, setComparedTeamKeys] = useState<string[]>([]);
+   const [comparedTeamKeys, setComparedTeamKeys] = useState<
+      { teamKey: string; minimized: boolean }[]
+   >([]);
 
    const [targetPicklist, setTargetPicklist] = useState<
       Tables<"event_picklist"> | undefined
@@ -63,6 +65,14 @@ function PicklistPage() {
             if (!prev) return prev;
             const picklist = prev.picklist as Picklist;
             const index = picklist.findIndex((team) => team.teamKey == teamKey);
+
+            if (
+               picklist.find((team) => team.teamKey == teamKey)?.excluded ==
+                  true
+            ) {
+               return prev;
+            }
+
             if (index > 0) {
                const newPicklist = [...picklist];
                let targetIndex = index - 1;
@@ -86,6 +96,14 @@ function PicklistPage() {
             if (!prev) return prev;
             const picklist = prev.picklist as Picklist;
             const index = picklist.findIndex((team) => team.teamKey == teamKey);
+
+            if (
+               picklist.find((team) => team.teamKey == teamKey)?.excluded ==
+                  true
+            ) {
+               return prev;
+            }
+
             if (index < picklist.length - 1) {
                const newPicklist = [...picklist];
                let targetIndex = index + 1;
@@ -157,16 +175,18 @@ function PicklistPage() {
                   throwNotification("success", `Deleted "${picklistName}"`);
                }
             });
+
+            setPicklistData((prev) => {
+               return {
+                  ...prev,
+                  picklists: prev.picklists.filter((picklist) =>
+                     picklist.id != targetPicklist.id
+                  ),
+               };
+            });
+            setComparedTeamKeys([]);
+            setTargetPicklist(undefined);
          }
-         setPicklistData((prev) => {
-            return {
-               ...prev,
-               picklists: prev.picklists.filter((picklist) =>
-                  picklist !== targetPicklist
-               ),
-            };
-         });
-         setTargetPicklist(undefined);
       },
    };
 

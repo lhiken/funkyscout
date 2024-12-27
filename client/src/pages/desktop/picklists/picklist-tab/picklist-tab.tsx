@@ -1,6 +1,7 @@
 import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
 import styles from "./picklist-tab.module.css";
 import {
+   ComparedTeamKeysContext,
    PicklistCommandContext,
    PicklistDataContext,
    TargetPicklistContext,
@@ -140,6 +141,7 @@ function PicklistEditingTab({ showSettings }: { showSettings: boolean }) {
 
    const targetPicklist = useContext(TargetPicklistContext);
    const picklistCommands = useContext(PicklistCommandContext);
+   const comparedTeams = useContext(ComparedTeamKeysContext);
 
    const picklist: Picklist = targetPicklist.val
       ? (targetPicklist.val.picklist as Picklist)
@@ -150,7 +152,8 @@ function PicklistEditingTab({ showSettings }: { showSettings: boolean }) {
       targetPicklist.setVal({ ...targetPicklist.val, picklist: newPicklist });
 
    function handleBack() {
-      if (targetPicklist.setVal) {
+      if (targetPicklist.setVal && comparedTeams.setVal) {
+         comparedTeams.setVal([]);
          targetPicklist.setVal(undefined);
       }
    }
@@ -402,6 +405,26 @@ function PicklistTeamCard(
       picklistCommands.excludeTeam(team.teamKey);
    }
 
+   const comparedTeams = useContext(ComparedTeamKeysContext);
+
+   function handleCompare() {
+      if (comparedTeams.setVal && comparedTeams.val) {
+         const teamIndex = comparedTeams.val.findIndex((val) =>
+            val.teamKey == team.teamKey
+         );
+         if (teamIndex == -1) {
+            comparedTeams.setVal((
+               prev,
+            ) => [{ teamKey: team.teamKey, minimized: false }, ...prev]);
+         } else {
+            comparedTeams.setVal((prev) =>
+               prev.filter((val) => val.teamKey != team.teamKey)
+            );
+         }
+      }
+      console.log(comparedTeams);
+   }
+
    return (
       <Reorder.Item
          key={team.teamKey}
@@ -411,7 +434,10 @@ function PicklistTeamCard(
          as="div"
       >
          <div
-            className={styles.teamCardContainer}
+            className={`${styles.teamCardContainer} ${
+               comparedTeams.val?.find((e) => e.teamKey == team.teamKey) &&
+               styles.active
+            }`}
             style={{
                opacity: (team.excluded ? 0.25 : 1),
             }}
@@ -463,6 +489,7 @@ function PicklistTeamCard(
                   <Tippy content="Compare" placement="bottom">
                      <i
                         className={`fa-solid fa-scale-unbalanced-flip ${styles.teamSettingIcon}`}
+                        onClick={handleCompare}
                      />
                   </Tippy>
                   <AnimatePresence>
