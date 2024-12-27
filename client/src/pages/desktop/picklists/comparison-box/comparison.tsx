@@ -178,7 +178,7 @@ function ComparedTeamElement(
                               (focusTeams.val && focusTeams.val?.filter((val) =>
                                        !val.minimized
                                     ).length < 3
-                                 ? "15rem"
+                                 ? "12rem"
                                  : "8rem"),
                         }}
                      >
