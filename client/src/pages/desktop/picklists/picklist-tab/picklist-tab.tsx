@@ -422,7 +422,6 @@ function PicklistTeamCard(
             );
          }
       }
-      console.log(comparedTeams);
    }
 
    return (

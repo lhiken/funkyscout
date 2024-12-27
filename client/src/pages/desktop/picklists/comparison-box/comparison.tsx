@@ -75,16 +75,14 @@ function ComparedTeams() {
             }
          }
 
-         focusTeams.setVal(newTeams);
+         focusTeams.setVal(
+            newTeams.sort((a, b) => Number(a.minimized) - Number(b.minimized)),
+         );
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [focusTeams.val?.length]);
 
    if (!focusTeams.val || !focusTeams.setVal) return;
-
-   const teams = focusTeams.val.slice().sort((a, b) =>
-      Number(a.minimized) - Number(b.minimized)
-   );
 
    return (
       <Reorder.Group
@@ -94,7 +92,9 @@ function ComparedTeams() {
          className={styles.comparedTeamsContainer}
          as="div"
       >
-         {teams.map((val) => {
+         {focusTeams.val.sort((a, b) =>
+            Number(a.minimized) - Number(b.minimized)
+         ).map((val) => {
             return <ComparedTeamElement key={val.teamKey} team={val} />;
          })}
       </Reorder.Group>
@@ -114,17 +114,34 @@ function ComparedTeamElement(
 
    function handleMinimizeToggle() {
       if (focusTeams.setVal && focusTeams.val) {
-         const numOfMax = focusTeams.val.filter((val) => !val.minimized).length;
+         const maxTeams = focusTeams.val.filter((val) => !val.minimized);
 
-         focusTeams.setVal((prev) => [
-            ...prev.filter((val) => val.teamKey != team.teamKey),
-            {
-               teamKey: team.teamKey,
-               minimized: numOfMax < 3 && team.minimized
-                  ? !team.minimized
-                  : true,
-            },
-         ]);
+         focusTeams.setVal((prev) => {
+            if (!team.minimized) {
+               return prev.map((val) =>
+                  val.teamKey === team.teamKey
+                     ? { ...val, minimized: true }
+                     : val
+               );
+            }
+
+            const updatedTeams = prev.map((val) => ({
+               ...val,
+               minimized: maxTeams.length >= 2 &&
+                     val.teamKey ===
+                        maxTeams[maxTeams.length - 1].teamKey
+                  ? true
+                  : val.minimized,
+            }));
+
+            return [
+               ...updatedTeams.filter((val) => val.teamKey !== team.teamKey),
+               {
+                  teamKey: team.teamKey,
+                  minimized: false,
+               },
+            ];
+         });
       }
    }
 
@@ -174,7 +191,7 @@ function ComparedTeamElement(
                            whiteSpace: "nowrap",
                            overflow: "hidden",
                            textOverflow: "ellipsis",
-                           width:
+                           maxWidth:
                               (focusTeams.val && focusTeams.val?.filter((val) =>
                                        !val.minimized
                                     ).length < 3
@@ -242,7 +259,21 @@ function ComparedTeamElement(
                            />
                         </div>
                         {parseTeamKey(team.teamKey)} <div>|</div>{" "}
-                        {teamData ? teamData.name : "N/A"}
+                        <div
+                           style={{
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              maxHeight: (focusTeams.val &&
+                                    focusTeams.val?.filter((val) =>
+                                          !val.minimized
+                                       ).length < 3
+                                 ? "14rem"
+                                 : "8rem"),
+                           }}
+                        >
+                           {teamData ? teamData.name : "N/A"}
+                        </div>
                      </div>
                   </Tippy>
 
