@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import styles from "./comparison.module.css";
 import {
    ComparedTeamKeysContext,
@@ -14,6 +14,7 @@ import {
 import { GlobalTeamDataContext } from "../../../../app-global-ctx";
 import { parseTeamKey } from "../../../../utils/logic/app";
 import Tippy from "@tippyjs/react";
+import PicklistBarGraph from "./graphs/bar";
 
 function ComparisonTab() {
    const targetPicklist = useContext(TargetPicklistContext);
@@ -145,6 +146,14 @@ function ComparedTeamElement(
       }
    }
 
+   function handleCompare() {
+      if (focusTeams.setVal) {
+         focusTeams.setVal((prev) =>
+            prev.filter((val) => val.teamKey != team.teamKey)
+         );
+      }
+   }
+
    function handleMoveUp() {
       picklistCommands.moveTeamUp(team.teamKey);
    }
@@ -157,6 +166,8 @@ function ComparedTeamElement(
       picklistCommands.excludeTeam(team.teamKey);
    }
 
+   const [showSettings, setShowSettings] = useState(false);
+
    return (
       <Reorder.Item
          key={team.teamKey}
@@ -167,9 +178,15 @@ function ComparedTeamElement(
          className={team.minimized
             ? styles.comparedTeamsMinimized
             : styles.comparedTeamElement}
+         onMouseEnter={() => team.minimized && setShowSettings(true)}
+         onMouseLeave={() => team.minimized && setShowSettings(false)}
       >
          {!team.minimized && (
-            <div className={styles.teamHeader}>
+            <div
+               className={styles.teamHeader}
+               onMouseEnter={() => setShowSettings(true)}
+               onMouseLeave={() => setShowSettings(false)}
+            >
                <div
                   className={styles.teamHeaderText}
                   onPointerDown={(e) => controls.start(e)}
@@ -181,6 +198,8 @@ function ComparedTeamElement(
                      style={{
                         display: "flex",
                         gap: "0.2rem",
+                        overflow: "visible",
+                        width: "1rem",
                      }}
                   >
                      {parseTeamKey(team.teamKey)}
@@ -191,12 +210,9 @@ function ComparedTeamElement(
                            whiteSpace: "nowrap",
                            overflow: "hidden",
                            textOverflow: "ellipsis",
-                           maxWidth:
-                              (focusTeams.val && focusTeams.val?.filter((val) =>
-                                       !val.minimized
-                                    ).length < 3
-                                 ? "12rem"
-                                 : "8rem"),
+                           width: "9vw",
+                           marginRight: "2rem",
+                           flexShrink: "0",
                         }}
                      >
                         {teamData ? teamData.name : "N/A"}
@@ -204,30 +220,50 @@ function ComparedTeamElement(
                   </div>
                </div>
                <div className={styles.elementOptions}>
-                  <Tippy content="Move up">
-                     <i
-                        className={`fa-solid fa-arrow-up ${styles.elementOptionButton}`}
-                        onClick={handleMoveUp}
-                     />
-                  </Tippy>
-                  <Tippy content="Move down">
-                     <i
-                        className={`fa-solid fa-arrow-down ${styles.elementOptionButton}`}
-                        onClick={handleMoveDown}
-                     />
-                  </Tippy>
-                  <Tippy content="Exclude">
-                     <i
-                        className={`fa-solid fa-ban ${styles.elementOptionButton}`}
-                        onClick={handleExclude}
-                     />
-                  </Tippy>{" "}
                   <Tippy content="Minimize tab">
                      <i
                         className={`fa-solid fa-compress ${styles.elementOptionButton}`}
                         onClick={handleMinimizeToggle}
                      />
                   </Tippy>
+                  <Tippy content="Stop comparing">
+                     <i
+                        className={`fa-solid fa-scale-unbalanced-flip ${styles.elementOptionButton}`}
+                        onClick={handleCompare}
+                     />
+                  </Tippy>
+                  <AnimatePresence>
+                     {showSettings && (
+                        <motion.div
+                           initial={{ x: 20, opacity: 0 }}
+                           animate={{ x: 0, opacity: 1 }}
+                           exit={{ x: 20, opacity: 0 }}
+                           transition={{
+                              duration: 0.1,
+                           }}
+                           className={styles.expandedSettings}
+                        >
+                           <Tippy content="Exclude">
+                              <i
+                                 className={`fa-solid fa-ban ${styles.elementOptionButton}`}
+                                 onClick={handleExclude}
+                              />
+                           </Tippy>
+                           <Tippy content="Move up">
+                              <i
+                                 className={`fa-solid fa-arrow-up ${styles.elementOptionButton}`}
+                                 onClick={handleMoveUp}
+                              />
+                           </Tippy>
+                           <Tippy content="Move down">
+                              <i
+                                 className={`fa-solid fa-arrow-down ${styles.elementOptionButton}`}
+                                 onClick={handleMoveDown}
+                              />
+                           </Tippy>
+                        </motion.div>
+                     )}
+                  </AnimatePresence>
                </div>
             </div>
          )}
@@ -264,36 +300,54 @@ function ComparedTeamElement(
                               whiteSpace: "nowrap",
                               overflow: "hidden",
                               textOverflow: "ellipsis",
-                              maxHeight: (focusTeams.val &&
-                                    focusTeams.val?.filter((val) =>
-                                          !val.minimized
-                                       ).length < 3
-                                 ? "14rem"
-                                 : "8rem"),
+                              height: "20vh",
                            }}
                         >
                            {teamData ? teamData.name : "N/A"}
                         </div>
                      </div>
                   </Tippy>
-
                   <div className={styles.elementOptionsMinimized}>
-                     <Tippy content="Exclude" placement="left">
+                     <AnimatePresence>
+                        {showSettings && (
+                           <motion.div
+                              initial={{ y: 20, opacity: 0 }}
+                              animate={{ y: 0, opacity: 1 }}
+                              exit={{ y: 20, opacity: 0 }}
+                              transition={{
+                                 duration: 0.1,
+                              }}
+                              className={styles.minimizedExpandedSettings}
+                           >
+                              <Tippy content="Exclude" placement="left">
+                                 <i
+                                    className={`fa-solid fa-ban ${styles.elementOptionButton} ${styles.minimized}`}
+                                    onClick={handleExclude}
+                                 />
+                              </Tippy>
+                              <Tippy content="Move up" placement="left">
+                                 <i
+                                    className={`fa-solid fa-arrow-up ${styles.elementOptionButton} ${styles.minimized}`}
+                                    onClick={handleMoveUp}
+                                 />
+                              </Tippy>
+                              <Tippy content="Move down" placement="left">
+                                 <i
+                                    className={`fa-solid fa-arrow-down ${styles.elementOptionButton} ${styles.minimized}`}
+                                    onClick={handleMoveDown}
+                                 />
+                              </Tippy>
+                           </motion.div>
+                        )}
+                     </AnimatePresence>
+                     <Tippy content="Stop comparing" placement="left">
                         <i
-                           className={`fa-solid fa-ban ${styles.elementOptionButton} ${styles.minimized}`}
-                           onClick={handleExclude}
-                        />
-                     </Tippy>
-                     <Tippy content="Move up" placement="left">
-                        <i
-                           className={`fa-solid fa-arrow-up ${styles.elementOptionButton} ${styles.minimized}`}
-                           onClick={handleMoveUp}
-                        />
-                     </Tippy>
-                     <Tippy content="Move down" placement="left">
-                        <i
-                           className={`fa-solid fa-arrow-down ${styles.elementOptionButton} ${styles.minimized}`}
-                           onClick={handleMoveDown}
+                           className={`fa-solid fa-scale-unbalanced-flip ${styles.elementOptionButton} ${styles.minimized}`}
+                           style={{
+                              fontSize: "0.95rem",
+                              padding: "0.3rem 0rem",
+                           }}
+                           onClick={handleCompare}
                         />
                      </Tippy>
                      <Tippy content="Minimize tab" placement="left">
@@ -311,9 +365,126 @@ function ComparedTeamElement(
 }
 
 function TeamGraphs() {
+   const [metrics, setMetrics] = useState<{
+      title: string;
+      values: { teamKey: string; value: number }[];
+      type: "bar" | "box" | "line" | "pie";
+   }[]>([]);
+
+   const comparedTeams = useContext(ComparedTeamKeysContext).val;
+   const teamsData = useContext(GlobalTeamDataContext);
+
+   const [teamEPAs, setTeamEPAs] = useState<
+      { teamKey: string; value: number }[]
+   >([]);
+
+   useEffect(() => {
+      if (comparedTeams) {
+         const teamEPAList: { teamKey: string; value: number }[] = [];
+
+         for (const team of comparedTeams) {
+            const teamKey = team.teamKey;
+
+            teamEPAList.push({
+               teamKey: teamKey,
+               value: teamsData.EPAdata[teamKey]?.epa.total_points.mean || 0,
+            });
+         }
+
+         setTeamEPAs(teamEPAList);
+      }
+
+      setMetrics([{
+         title: "Mean EPA",
+         values: teamEPAs,
+         type: "bar",
+      }]);
+
+      console.log(metrics);
+
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [comparedTeams]);
+
    return (
-      <div className={styles.teamGraphsContainer}>
-      </div>
+      <Reorder.Group
+         axis="x"
+         values={metrics}
+         onReorder={setMetrics}
+         className={styles.teamGraphsContainer}
+         as="div"
+      >
+         {metrics.map((val) => {
+            return (
+               <TeamGraphElement
+                  title={val.title}
+                  values={val.values}
+                  type={val.type}
+                  key={val.title}
+               />
+            );
+         })}
+      </Reorder.Group>
+   );
+}
+
+function TeamGraphElement({ title, values, type }: {
+   title: string;
+   values: { teamKey: string; value: number }[];
+   type: "bar" | "box" | "line" | "pie";
+}) {
+   return (
+      <Reorder.Item
+         key={title}
+         value={{ title: title, values: values }}
+         // dragListener={false}
+         // dragControls={controls}
+         as="div"
+         className={styles.teamGraphElement}
+      >
+         <div className={styles.teamGraphDetails}>
+            <div className={styles.teamGraphHeader}>{title}</div>
+            <div className={styles.teamGraphValues}>
+               {values.map((val) => {
+                  return (
+                     <div
+                        className={`${styles.teamGraphValueEntry} ${
+                           values.reduce(
+                                 (max, val) =>
+                                    val.value > max.value ? val : max,
+                                 values[0],
+                              ).teamKey == val.teamKey && styles.active
+                        }`}
+                     >
+                        {parseTeamKey(val.teamKey)}{" "}
+                        <div
+                           style={{
+                              color: (values.reduce(
+                                    (max, val) =>
+                                       val.value > max.value ? val : max,
+                                    values[0],
+                                 ).teamKey == val.teamKey
+                                 ? "var(--text-primary)"
+                                 : "var(--text-secondary)"),
+                           }}
+                        >
+                           {parseFloat(val.value.toFixed(1))}
+                        </div>
+                     </div>
+                  );
+               })}
+            </div>
+         </div>
+         <div className={styles.teamGraph}>
+            {type == "bar" && (
+               <PicklistBarGraph
+                  valueObject={values}
+                  indexByKey="teamKey"
+                  keysOfSeries={["value"]}
+                  axisTicks={0}
+               />
+            )}
+         </div>
+      </Reorder.Item>
    );
 }
 
