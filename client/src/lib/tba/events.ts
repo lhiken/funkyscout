@@ -115,5 +115,34 @@ async function fetchTBAMatchSchedule(eventKey: string) {
    return matchSchedule;
 }
 
-export { fetchTBAEventTeams, fetchTBAMatchSchedule };
+async function fetchTeamEventCOPRs(
+   eventKey: string,
+) {
+   const OPRs = await fetchTBAData(
+      `/event/${eventKey}/oprs`,
+      "GET",
+   );
+
+   const COPRs = await fetchTBAData(
+      `/event/${eventKey}/coprs`,
+      "GET",
+   );
+
+   if (!OPRs || !COPRs) return;
+
+   const returnObject: Record<string, Record<string, number>> = {};
+
+   returnObject["Offensive Power Rating"] = OPRs.oprs;
+
+   for (const value in COPRs) {
+      console.log(value);
+      returnObject[value] = COPRs[value];
+   }
+
+   console.log(returnObject);
+
+   return returnObject;
+}
+
+export { fetchTBAEventTeams, fetchTBAMatchSchedule, fetchTeamEventCOPRs };
 export type { EventSchedule, TeamRank };

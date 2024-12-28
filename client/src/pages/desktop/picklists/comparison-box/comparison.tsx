@@ -413,6 +413,10 @@ function TeamGraphs() {
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [comparedTeams]);
 
+   const [showAllMetrics, setShowAllMetrics] = useState(false);
+
+   const [hoveringOverMetrics, setHoveringOverMetrics] = useState(false);
+
    return (
       <div className={styles.teamGraphsContainer}>
          <Reorder.Group
@@ -433,9 +437,45 @@ function TeamGraphs() {
                );
             })}
          </Reorder.Group>
-         <div className={styles.newMetricButton}>
+         <div
+            className={styles.newMetricButton}
+            onClick={() => setShowAllMetrics(!showAllMetrics)}
+         >
             <i className="fa-solid fa-plus" />
          </div>
+         <AnimatePresence>
+            {showAllMetrics && (
+               <>
+                  <motion.div
+                     initial={{ opacity: 0 }}
+                     animate={{ opacity: 1 }}
+                     exit={{ opacity: 0 }}
+                     transition={{
+                        duration: 0.1,
+                     }}
+                     className={styles.allMetricsBox}
+                     onClick={() =>
+                        !hoveringOverMetrics && setShowAllMetrics(false)}
+                  >
+                     <div
+                        className={styles.metricsContainer}
+                        onMouseEnter={() => setHoveringOverMetrics(true)}
+                        onMouseLeave={() => setHoveringOverMetrics(false)}
+                     >
+                        <div className={styles.metricsHeader}>
+                           Comparable Metrics
+                        </div>
+                        <div className={styles.seperator} />
+                        <div className={styles.metricCategory}>
+                           <div className={styles.metricsHeader}>
+                              COPRs
+                           </div>
+                        </div>
+                     </div>
+                  </motion.div>
+               </>
+            )}
+         </AnimatePresence>
       </div>
    );
 }

@@ -13,7 +13,11 @@ import MobileApp from "./pages/mobile/mobile";
 import isMobile from "./utils/device";
 import { getEvent, getFocusTeam, setFocusTeam } from "./utils/logic/app";
 import { fetchEventTeamEPAs } from "./lib/statbotics/event-teams";
-import { fetchTBAEventTeams, TeamRank } from "./lib/tba/events";
+import {
+   fetchTBAEventTeams,
+   fetchTeamEventCOPRs,
+   TeamRank,
+} from "./lib/tba/events";
 import {
    fetchMatchDataByEvent,
    fetchTeamDataByEvent,
@@ -27,6 +31,7 @@ export interface GlobalTeamData {
    TBAdata: TeamRank[];
    InternalMatchData: Tables<"event_match_data">[];
    InternalTeamData: Tables<"event_team_data">[];
+   COPRdata: Record<string, Record<string, number>>;
    progress: {
       EPAloading: boolean;
       EPAerror: boolean;
@@ -36,6 +41,8 @@ export interface GlobalTeamData {
       MatchError: boolean;
       TeamLoading: boolean;
       TeamError: boolean;
+      COPRloading: boolean;
+      COPRerror: boolean;
    };
    refetch: () => void;
 }
@@ -70,6 +77,7 @@ export default function App() {
       TBAdata: [],
       InternalMatchData: [],
       InternalTeamData: [],
+      COPRdata: {},
       progress: {
          EPAloading: true,
          EPAerror: false,
@@ -79,9 +87,13 @@ export default function App() {
          MatchError: false,
          TeamLoading: true,
          TeamError: false,
+         COPRloading: true,
+         COPRerror: false,
       },
       refetch: () => {},
    });
+
+   const masterRefetchIntervalSeconds = 240;
 
    const results = useQueries({
       queries: [
@@ -89,37 +101,45 @@ export default function App() {
             queryKey: [`appFetchEPA/${getEvent()}`],
             queryFn: () => fetchEventTeamEPAs(getEvent() || ""),
             refetchOnWindowFocus: false,
-            refetchInterval: 120000,
+            refetchInterval: masterRefetchIntervalSeconds * 1000,
          },
          {
             queryKey: [`appFetchTBA/${getEvent()}`],
             queryFn: () => fetchTBAEventTeams(getEvent() || ""),
             refetchOnWindowFocus: false,
-            refetchInterval: 120000,
+            refetchInterval: masterRefetchIntervalSeconds * 1000,
          },
          {
             queryKey: [`appFetchMatchData/${getEvent()}`],
             queryFn: () => fetchMatchDataByEvent(getEvent() || ""),
             refetchOnWindowFocus: false,
-            refetchInterval: 120000,
+            refetchInterval: masterRefetchIntervalSeconds * 1000,
          },
          {
             queryKey: [`appFetchTeamData/${getEvent()}`],
             queryFn: () => fetchTeamDataByEvent(getEvent() || ""),
             refetchOnWindowFocus: false,
-            refetchInterval: 120000,
+            refetchInterval: masterRefetchIntervalSeconds * 1000,
+         },
+         {
+            queryKey: [`appFetchCOPR/${getEvent()}`],
+            queryFn: () => fetchTeamEventCOPRs(getEvent() || ""),
+            refetchOnWindowFocus: false,
+            refetchInterval: masterRefetchIntervalSeconds * 1000,
          },
       ],
    });
 
    useEffect(() => {
-      const [EPAdata, TBAdata, InternalMatchData, InternalTeamData] = results;
+      const [EPAdata, TBAdata, InternalMatchData, InternalTeamData, COPRdata] =
+         results;
 
       setTeamData({
          EPAdata: EPAdata.data || {},
          TBAdata: TBAdata.data || [],
          InternalMatchData: InternalMatchData.data || [],
          InternalTeamData: InternalTeamData.data || [],
+         COPRdata: COPRdata.data || {},
          progress: {
             EPAloading: EPAdata.isLoading,
             EPAerror: EPAdata.isError,
@@ -129,6 +149,8 @@ export default function App() {
             MatchError: InternalMatchData.isError,
             TeamLoading: InternalTeamData.isLoading,
             TeamError: InternalTeamData.isError,
+            COPRloading: COPRdata.isLoading,
+            COPRerror: COPRdata.isError,
          },
          refetch: () => {
             TBAdata.refetch();
