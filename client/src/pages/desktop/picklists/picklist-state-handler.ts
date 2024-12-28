@@ -15,7 +15,6 @@ export function getCurrentPicklist() {
 export function setComparedTeams(
    teams: { teamKey: string; minimized: boolean }[] | undefined,
 ) {
-   console.log("????");
    setLocalStorageItem("picklist_compared_teams", teams);
 }
 

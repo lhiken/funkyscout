@@ -15,6 +15,7 @@ import { GlobalTeamDataContext } from "../../../../app-global-ctx";
 import { parseTeamKey } from "../../../../utils/logic/app";
 import Tippy from "@tippyjs/react";
 import PicklistBarGraph from "./graphs/bar";
+import { getUsedMetrics, setUsedMetrics } from "../picklist-state-handler";
 
 function ComparisonTab() {
    const targetPicklist = useContext(TargetPicklistContext);
@@ -371,6 +372,15 @@ function TeamGraphs() {
       type: "bar" | "box" | "line" | "pie";
    }[]>([]);
 
+   useEffect(() => {
+      const metrics = getUsedMetrics();
+      if (metrics) setMetrics(metrics);
+   }, []);
+
+   useEffect(() => {
+      if (metrics.length > 0) setUsedMetrics(metrics);
+   }, [metrics]);
+
    const comparedTeams = useContext(ComparedTeamKeysContext).val;
    const teamsData = useContext(GlobalTeamDataContext);
 
@@ -400,30 +410,33 @@ function TeamGraphs() {
          type: "bar",
       }]);
 
-      console.log(metrics);
-
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [comparedTeams]);
 
    return (
-      <Reorder.Group
-         axis="x"
-         values={metrics}
-         onReorder={setMetrics}
-         className={styles.teamGraphsContainer}
-         as="div"
-      >
-         {metrics.map((val) => {
-            return (
-               <TeamGraphElement
-                  title={val.title}
-                  values={val.values}
-                  type={val.type}
-                  key={val.title}
-               />
-            );
-         })}
-      </Reorder.Group>
+      <div className={styles.teamGraphsContainer}>
+         <Reorder.Group
+            axis="x"
+            values={metrics}
+            onReorder={setMetrics}
+            className={styles.teamMetricsContainer}
+            as="div"
+         >
+            {metrics.map((val) => {
+               return (
+                  <TeamGraphElement
+                     title={val.title}
+                     values={val.values}
+                     type={val.type}
+                     key={val.title}
+                  />
+               );
+            })}
+         </Reorder.Group>
+         <div className={styles.newMetricButton}>
+            <i className="fa-solid fa-plus" />
+         </div>
+      </div>
    );
 }
 

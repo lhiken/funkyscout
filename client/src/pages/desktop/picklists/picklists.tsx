@@ -12,7 +12,7 @@ import {
 } from "./picklists-context";
 import PicklistTab from "./picklist-tab/picklist-tab";
 import ComparisonTab from "./comparison-box/comparison";
-import { Picklist } from "../../../schemas/schema";
+import { Picklist } from "../../../schemas/defs";
 import throwNotification from "../../../components/app/toast/toast";
 import {
    getComparedTeams,
@@ -20,6 +20,7 @@ import {
    setComparedTeams,
    setCurrentPicklist,
 } from "./picklist-state-handler";
+import { getLocalUserData } from "../../../lib/supabase/auth";
 
 export interface PicklistData {
    picklists: Tables<"event_picklist">[];
@@ -148,16 +149,23 @@ function PicklistPage() {
       changePicklistVisibility: (
          visiblity: "default" | "private" | "public",
       ) => {
-         setPicklistData((prev) => {
-            const newPicklists = prev.picklists.map((picklist) => {
-               if (targetPicklist && picklist.id == targetPicklist.id) {
-                  setTargetPicklist({ ...targetPicklist, type: visiblity });
-                  return { ...picklist, type: visiblity };
-               }
-               return picklist;
+         if (targetPicklist?.uid == getLocalUserData().uid) { // Yes its joever if someone bypasses this but its not that important anyways and nobody will notice!
+            setPicklistData((prev) => {
+               const newPicklists = prev.picklists.map((picklist) => {
+                  if (targetPicklist && picklist.id == targetPicklist.id) {
+                     setTargetPicklist({ ...targetPicklist, type: visiblity });
+                     return { ...picklist, type: visiblity };
+                  }
+                  return picklist;
+               });
+               return { ...prev, picklists: newPicklists };
             });
-            return { ...prev, picklists: newPicklists };
-         });
+         } else {
+            throwNotification(
+               "error",
+               "You don't have permission to change this value",
+            );
+         }
       },
 
       renamePicklist: (name: string) => {

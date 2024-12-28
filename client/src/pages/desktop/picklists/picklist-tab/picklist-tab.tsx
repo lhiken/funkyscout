@@ -17,7 +17,7 @@ import {
 } from "../../../../lib/supabase/data";
 import throwNotification from "../../../../components/app/toast/toast";
 import { AnimatePresence, motion, useDragControls } from "motion/react";
-import { Picklist } from "../../../../schemas/schema";
+import { Picklist } from "../../../../schemas/defs";
 import { GlobalTeamDataContext } from "../../../../app-global-ctx";
 import { Reorder } from "motion/react";
 import Checkbox from "../../../../components/app/buttons/checkbox";
