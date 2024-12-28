@@ -21,6 +21,7 @@ import { Picklist } from "../../../../schemas/schema";
 import { GlobalTeamDataContext } from "../../../../app-global-ctx";
 import { Reorder } from "motion/react";
 import Checkbox from "../../../../components/app/buttons/checkbox";
+import { setCurrentPicklist } from "../picklist-state-handler";
 
 function PicklistTab() {
    const targetPicklist = useContext(TargetPicklistContext);
@@ -155,6 +156,7 @@ function PicklistEditingTab({ showSettings }: { showSettings: boolean }) {
       if (targetPicklist.setVal && comparedTeams.setVal) {
          comparedTeams.setVal([]);
          targetPicklist.setVal(undefined);
+         setCurrentPicklist(undefined);
       }
    }
 

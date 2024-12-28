@@ -14,6 +14,12 @@ import PicklistTab from "./picklist-tab/picklist-tab";
 import ComparisonTab from "./comparison-box/comparison";
 import { Picklist } from "../../../schemas/schema";
 import throwNotification from "../../../components/app/toast/toast";
+import {
+   getComparedTeams,
+   getCurrentPicklist,
+   setComparedTeams,
+   setCurrentPicklist,
+} from "./picklist-state-handler";
 
 export interface PicklistData {
    picklists: Tables<"event_picklist">[];
@@ -218,6 +224,24 @@ function PicklistPage() {
       // We could do it some other way but oh well!
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [results.map((res) => res.isFetching).join()]);
+
+   useEffect(() => {
+      if (!targetPicklist) {
+         setTargetPicklist(getCurrentPicklist());
+
+         const teams = getComparedTeams();
+         if (teams) setComparedTeamKeys(teams);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, []);
+
+   useEffect(() => {
+      if (comparedTeamKeys.length > 0) setComparedTeams(comparedTeamKeys);
+   }, [comparedTeamKeys]);
+
+   useEffect(() => {
+      if (targetPicklist != undefined) setCurrentPicklist(targetPicklist);
+   }, [targetPicklist]);
 
    // sorry, but oh well!
    // also it's not even that bad
