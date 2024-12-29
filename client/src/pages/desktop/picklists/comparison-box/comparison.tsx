@@ -1,4 +1,10 @@
-import { useContext, useEffect, useState } from "react";
+import {
+   SetStateAction,
+   useContext,
+   useEffect,
+   useMemo,
+   useState,
+} from "react";
 import styles from "./comparison.module.css";
 import {
    ComparedTeamKeysContext,
@@ -16,6 +22,8 @@ import { parseTeamKey } from "../../../../utils/logic/app";
 import Tippy from "@tippyjs/react";
 import PicklistBarGraph from "./graphs/bar";
 import { getUsedMetrics, setUsedMetrics } from "../picklist-state-handler";
+import { DisplayedMetric } from "../../../../schemas/defs";
+import { DesktopMetricsSelector } from "../../../../components/metrics/metrics-selector";
 
 function ComparisonTab() {
    const targetPicklist = useContext(TargetPicklistContext);
@@ -366,11 +374,7 @@ function ComparedTeamElement(
 }
 
 function TeamGraphs() {
-   const [metrics, setMetrics] = useState<{
-      title: string;
-      values: { teamKey: string; value: number }[];
-      type: "bar" | "box" | "line" | "pie";
-   }[]>([]);
+   const [metrics, setMetrics] = useState<DisplayedMetric[]>([]);
 
    useEffect(() => {
       const metrics = getUsedMetrics();
@@ -381,41 +385,7 @@ function TeamGraphs() {
       if (metrics.length > 0) setUsedMetrics(metrics);
    }, [metrics]);
 
-   const comparedTeams = useContext(ComparedTeamKeysContext).val;
-   const teamsData = useContext(GlobalTeamDataContext);
-
-   const [teamEPAs, setTeamEPAs] = useState<
-      { teamKey: string; value: number }[]
-   >([]);
-
-   useEffect(() => {
-      if (comparedTeams) {
-         const teamEPAList: { teamKey: string; value: number }[] = [];
-
-         for (const team of comparedTeams) {
-            const teamKey = team.teamKey;
-
-            teamEPAList.push({
-               teamKey: teamKey,
-               value: teamsData.EPAdata[teamKey]?.epa.total_points.mean || 0,
-            });
-         }
-
-         setTeamEPAs(teamEPAList);
-      }
-
-      setMetrics([{
-         title: "Mean EPA",
-         values: teamEPAs,
-         type: "bar",
-      }]);
-
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [comparedTeams]);
-
    const [showAllMetrics, setShowAllMetrics] = useState(false);
-
-   const [hoveringOverMetrics, setHoveringOverMetrics] = useState(false);
 
    return (
       <div className={styles.teamGraphsContainer}>
@@ -429,10 +399,9 @@ function TeamGraphs() {
             {metrics.map((val) => {
                return (
                   <TeamGraphElement
-                     title={val.title}
-                     values={val.values}
-                     type={val.type}
                      key={val.title}
+                     metric={val}
+                     setMetric={setMetrics}
                   />
                );
             })}
@@ -445,57 +414,68 @@ function TeamGraphs() {
          </div>
          <AnimatePresence>
             {showAllMetrics && (
-               <>
-                  <motion.div
-                     initial={{ opacity: 0 }}
-                     animate={{ opacity: 1 }}
-                     exit={{ opacity: 0 }}
-                     transition={{
-                        duration: 0.1,
-                     }}
-                     className={styles.allMetricsBox}
-                     onClick={() =>
-                        !hoveringOverMetrics && setShowAllMetrics(false)}
-                  >
-                     <div
-                        className={styles.metricsContainer}
-                        onMouseEnter={() => setHoveringOverMetrics(true)}
-                        onMouseLeave={() => setHoveringOverMetrics(false)}
-                     >
-                        <div className={styles.metricsHeader}>
-                           Comparable Metrics
-                        </div>
-                        <div className={styles.seperator} />
-                        <div className={styles.metricCategory}>
-                           <div className={styles.metricsHeader}>
-                              COPRs
-                           </div>
-                        </div>
-                     </div>
-                  </motion.div>
-               </>
+               <DesktopMetricsSelector
+                  metrics={metrics}
+                  setMetrics={setMetrics}
+                  setShow={setShowAllMetrics}
+               />
             )}
          </AnimatePresence>
       </div>
    );
 }
 
-function TeamGraphElement({ title, values, type }: {
-   title: string;
-   values: { teamKey: string; value: number }[];
-   type: "bar" | "box" | "line" | "pie";
+function TeamGraphElement({ metric, setMetric }: {
+   metric: DisplayedMetric;
+   setMetric: React.Dispatch<SetStateAction<DisplayedMetric[]>>;
 }) {
+   const comparedTeams = useContext(ComparedTeamKeysContext);
+
+   const values = useMemo(() => {
+      return metric.values.filter((val) =>
+         comparedTeams.val?.map((val) => val.teamKey).includes(val.teamKey)
+      );
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [comparedTeams.val?.length]);
+
+   const [showRemove, setShowRemove] = useState(false);
+
    return (
       <Reorder.Item
-         key={title}
-         value={{ title: title, values: values }}
-         // dragListener={false}
-         // dragControls={controls}
+         key={metric.title}
+         value={metric}
          as="div"
          className={styles.teamGraphElement}
       >
          <div className={styles.teamGraphDetails}>
-            <div className={styles.teamGraphHeader}>{title}</div>
+            <div
+               className={styles.teamGraphHeader}
+               onMouseEnter={() => setShowRemove(true)}
+               onMouseLeave={() => setShowRemove(false)}
+            >
+               <Tippy content={metric.title}>
+                  <div
+                     style={{
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                     }}
+                  >
+                     {metric.title}
+                  </div>
+               </Tippy>
+               {showRemove && (
+                  <div
+                     className={styles.teamGraphIcon}
+                     onClick={() =>
+                        setMetric((prev) =>
+                           prev.filter((val) => val.title != metric.title)
+                        )}
+                  >
+                     <i className="fa-solid fa-xmark" />
+                  </div>
+               )}
+            </div>
             <div className={styles.teamGraphValues}>
                {values.map((val) => {
                   return (
@@ -528,7 +508,7 @@ function TeamGraphElement({ title, values, type }: {
             </div>
          </div>
          <div className={styles.teamGraph}>
-            {type == "bar" && (
+            {metric.type == "bar" && (
                <PicklistBarGraph
                   valueObject={values}
                   indexByKey="teamKey"

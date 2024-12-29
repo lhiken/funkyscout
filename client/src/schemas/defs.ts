@@ -2,6 +2,7 @@
 
 // App related
 
+import { Tables } from "../lib/supabase/database.types";
 import {
    MatchMetrics,
    RobotActions,
@@ -14,6 +15,12 @@ export type Picklist = {
    comment?: string;
    excluded: boolean;
 }[];
+
+export type DisplayedMetric = {
+   title: string;
+   values: { teamKey: string; value: number }[];
+   type: "bar" | "box" | "line" | "pie";
+};
 
 // Pit scouting data
 
@@ -64,13 +71,13 @@ export type CombinedMatchActions<
  * or climbing. Each "action" has a time, location, and action (as defined
  * in schema.ts).
  */
-export type TeleopAction<Year extends keyof (ScoreActions | RobotActions)> = {
+type TeleopAction<Year extends keyof (ScoreActions | RobotActions)> = {
    timestamp: number; // Timestamp of the action
    location?: { x: number; y: number }; // Position on the field, can be arbitrary year-to-year.
    action: RobotActions[Year] | ScoreActions[Year]; // The action taken by the robot.
 };
 
-export type AutoAction<Year extends keyof (ScoreActions | RobotActions)> = {
+type AutoAction<Year extends keyof (ScoreActions | RobotActions)> = {
    timestamp: number; // Timestamp of the action
    location?: { x: number; y: number }; // Position on the field, can be arbitrary year-to-year.
    action: RobotActions[Year] | ScoreActions[Year]; // The action taken by the robot.
@@ -99,3 +106,74 @@ export type PointValuesType = {
       [Q in ScoreActions[K]]: number;
    };
 };
+
+/** */
+/** Data Parser
+ * For each metric defined in schema.ts, there must exist a function
+ * to get said metric.
+ */
+export type RequiredFunctions<T extends keyof TeamMetrics> =
+   & TeamFunctions<T>
+   & MatchFunctions<T>;
+
+type TeamFunctions<T extends keyof TeamMetrics> = {
+   [K in keyof TeamMetrics[T] as `getTeam${Capitalize<string & K>}`]: (
+      teamKey?: string,
+   ) => CommonMetricReturnType<TeamMetrics[T][K]>;
+};
+
+type MatchFunctions<T extends keyof MatchMetrics> = {
+   [Q in keyof MatchMetrics[T] as `getMatch${Capitalize<string & Q>}`]: (
+      matchKey: string,
+   ) => CommonMetricReturnType<MatchMetrics[T][Q]>;
+};
+
+type CommonMetricReturnType<T> = Record<string, T>; // {{teamKey, value}, {teamKey, value}}
+
+export class DataParser<T extends keyof (MatchMetrics | TeamMetrics)> {
+   private data: Tables<"event_match_data">[] = [];
+   private combinedData: {
+      matchKey: string;
+      teamKey: string;
+      alliance: "red" | "blue";
+      metrics: MatchMetrics[T];
+      autoActions: AutoAction<T>[];
+      teleActions: TeleopAction<T>[];
+   }[] = [];
+   private team: string;
+
+   constructor(data: Tables<"event_match_data">[], teamKey?: string) {
+      this.data = data;
+      this.team = teamKey || "";
+
+      if (teamKey) {
+         this.data = data.filter((val) => val.team == teamKey);
+      }
+
+      for (const entry of data) {
+         const combinedMetrics = entry.data as CombinedMatchMetrics<T>;
+         const combinedActions = entry.data_raw as CombinedMatchActions<T>;
+
+         this.combinedData.push({
+            matchKey: entry.match,
+            teamKey: entry.team,
+            alliance: entry.alliance,
+            metrics: combinedMetrics.metrics,
+            autoActions: combinedActions.autoActions,
+            teleActions: combinedActions.teleopActions,
+         });
+      }
+   }
+
+   getParserData() {
+      return this.data;
+   }
+
+   getParserCombinedData() {
+      return this.combinedData;
+   }
+
+   getParserTeam() {
+      return this.team;
+   }
+}

@@ -35,7 +35,7 @@ function PicklistTab() {
       if (inputRef.current) {
          const span = document.createElement("span");
          span.style.font = getComputedStyle(inputRef.current).font;
-         span.textContent = (targetPicklist.val?.title || "") + " "; // Add a space to ensure spaces are measured
+         span.textContent = (targetPicklist.val?.title || "") + " ";
 
          document.body.appendChild(span);
          setInputWidth(span.offsetWidth);
