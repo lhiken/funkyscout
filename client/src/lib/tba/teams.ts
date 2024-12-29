@@ -40,6 +40,5 @@ async function fetchTeamEventStatus(
    };
 }
 
-
 export { fetchTeamEventStatus };
 export type { TeamEventStatus };

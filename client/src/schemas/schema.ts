@@ -1,4 +1,4 @@
-import { AutoMetricsObject, PointValues, TeleopMetricsObject } from "./defs";
+import { MetricDescriptionsType, PointValuesType } from "./defs";
 
 /** Yearly update guide
  * This file acts as a "config" for the app,
@@ -6,6 +6,9 @@ import { AutoMetricsObject, PointValues, TeleopMetricsObject } from "./defs";
  * To add a new year, create years with actions in
  * each of the types and definitions in this file
  * before updating any other code.
+ *
+ * Add a new year for each of the following types and
+ * syntax errors will show where things must be changed.
  */
 
 /** Actions
@@ -24,13 +27,10 @@ export type RobotActions = {
    2024:
       | "notePickup"
       | "noteDrop"
-      | "noteMiss"
-      | "breakdown"
-      | "brownout"
-      | "tipover"
-      | "defended";
-   // 2025:
-   //    | "robot action"
+      | "noteMiss";
+   2025:
+      | "exampleDisable"
+      | "exampleExplode";
 };
 
 /** Scoring actions
@@ -38,14 +38,13 @@ export type RobotActions = {
  * points during a match and should be redefined
  * every year.
  */
-export type ScoringActions = {
+export type ScoreActions = {
    2024:
-      | "noteScoreAmp"
-      | "noteScoreSpeaker"
-      | "robotTrap"
-      | "climb";
-   // 2025:
-   //    | "scorable action"
+      | "noteScore"
+      | "robotClimb";
+   2025:
+      | "exampleScore"
+      | "exampleClimb";
 };
 
 /** Scoring action points
@@ -53,13 +52,15 @@ export type ScoringActions = {
  * While not perfectly accurate, this should be able
  * to give a rough estimate of the points scored.
  */
-export const YearlyPointValues: PointValues = {
+export const PointValues: PointValuesType = {
    2024: {
       // Note: these are random values
-      noteScoreAmp: 1,
-      noteScoreSpeaker: 2,
-      robotTrap: 2,
-      climb: 2,
+      noteScore: 2,
+      robotClimb: 2,
+   },
+   2025: {
+      exampleScore: 0,
+      exampleClimb: 0,
    },
 };
 
@@ -71,50 +72,60 @@ export const YearlyPointValues: PointValues = {
  * used to compare teams. Each metric then must be defined
  * with a title and then queryKey that matches one of the
  * robot/scoring actions.
- *
- * While meaningless on its own, the queryKey serves as a
- * "hint" that you can use in your code as to what the data
- * actually is.
  */
-export type TeleopMetrics = {
-   2024:
-      | "notesScoredAmp"
-      | "notesScoredSpeaker"
-      | "failureTime";
-};
 
-export const TeleopMetricsTable: TeleopMetricsObject = {
+/** Match Metrics
+ * Match metrics are collected on a per-team-per-match basis,
+ * as its all the user can collect during the match when each
+ * scouter looks at one team.
+ */
+export type MatchMetrics = {
    2024: {
-      notesScoredAmp: {
-         title: "Amp Notes",
-         queryKey: "noteScoreAmp",
-      },
-      notesScoredSpeaker: {
-         title: "Speaker Notes",
-         queryKey: "noteScoreSpeaker",
-      },
-      failureTime: {
-         title: "Failure Time",
-         queryKey: "breakdown",
-      },
-   },
+      notesScored: number;
+      notesMissed: number;
+      robotClimb: boolean;
+   };
+   2025: {
+      exampleMetric: number;
+   };
 };
 
-export type AutoMetrics = {
-   2024:
-      | "notesScored"
-      | "notesTrapped";
+/** Team Metrics
+ * Team metrics are metrics for an entire team during the event,
+ * like game pieces scored on average. Unlike the other types,
+ * this is defined to be used in the data parser and be displayed
+ * in the app rather than be stored in the database.
+ */
+export type TeamMetrics = {
+   2024: {
+      notesScored: number[];
+      notesMissed: number[];
+      robotDisabled: boolean[];
+   };
+   2025: {
+      exampleMetric: number[];
+   };
 };
 
-export const AutoMetricsTable: AutoMetricsObject = {
+/** Metric Descriptions
+ * The metric descriptions are used to tell the app how to display
+ * and process the data for a certain team.
+ */
+export const MetricDescriptions: MetricDescriptionsType = {
    2024: {
       notesScored: {
-         title: "Amp Notes",
-         queryKey: "noteScoreAmp",
+         title: "Notes Scored",
       },
-      notesTrapped: {
-         title: "Trapped Notes",
-         queryKey: "robotTrap",
+      notesMissed: {
+         title: "Notes Missed",
+      },
+      robotDisabled: {
+         title: "Robot Disabled",
+      },
+   },
+   2025: {
+      exampleMetric: {
+         title: "Example metric",
       },
    },
 };
