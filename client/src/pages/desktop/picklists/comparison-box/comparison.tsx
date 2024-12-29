@@ -375,33 +375,32 @@ function ComparedTeamElement(
 
 function TeamGraphs() {
    const [metrics, setMetrics] = useState<DisplayedMetric[]>([]);
+   const [rendered, setRendered] = useState(false);
 
    useEffect(() => {
       const metrics = getUsedMetrics();
+      setRendered(true);
       if (metrics) setMetrics(metrics);
    }, []);
 
    useEffect(() => {
-      if (metrics.length > 0) setUsedMetrics(metrics);
+      if (rendered) setUsedMetrics(metrics);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [metrics]);
 
    const [showAllMetrics, setShowAllMetrics] = useState(false);
 
    return (
       <div className={styles.teamGraphsContainer}>
-         <div
-            className={styles.newMetricButton}
-            onClick={() => setShowAllMetrics(!showAllMetrics)}
-         >
-            <i className="fa-solid fa-plus" />
-         </div>
          <Reorder.Group
             axis="x"
             values={metrics}
             onReorder={setMetrics}
+            layoutScroll
             className={styles.teamMetricsContainer}
             as="div"
          >
+            <div className={styles.seperator} />
             {metrics.map((val) => {
                return (
                   <TeamGraphElement
@@ -411,11 +410,27 @@ function TeamGraphs() {
                   />
                );
             })}
+            {metrics.length == 0 && (
+               <div
+                  className={styles.errorBox}
+                  onClick={() => setShowAllMetrics(!showAllMetrics)}
+               >
+                  Choose a metric to graph
+               </div>
+            )}
          </Reorder.Group>
+         <Tippy content="Add a new metric" placement="left">
+            <div
+               className={styles.newMetricButton}
+               onClick={() => setShowAllMetrics(!showAllMetrics)}
+            >
+               <i className="fa-solid fa-plus" />
+            </div>
+         </Tippy>
          <AnimatePresence>
             {showAllMetrics && (
                <DesktopMetricsSelector
-                  metrics={metrics}
+                  displayedMetrics={metrics}
                   setMetrics={setMetrics}
                   setShow={setShowAllMetrics}
                />

@@ -3,13 +3,15 @@ import { DisplayedMetric } from "../../schemas/defs";
 import { AnimatePresence, motion } from "motion/react";
 import styles from "./metrics.module.css";
 import { GlobalTeamDataContext } from "../../app-global-ctx";
-import { MetricDescriptions } from "../../schemas/schema";
+import { MetricDescriptions, TeamMetrics } from "../../schemas/schema";
 
-export function DesktopMetricsSelector({ setMetrics, setShow }: {
-   metrics: DisplayedMetric[];
-   setMetrics: Dispatch<SetStateAction<DisplayedMetric[]>>;
-   setShow: Dispatch<SetStateAction<boolean>>;
-}) {
+export function DesktopMetricsSelector(
+   { setMetrics, setShow, displayedMetrics }: {
+      displayedMetrics: DisplayedMetric[];
+      setMetrics: Dispatch<SetStateAction<DisplayedMetric[]>>;
+      setShow: Dispatch<SetStateAction<boolean>>;
+   },
+) {
    const [hoveringOverMetrics, setHoveringOverMetrics] = useState(false);
    const COPRs = useContext(GlobalTeamDataContext).COPRdata;
 
@@ -21,12 +23,6 @@ export function DesktopMetricsSelector({ setMetrics, setShow }: {
 
          if (prev.filter((val) => val.title == metric.title).length > 0) {
             return newMetric.filter((val) => val.title != metric.title);
-         }
-
-         if (prev.length > 3) {
-            newMetric.pop();
-            console.log(newMetric);
-            return [metric, ...newMetric];
          }
 
          return [metric, ...prev];
@@ -49,7 +45,7 @@ export function DesktopMetricsSelector({ setMetrics, setShow }: {
       addMetric(newMetric);
    }
 
-   const metrics = MetricDescriptions["2024"];
+   const metrics = MetricDescriptions[2024];
 
    return (
       <motion.div
@@ -72,18 +68,26 @@ export function DesktopMetricsSelector({ setMetrics, setShow }: {
             </div>
             <div className={styles.seperator} />
             <MetricCategory
+               metrics={displayedMetrics}
                title="Scouting Data"
-               entryKeys={Object.keys(metrics)}
+               entryKeys={Object.keys(metrics).map((val) => {
+                  const key = val as keyof TeamMetrics[2024];
+                  return metrics[key].title;
+               })}
                entryCallback={() => {}}
             />
             <MetricCategory
+               metrics={displayedMetrics}
                title="EPA"
                entryKeys={["Mean EPA"]}
                entryCallback={() => {}}
             />
             <MetricCategory
+               metrics={displayedMetrics}
                title="COPRs"
-               entryKeys={Object.keys(COPRs)}
+               entryKeys={Object.keys(COPRs).filter((val) =>
+                  val[0] == val[0].toUpperCase()
+               )}
                entryCallback={handleToggleCOPR}
             />
          </div>
@@ -95,10 +99,12 @@ function MetricCategory({
    title,
    entryKeys,
    entryCallback,
+   metrics,
 }: {
    title: string;
    entryKeys: string[];
    entryCallback: (key: string) => void;
+   metrics: DisplayedMetric[];
 }) {
    const [showCategory, setShowCategory] = useState(false);
 
@@ -130,6 +136,7 @@ function MetricCategory({
                      {entryKeys.map((val, index) => {
                         return (
                            <MetricEntry
+                              metrics={metrics}
                               key={index}
                               callback={entryCallback}
                               entryKey={val}
@@ -145,16 +152,21 @@ function MetricCategory({
 }
 
 function MetricEntry(
-   { callback, entryKey }: {
+   { callback, entryKey, metrics }: {
       callback: (key: string) => void;
       entryKey: string;
+      metrics: DisplayedMetric[];
    },
 ) {
    const [hovered, setHovered] = useState(false);
 
+   const active = Object.values(metrics).map((val) => val.title).includes(
+      entryKey,
+   );
+
    return (
       <div
-         className={styles.metricEntry}
+         className={`${styles.metricEntry} ${active && styles.active}`}
          onClick={() => callback(entryKey)}
          onMouseEnter={() => setHovered(true)}
          onMouseLeave={() => setHovered(false)}
@@ -162,7 +174,19 @@ function MetricEntry(
          {entryKey}
          {hovered && (
             <div>
-               <i className="fa-regular fa-circle-check" />
+               {active
+                  ? (
+                     <i
+                        className="fa-solid fa-trash"
+                        style={{ color: "var(--error)" }}
+                     />
+                  )
+                  : (
+                     <i
+                        className="fa-solid fa-plus"
+                        style={{ color: "var(--success" }}
+                     />
+                  )}
             </div>
          )}
       </div>

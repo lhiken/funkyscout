@@ -80,6 +80,10 @@
    cursor: pointer;
 }
 
+.metricEntry.active {
+   color: var(--text-primary);
+}
+
 .metricEntry:hover {
    color: var(--text-primary);
 }

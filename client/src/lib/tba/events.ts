@@ -132,7 +132,7 @@ async function fetchTeamEventCOPRs(
 
    const returnObject: Record<string, Record<string, number>> = {};
 
-   returnObject["Offensive Power Rating"] = OPRs.oprs;
+   returnObject["Total Points"] = OPRs.oprs;
 
    for (const value in COPRs) {
       console.log(value);

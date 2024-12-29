@@ -170,20 +170,23 @@
 .teamGraphsContainer {
    display: flex;
    flex-direction: row;
-   gap: 1rem;
+   justify-content: space-between;
    padding: 1.75rem;
-   overflow-x: scroll;
-}
-
-.teamGraphsContainer::-webkit-scrollbar {
-   display: none;
+   padding-left: 0;
+   overflow: hidden;
 }
 
 .teamMetricsContainer {
    display: flex;
-   gap: 1rem;
+   width: 1rem;
+   overflow-x: scroll;
+   flex-grow: 1;
+   border-radius: 1rem;
 }
 
+.teamMetricsContainer::-webkit-scrollbar {
+   display: none;
+}
 .teamGraphElement {
    display: flex;
    flex-direction: row;
@@ -191,6 +194,16 @@
    border: 2px solid var(--text-background);
    border-radius: 1rem;
    background-color: var(--surface);
+   cursor: grab;
+   cursor: -moz-grab;
+   cursor: -webkit-grab;
+   margin-right: 1rem;
+}
+
+.teamGraphElement:active {
+   cursor: grabbing;
+   cursor: -webkit-grabbing;
+   cursor: -moz-grabbing;
 }
 
 .newMetricButton {
@@ -246,6 +259,12 @@
    gap: 0.4rem;
 }
 
+.seperator {
+   width: 1.75rem;
+   height: 1rem;
+   flex-shrink: 0;
+}
+
 .teamGraphValueEntry {
    display: flex;
    justify-content: space-between;
@@ -268,6 +287,7 @@
    display: flex;
    flex-grow: 1;
    width: 10rem;
+   cursor: default;
 }
 
 .minimizedExpandedSettings {
@@ -275,4 +295,15 @@
    flex-direction: column;
    align-items: center;
    justify-content: center;
+}
+
+.errorBox {
+   display: flex;
+   width: 100%;
+   height: 100%;
+   border-radius: 1rem;
+   border: 2px solid var(--text-background);
+   justify-content: center;
+   align-items: center;
+   margin-right: 1rem;
 }
