@@ -389,6 +389,12 @@ function TeamGraphs() {
 
    return (
       <div className={styles.teamGraphsContainer}>
+         <div
+            className={styles.newMetricButton}
+            onClick={() => setShowAllMetrics(!showAllMetrics)}
+         >
+            <i className="fa-solid fa-plus" />
+         </div>
          <Reorder.Group
             axis="x"
             values={metrics}
@@ -406,12 +412,6 @@ function TeamGraphs() {
                );
             })}
          </Reorder.Group>
-         <div
-            className={styles.newMetricButton}
-            onClick={() => setShowAllMetrics(!showAllMetrics)}
-         >
-            <i className="fa-solid fa-plus" />
-         </div>
          <AnimatePresence>
             {showAllMetrics && (
                <DesktopMetricsSelector

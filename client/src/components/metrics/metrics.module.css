@@ -35,6 +35,16 @@
    flex-direction: row;
    justify-content: space-between;
    flex-shrink: 0;
+   cursor: pointer;
+}
+
+.metricsHeaderIcon {
+   color: var(--text-secondary);
+   transition: 0.2s;
+}
+
+.metricsHeader:hover .metricsHeaderIcon {
+   color: var(--primary);
 }
 
 .seperator {
@@ -65,4 +75,11 @@
    display: flex;
    flex-direction: row;
    padding: 0.2rem 0;
+   transition: 0.2s;
+   justify-content: space-between;
+   cursor: pointer;
+}
+
+.metricEntry:hover {
+   color: var(--text-primary);
 }
