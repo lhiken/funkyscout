@@ -12,15 +12,8 @@ import {
 } from "./picklists-context";
 import PicklistTab from "./picklist-tab/picklist-tab";
 import ComparisonTab from "./comparison-box/comparison";
-import { Picklist } from "../../../schemas/defs";
+import { Picklist } from "../../../schemas/schema";
 import throwNotification from "../../../components/app/toast/toast";
-import {
-   getComparedTeams,
-   getCurrentPicklist,
-   setComparedTeams,
-   setCurrentPicklist,
-} from "./picklist-state-handler";
-import { getLocalUserData } from "../../../lib/supabase/auth";
 
 export interface PicklistData {
    picklists: Tables<"event_picklist">[];
@@ -58,9 +51,7 @@ function PicklistPage() {
       },
    });
 
-   const [comparedTeamKeys, setComparedTeamKeys] = useState<
-      { teamKey: string; minimized: boolean }[]
-   >([]);
+   const [comparedTeamKeys, setComparedTeamKeys] = useState<string[]>([]);
 
    const [targetPicklist, setTargetPicklist] = useState<
       Tables<"event_picklist"> | undefined
@@ -72,14 +63,6 @@ function PicklistPage() {
             if (!prev) return prev;
             const picklist = prev.picklist as Picklist;
             const index = picklist.findIndex((team) => team.teamKey == teamKey);
-
-            if (
-               picklist.find((team) => team.teamKey == teamKey)?.excluded ==
-                  true
-            ) {
-               return prev;
-            }
-
             if (index > 0) {
                const newPicklist = [...picklist];
                let targetIndex = index - 1;
@@ -103,14 +86,6 @@ function PicklistPage() {
             if (!prev) return prev;
             const picklist = prev.picklist as Picklist;
             const index = picklist.findIndex((team) => team.teamKey == teamKey);
-
-            if (
-               picklist.find((team) => team.teamKey == teamKey)?.excluded ==
-                  true
-            ) {
-               return prev;
-            }
-
             if (index < picklist.length - 1) {
                const newPicklist = [...picklist];
                let targetIndex = index + 1;
@@ -149,23 +124,16 @@ function PicklistPage() {
       changePicklistVisibility: (
          visiblity: "default" | "private" | "public",
       ) => {
-         if (targetPicklist?.uid == getLocalUserData().uid) { // Yes its joever if someone bypasses this but its not that important anyways and nobody will notice!
-            setPicklistData((prev) => {
-               const newPicklists = prev.picklists.map((picklist) => {
-                  if (targetPicklist && picklist.id == targetPicklist.id) {
-                     setTargetPicklist({ ...targetPicklist, type: visiblity });
-                     return { ...picklist, type: visiblity };
-                  }
-                  return picklist;
-               });
-               return { ...prev, picklists: newPicklists };
+         setPicklistData((prev) => {
+            const newPicklists = prev.picklists.map((picklist) => {
+               if (targetPicklist && picklist.id == targetPicklist.id) {
+                  setTargetPicklist({ ...targetPicklist, type: visiblity });
+                  return { ...picklist, type: visiblity };
+               }
+               return picklist;
             });
-         } else {
-            throwNotification(
-               "error",
-               "You don't have permission to change this value",
-            );
-         }
+            return { ...prev, picklists: newPicklists };
+         });
       },
 
       renamePicklist: (name: string) => {
@@ -189,18 +157,16 @@ function PicklistPage() {
                   throwNotification("success", `Deleted "${picklistName}"`);
                }
             });
-
-            setPicklistData((prev) => {
-               return {
-                  ...prev,
-                  picklists: prev.picklists.filter((picklist) =>
-                     picklist.id != targetPicklist.id
-                  ),
-               };
-            });
-            setComparedTeamKeys([]);
-            setTargetPicklist(undefined);
          }
+         setPicklistData((prev) => {
+            return {
+               ...prev,
+               picklists: prev.picklists.filter((picklist) =>
+                  picklist !== targetPicklist
+               ),
+            };
+         });
+         setTargetPicklist(undefined);
       },
    };
 
@@ -232,24 +198,6 @@ function PicklistPage() {
       // We could do it some other way but oh well!
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [results.map((res) => res.isFetching).join()]);
-
-   useEffect(() => {
-      if (!targetPicklist) {
-         setTargetPicklist(getCurrentPicklist());
-
-         const teams = getComparedTeams();
-         if (teams) setComparedTeamKeys(teams);
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, []);
-
-   useEffect(() => {
-      if (comparedTeamKeys.length > 0) setComparedTeams(comparedTeamKeys);
-   }, [comparedTeamKeys]);
-
-   useEffect(() => {
-      if (targetPicklist != undefined) setCurrentPicklist(targetPicklist);
-   }, [targetPicklist]);
 
    // sorry, but oh well!
    // also it's not even that bad

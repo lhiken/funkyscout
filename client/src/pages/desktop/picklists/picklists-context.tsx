@@ -13,8 +13,8 @@ export const TargetPicklistContext = createContext<{
 }>({});
 
 export const ComparedTeamKeysContext = createContext<{
-   val?: { teamKey: string; minimized: boolean }[];
-   setVal?: Dispatch<SetStateAction<{ teamKey: string; minimized: boolean }[]>>;
+   val?: string[];
+   setVal?: Dispatch<SetStateAction<string[]>>;
 }>({});
 
 export const PicklistCommandContext = createContext<PicklistCommands>({

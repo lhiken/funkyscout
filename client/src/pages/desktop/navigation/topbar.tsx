@@ -138,7 +138,7 @@ function Topbar() {
                         style={{ fontSize: "0.9rem" }}
                      />
                   </div>
-                  <div className={styles.userText}>{user.name}</div>
+                  <div>{user.name}</div>
                   <div
                      className={styles.userBreadcrumb}
                   >

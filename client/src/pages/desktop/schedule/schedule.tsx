@@ -39,6 +39,7 @@ interface AssignmentData {
    teamData: Tables<"event_team_data">[];
    matchData: Tables<"event_schedule">[];
    priorityTeams: string[];
+   lowPriorityTeams: string[];
    scouterList: { name: string; uid: string }[];
 }
 
@@ -60,6 +61,7 @@ function SchedulePage() {
       teamData: [],
       matchData: [],
       priorityTeams: [],
+      lowPriorityTeams: [],
       scouterList: [],
    });
 

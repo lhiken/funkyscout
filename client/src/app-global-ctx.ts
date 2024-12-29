@@ -6,7 +6,6 @@ export const GlobalTeamDataContext = createContext<GlobalTeamData>({
    TBAdata: [],
    InternalMatchData: [],
    InternalTeamData: [],
-   COPRdata: {},
    progress: {
       EPAloading: true,
       EPAerror: false,
@@ -16,8 +15,6 @@ export const GlobalTeamDataContext = createContext<GlobalTeamData>({
       MatchError: false,
       TeamLoading: true,
       TeamError: false,
-      COPRloading: true,
-      COPRerror: false,
    },
    refetch: () => {},
 });

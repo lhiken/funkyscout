@@ -12,12 +12,32 @@ function TeamAssignmentCard({
 
    function handleStarClick() {
       if (assignmentData.setVal) {
-         assignmentData.setVal((prev) => ({
-            ...prev,
-            priorityTeams: prev.priorityTeams.includes(teamData.key)
-               ? prev.priorityTeams.filter((team) => team !== teamData.key)
-               : [...prev.priorityTeams, teamData.key],
-         }));
+         assignmentData.setVal((prev) => {
+            let updatedPriorityTeams = [...prev.priorityTeams];
+            let updatedLowPriorityTeams = [...prev.lowPriorityTeams];
+
+            // Priority -> Low Priority
+            if (updatedPriorityTeams.includes(teamData.key)) {
+               console.log(`(${teamData.key}): Priority -> Low Priority`);
+               updatedPriorityTeams = updatedPriorityTeams.filter((team) => team !== teamData.key);
+               updatedLowPriorityTeams = [...updatedLowPriorityTeams, teamData.key];
+            }
+            // Low Priority -> Inactive
+            else if (updatedLowPriorityTeams.includes(teamData.key)) {
+               console.log(`(${teamData.key}): Low Priority -> Inactive`);
+               updatedLowPriorityTeams = updatedLowPriorityTeams.filter((team) => team !== teamData.key);
+            }
+            // Inactive -> Priority
+            else {
+               console.log(`(${teamData.key}): Inactive -> Priority`);
+               updatedPriorityTeams = [...updatedPriorityTeams, teamData.key];
+            }
+            return {
+               ...prev,
+               priorityTeams: updatedPriorityTeams,
+               lowPriorityTeams: updatedLowPriorityTeams,
+            };
+         });
       }
    }
 
@@ -72,10 +92,10 @@ function TeamAssignmentCard({
                &nbsp;
                <div
                   className={`${styles.teamStarIcon} ${
-                     assignmentData.val?.priorityTeams.includes(
-                           teamData.key,
-                        )
+                     assignmentData.val?.priorityTeams.includes(teamData.key)
                         ? styles.active
+                        : assignmentData.val?.lowPriorityTeams.includes(teamData.key)
+                        ? styles.lowPriority
                         : styles.inactive
                   }`}
                >

@@ -21,6 +21,7 @@ interface AvailableScouter extends Scouter {
 function assignUsersToMatches(
    schedule: EventSchedule,
    priorityTeams: string[],
+   lowPriorityTeams: string[],
    users: { name: string; uid: string }[],
    maxConsecMatches: number,
    breakLength: number,
@@ -35,6 +36,13 @@ function assignUsersToMatches(
 
    // Creates an array of unavailable scouters by mapping over each user and adding
    // unavailable scouter properties
+   if (!Array.isArray(users)) {
+      console.error("Expected 'users' to be an array, but got:", users);
+      return [];
+   }
+   else {
+      console.log(users);
+   }
    const unavailableScouterPool: UnavailableScouter[] = users.map((user) => ({
       name: user.name,
       uid: user.uid,
@@ -54,20 +62,42 @@ function assignUsersToMatches(
 
       // Sort teamKeys in order of importance; this is what should be edited to
       // make the number of matches each team gets more balanced
+      // console.log("Priority Teams: ", priorityTeams);
+      console.log(shifts);
       const teamKeys = [...matchData.blueTeams, ...matchData.redTeams].sort(
          (a, b) => {
-            const aPriority = priorityTeams.includes(a);
-            const bPriority = priorityTeams.includes(b);
+            console.log(`Comparing team ${a} with team ${b}`);
+            const aPriority = priorityTeams && priorityTeams.includes(a);
+            const bPriority = priorityTeams && priorityTeams.includes(b);
+            const aLowPriority = lowPriorityTeams && lowPriorityTeams.includes(a);
+            const bLowPriority = lowPriorityTeams && lowPriorityTeams.includes(b);
 
             if (aPriority && !bPriority) return -1;
             if (bPriority && !aPriority) return 1;
+            if (aLowPriority && !bLowPriority) return 1;
+            if (bLowPriority && !aLowPriority) return -1;
 
-            const aMatches = shifts.filter((shift) => shift.team === a).length;
-            const bMatches = shifts.filter((shift) => shift.team === b).length;
+            const aScoutedMatches = shifts.filter((shift) => shift.team === a && shift.name != null).length;
+            console.log(shifts.filter((shift) => shift.team === a && shift.name != null));
+            const bScoutedMatches = shifts.filter((shift) => shift.team === b && shift.name != null).length;
+            console.log(shifts.filter((shift) => shift.team === b && shift.name != null));
 
-            return aMatches - bMatches;
+            /*if (aScoutedMatches < bScoutedMatches) return -1
+            if (bScoutedMatches < aScoutedMatches) return 1
+            return 0;*/
+            return aScoutedMatches - bScoutedMatches;
+            /*if (!(a in matchCounts)) matchCounts[a] = 0;
+            if (!(b in matchCounts)) matchCounts[b] = 0;
+
+            if (a in matchCounts) matchCounts[a] += 1;
+            if (b in matchCounts) matchCounts[b] += 1;
+            const aMatches = matchCounts[a];
+            const bMatches = matchCounts[b];
+            console.log(`aMatches: ${aMatches}, bMatches: ${bMatches}`);
+            return aMatches - bMatches;*/
          },
       );
+      console.log("Sorted", teamKeys);
 
       // Assign shifts for each team in a match
       for (const team of teamKeys) {
