@@ -36,6 +36,7 @@ function SetupPanel() {
          const updatedMatchData = assignUsersToMatches(
             scheduleData.val?.matchData || {},
             assignmentData.val?.priorityTeams || [],
+            assignmentData.val?.lowPriorityTeams || [],
             assignmentData.val?.scouterList || [],
             Number(maxConsecShifts),
             Number(breakLength),
