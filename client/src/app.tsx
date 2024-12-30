@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { updateTheme } from "./utils/theme";
 import AuthPage from "./pages/main/auth/auth";
 import Dashboard from "./pages/desktop/dashboard";
-import { getLocalUserData } from "./lib/supabase/auth";
+import { fetchSession, getLocalUserData } from "./lib/supabase/auth";
 import ErrorPage from "./pages/main/error/error";
 import EventSelector from "./pages/main/event-selector/event-selector";
 import { useQueries } from "@tanstack/react-query";
@@ -13,7 +13,11 @@ import MobileApp from "./pages/mobile/mobile";
 import isMobile from "./utils/device";
 import { getEvent, getFocusTeam, setFocusTeam } from "./utils/logic/app";
 import { fetchEventTeamEPAs } from "./lib/statbotics/event-teams";
-import { fetchTBAEventTeams, TeamRank } from "./lib/tba/events";
+import {
+   fetchTBAEventTeams,
+   fetchTeamEventCOPRs,
+   TeamRank,
+} from "./lib/tba/events";
 import {
    fetchMatchDataByEvent,
    fetchTeamDataByEvent,
@@ -21,12 +25,14 @@ import {
 import { StatboticsTeamEPAs } from "./lib/statbotics/teams";
 import { Tables } from "./lib/supabase/database.types";
 import { GlobalTeamDataContext } from "./app-global-ctx";
+import throwNotification from "./components/app/toast/toast";
 
 export interface GlobalTeamData {
    EPAdata: Record<string, StatboticsTeamEPAs>;
    TBAdata: TeamRank[];
    InternalMatchData: Tables<"event_match_data">[];
    InternalTeamData: Tables<"event_team_data">[];
+   COPRdata: Record<string, Record<string, number>>;
    progress: {
       EPAloading: boolean;
       EPAerror: boolean;
@@ -36,6 +42,8 @@ export interface GlobalTeamData {
       MatchError: boolean;
       TeamLoading: boolean;
       TeamError: boolean;
+      COPRloading: boolean;
+      COPRerror: boolean;
    };
    refetch: () => void;
 }
@@ -70,6 +78,7 @@ export default function App() {
       TBAdata: [],
       InternalMatchData: [],
       InternalTeamData: [],
+      COPRdata: {},
       progress: {
          EPAloading: true,
          EPAerror: false,
@@ -79,9 +88,13 @@ export default function App() {
          MatchError: false,
          TeamLoading: true,
          TeamError: false,
+         COPRloading: true,
+         COPRerror: false,
       },
       refetch: () => {},
    });
+
+   const masterRefetchIntervalSeconds = 240;
 
    const results = useQueries({
       queries: [
@@ -89,37 +102,45 @@ export default function App() {
             queryKey: [`appFetchEPA/${getEvent()}`],
             queryFn: () => fetchEventTeamEPAs(getEvent() || ""),
             refetchOnWindowFocus: false,
-            refetchInterval: 120000,
+            refetchInterval: masterRefetchIntervalSeconds * 1000,
          },
          {
             queryKey: [`appFetchTBA/${getEvent()}`],
             queryFn: () => fetchTBAEventTeams(getEvent() || ""),
             refetchOnWindowFocus: false,
-            refetchInterval: 120000,
+            refetchInterval: masterRefetchIntervalSeconds * 1000,
          },
          {
             queryKey: [`appFetchMatchData/${getEvent()}`],
             queryFn: () => fetchMatchDataByEvent(getEvent() || ""),
             refetchOnWindowFocus: false,
-            refetchInterval: 120000,
+            refetchInterval: masterRefetchIntervalSeconds * 1000,
          },
          {
             queryKey: [`appFetchTeamData/${getEvent()}`],
             queryFn: () => fetchTeamDataByEvent(getEvent() || ""),
             refetchOnWindowFocus: false,
-            refetchInterval: 120000,
+            refetchInterval: masterRefetchIntervalSeconds * 1000,
+         },
+         {
+            queryKey: [`appFetchCOPR/${getEvent()}`],
+            queryFn: () => fetchTeamEventCOPRs(getEvent() || ""),
+            refetchOnWindowFocus: false,
+            refetchInterval: masterRefetchIntervalSeconds * 1000,
          },
       ],
    });
 
    useEffect(() => {
-      const [EPAdata, TBAdata, InternalMatchData, InternalTeamData] = results;
+      const [EPAdata, TBAdata, InternalMatchData, InternalTeamData, COPRdata] =
+         results;
 
       setTeamData({
          EPAdata: EPAdata.data || {},
          TBAdata: TBAdata.data || [],
          InternalMatchData: InternalMatchData.data || [],
          InternalTeamData: InternalTeamData.data || [],
+         COPRdata: COPRdata.data || {},
          progress: {
             EPAloading: EPAdata.isLoading,
             EPAerror: EPAdata.isError,
@@ -129,6 +150,8 @@ export default function App() {
             MatchError: InternalMatchData.isError,
             TeamLoading: InternalTeamData.isLoading,
             TeamError: InternalTeamData.isError,
+            COPRloading: COPRdata.isLoading,
+            COPRerror: COPRdata.isError,
          },
          refetch: () => {
             TBAdata.refetch();
@@ -141,6 +164,17 @@ export default function App() {
       });
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [results.map((res) => res.isFetching).join()]);
+
+   useEffect(() => {
+      fetchSession().then((res) => {
+         console.log("checked auth status");
+         if (!res || !res.session?.user.id && location != "/auth") {
+            throwNotification("error", "Please log in before continuing");
+            setLocation("/auth");
+         }
+      });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [location]);
 
    return (
       <>

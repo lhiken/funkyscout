@@ -65,12 +65,14 @@ a {
    display: flex;
    justify-content: center;
    align-items: center;
+   user-select: none;
 }
 
 .theme-dark {
    /* UI Elements 1 */
    --primary: rgba(205, 167, 69, 1);
    --primary-variant: rgba(205, 167, 69, 0.7);
+   --primary-dark: rgba(205, 167, 69, 0.3);
    --background: rgba(9, 9, 9, 1);
    --inset: rgba(13, 13, 13, 1);
    --surface: rgba(19, 19, 19, 1);
@@ -87,6 +89,7 @@ a {
    /* UI Elements 1 */
    --primary: rgb(218, 184, 89);
    --primary-variant: rgba(218, 184, 89, 0.7);
+   --primary-dark: rgba(218, 184, 89, 0.3);
    --background: rgba(254, 254, 254, 1);
    --inset: rgba(251, 251, 251, 1);
    --surface: rgba(247, 247, 247, 1);

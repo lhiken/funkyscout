@@ -36,7 +36,7 @@ interface StatboticsTeamData {
 interface StatboticsTeamEPAs {
    team: string;
    year: number;
-   name: string;
+   team_name: string;
    country: string;
    state: string;
    district: string | null;
@@ -49,6 +49,7 @@ interface StatboticsTeamEPAs {
       unitless: number;
       norm: number;
       conf: number[];
+      breakdown: Record<string, { mean: number; sd: number }>;
    };
    record: {
       season: {
@@ -82,7 +83,7 @@ async function fetchStatboticsTeamData(team: string) {
 
 async function fetchStatboticsTeamEPA(team: string, event: string) {
    const teamData: StatboticsTeamEPAs = await fetchStatboticsData(
-      `/team_year/${team}/${event.substring(0, 4)}`,
+      `/team_event/${team}/${event}`,
    );
 
    if (!teamData) {

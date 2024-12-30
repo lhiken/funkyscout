@@ -1,3 +1,8 @@
+import {
+   setComparedTeams,
+   setCurrentPicklist,
+   setUsedMetrics,
+} from "../../pages/desktop/picklists/picklist-state-handler";
 import { handleError } from "../../utils/errorHandler";
 import { Enums } from "./database.types";
 import supabase from "./supabase";
@@ -161,6 +166,10 @@ async function logout() {
    try {
       localStorage.removeItem("userData");
       localStorage.removeItem("event");
+
+      setCurrentPicklist(undefined);
+      setComparedTeams(undefined);
+      setUsedMetrics([]);
 
       const { error } = await supabase.auth.signOut();
 

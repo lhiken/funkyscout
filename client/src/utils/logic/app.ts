@@ -1,3 +1,5 @@
+import { TeamMetrics } from "../../schemas/schema";
+
 function handleEventChange(event: string) {
    const oldEvent = localStorage.getItem("event");
 
@@ -14,6 +16,15 @@ function getEvent() {
    }
 
    return event;
+}
+
+function getEventYear(): keyof TeamMetrics {
+   const event = getEvent();
+   if (event) {
+      return Number(event.substring(0, 4)) as keyof TeamMetrics;
+   } else {
+      return 0 as keyof TeamMetrics;
+   }
 }
 
 function setFocusTeam(team: string) {
@@ -95,6 +106,7 @@ function parseTeamKey(key: string) {
 
 export {
    getEvent,
+   getEventYear,
    getFocusTeam,
    handleEventChange,
    parseMatchKey,

@@ -1,6 +1,7 @@
 import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
 import styles from "./picklist-tab.module.css";
 import {
+   ComparedTeamKeysContext,
    PicklistCommandContext,
    PicklistDataContext,
    TargetPicklistContext,
@@ -16,10 +17,11 @@ import {
 } from "../../../../lib/supabase/data";
 import throwNotification from "../../../../components/app/toast/toast";
 import { AnimatePresence, motion, useDragControls } from "motion/react";
-import { Picklist } from "../../../../schemas/schema";
+import { Picklist } from "../../../../schemas/defs";
 import { GlobalTeamDataContext } from "../../../../app-global-ctx";
 import { Reorder } from "motion/react";
 import Checkbox from "../../../../components/app/buttons/checkbox";
+import { setCurrentPicklist } from "../picklist-state-handler";
 
 function PicklistTab() {
    const targetPicklist = useContext(TargetPicklistContext);
@@ -33,7 +35,7 @@ function PicklistTab() {
       if (inputRef.current) {
          const span = document.createElement("span");
          span.style.font = getComputedStyle(inputRef.current).font;
-         span.textContent = (targetPicklist.val?.title || "") + " "; // Add a space to ensure spaces are measured
+         span.textContent = (targetPicklist.val?.title || "") + " ";
 
          document.body.appendChild(span);
          setInputWidth(span.offsetWidth);
@@ -140,6 +142,7 @@ function PicklistEditingTab({ showSettings }: { showSettings: boolean }) {
 
    const targetPicklist = useContext(TargetPicklistContext);
    const picklistCommands = useContext(PicklistCommandContext);
+   const comparedTeams = useContext(ComparedTeamKeysContext);
 
    const picklist: Picklist = targetPicklist.val
       ? (targetPicklist.val.picklist as Picklist)
@@ -150,8 +153,10 @@ function PicklistEditingTab({ showSettings }: { showSettings: boolean }) {
       targetPicklist.setVal({ ...targetPicklist.val, picklist: newPicklist });
 
    function handleBack() {
-      if (targetPicklist.setVal) {
+      if (targetPicklist.setVal && comparedTeams.setVal) {
+         comparedTeams.setVal([]);
          targetPicklist.setVal(undefined);
+         setCurrentPicklist(undefined);
       }
    }
 
@@ -402,6 +407,25 @@ function PicklistTeamCard(
       picklistCommands.excludeTeam(team.teamKey);
    }
 
+   const comparedTeams = useContext(ComparedTeamKeysContext);
+
+   function handleCompare() {
+      if (comparedTeams.setVal && comparedTeams.val) {
+         const teamIndex = comparedTeams.val.findIndex((val) =>
+            val.teamKey == team.teamKey
+         );
+         if (teamIndex == -1) {
+            comparedTeams.setVal((
+               prev,
+            ) => [{ teamKey: team.teamKey, minimized: false }, ...prev]);
+         } else {
+            comparedTeams.setVal((prev) =>
+               prev.filter((val) => val.teamKey != team.teamKey)
+            );
+         }
+      }
+   }
+
    return (
       <Reorder.Item
          key={team.teamKey}
@@ -411,7 +435,10 @@ function PicklistTeamCard(
          as="div"
       >
          <div
-            className={styles.teamCardContainer}
+            className={`${styles.teamCardContainer} ${
+               comparedTeams.val?.find((e) => e.teamKey == team.teamKey) &&
+               styles.active
+            }`}
             style={{
                opacity: (team.excluded ? 0.25 : 1),
             }}
@@ -432,13 +459,13 @@ function PicklistTeamCard(
                         width: "10rem",
                      }}
                      title={teamEPAData
-                        ? teamEPAData.name
+                        ? teamEPAData.team_name
                         : teamTBAData
                         ? teamTBAData.name
                         : "N/A"}
                   >
                      {teamEPAData
-                        ? teamEPAData.name
+                        ? teamEPAData.team_name
                         : teamTBAData
                         ? teamTBAData.name
                         : "N/A"}
@@ -463,6 +490,7 @@ function PicklistTeamCard(
                   <Tippy content="Compare" placement="bottom">
                      <i
                         className={`fa-solid fa-scale-unbalanced-flip ${styles.teamSettingIcon}`}
+                        onClick={handleCompare}
                      />
                   </Tippy>
                   <AnimatePresence>

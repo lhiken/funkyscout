@@ -1,9 +1,9 @@
 .container {
    display: flex;
-   flex-direction: row;
-   justify-content: space-between;
+   flex-direction: column;
    gap: 1rem;
-   width: 100%;
+   flex-grow: 1;
+   width: 1rem;
    height: 100%;
 }
 
@@ -16,4 +16,294 @@
    border-radius: 1rem;
    background-color: var(--surface);
    color: var(--text-secondary);
+   box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.1);
+}
+
+.comparedTeamsContainer {
+   width: 100%;
+   height: 1rem;
+   flex-grow: 1;
+   display: flex;
+   flex-direction: row;
+   overflow: scroll;
+   scroll-snap-type: x mandatory;
+   border-radius: 0.75rem;
+   gap: 1rem;
+   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
+}
+
+.comparedTeamsContainer::-webkit-scrollbar {
+   display: none;
+}
+
+.teamGraphsContainer {
+   display: flex;
+   width: 100%;
+   height: 15rem;
+   border-radius: 1rem;
+   background-color: var(--surface);
+   color: var(--text-secondary);
+   box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.1);
+}
+
+.comparedTeamElement {
+   display: flex;
+   flex-direction: column;
+   background-color: var(--surface);
+   color: var(--text-secondary);
+   border-radius: 1rem;
+   padding: 1.75rem;
+   flex-grow: 1;
+   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
+   flex-shrink: 0;
+   scroll-snap-align: start;
+}
+
+.comparedTeamContent {
+   display: flex;
+   width: 100%;
+   max-width: 40rem;
+   flex-grow: 1;
+}
+
+.teamHeader {
+   display: flex;
+   flex-direction: row;
+   justify-content: space-between;
+   user-select: none;
+}
+
+.teamHeaderText {
+   display: flex;
+   gap: 0.15rem;
+   color: var(--primary);
+   flex-shrink: 1;
+   cursor: -webkit-grab;
+   cursor: grab;
+   cursor: -moz-grab;
+}
+
+.elementOptions {
+   display: flex;
+   flex-direction: row;
+   font-size: 1.1rem;
+   line-height: 1rem;
+   width: 1rem;
+   overflow: visible;
+   flex-direction: row-reverse;
+}
+
+.elementOptionButton {
+   color: var(--text-secondary);
+   cursor: pointer;
+   padding-inline: 0.25rem;
+   transition: 0.2s;
+}
+
+.elementOptionButton:hover {
+   color: var(--primary);
+}
+
+.comparedTeamsMinimized {
+   display: flex;
+   flex-direction: column;
+   justify-content: space-between;
+   padding: 1.75rem 0.75rem 0.75rem;
+   background-color: var(--surface);
+   border-radius: 0.75rem;
+   user-select: none;
+   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
+}
+
+.elementOptionsMinimized {
+   display: flex;
+   flex-direction: column;
+   font-size: 1.1rem;
+   line-height: 1rem;
+   align-items: center;
+}
+
+.elementOptionButton.minimized {
+   padding: 0.25rem 0;
+}
+
+.expandedSettings {
+   display: flex;
+}
+
+.teamName {
+   display: flex;
+   flex-direction: row;
+   gap: 0.4rem;
+   width: 1.25rem;
+   color: var(--primary);
+   text-wrap: nowrap;
+   writing-mode: vertical-rl;
+   text-orientation: mixed;
+   align-items: center;
+   justify-content: center;
+   cursor: -webkit-grab;
+   cursor: grab;
+   cursor: -moz-grab;
+}
+
+.gripControl {
+   font-size: 1.15rem;
+   color: var(--primary);
+}
+
+.teamName:active .teamHeader:active {
+   cursor: grabbing;
+   cursor: -moz-grabbing;
+   cursor: -webkit-grabbing;
+}
+
+.minimizedContainer {
+   display: flex;
+   flex-direction: column;
+   justify-content: space-between;
+   flex-grow: 1;
+}
+
+/* team graphs styling */
+
+.teamGraphsContainer {
+   display: flex;
+   flex-direction: row;
+   justify-content: space-between;
+   padding: 1.75rem;
+   padding-left: 0;
+   overflow: hidden;
+}
+
+.teamMetricsContainer {
+   display: flex;
+   width: 1rem;
+   overflow-x: scroll;
+   flex-grow: 1;
+   border-radius: 1rem;
+}
+
+.teamMetricsContainer::-webkit-scrollbar {
+   display: none;
+}
+.teamGraphElement {
+   display: flex;
+   flex-direction: row;
+   padding: 1.5rem 1rem;
+   border: 2px solid var(--text-background);
+   border-radius: 1rem;
+   background-color: var(--surface);
+   cursor: grab;
+   cursor: -moz-grab;
+   cursor: -webkit-grab;
+   margin-right: 1rem;
+}
+
+.teamGraphElement:active {
+   cursor: grabbing;
+   cursor: -webkit-grabbing;
+   cursor: -moz-grabbing;
+}
+
+.newMetricButton {
+   display: flex;
+   height: 100%;
+   padding: 1.5rem 1rem;
+   justify-content: center;
+   align-items: center;
+   border: 2px solid var(--text-background);
+   border-radius: 1rem;
+   transition: 0.2s;
+   background-color: var(--surface);
+   cursor: pointer;
+}
+
+.newMetricButton:hover {
+   color: var(--primary);
+}
+
+.teamGraphDetails {
+   display: flex;
+   flex-direction: column;
+   gap: 1rem;
+   width: 8rem;
+}
+
+.teamGraphHeader {
+   color: var(--primary);
+   width: 8rem;
+   display: flex;
+   flex-direction: row;
+   flex-shrink: 0;
+   justify-content: space-between;
+}
+
+.teamGraphIcon {
+   color: var(--text-secondary);
+   cursor: pointer;
+   flex-shrink: 0;
+   padding-left: 1rem;
+   transition: 0.2s;
+}
+
+.teamGraphIcon:hover {
+   color: var(--primary);
+}
+
+.teamGraphValues {
+   display: flex;
+   flex-direction: column;
+   overflow: scroll;
+   flex-grow: 1;
+   gap: 0.4rem;
+}
+
+.seperator {
+   width: 1.75rem;
+   height: 1rem;
+   flex-shrink: 0;
+}
+
+.teamGraphValueEntry {
+   display: flex;
+   justify-content: space-between;
+   color: var(--text-primary);
+   font-family: "Ubuntu Mono";
+   font-size: 1.1rem;
+   opacity: 0.8;
+}
+
+.teamGraphValues::-webkit-scrollbar {
+   display: none;
+}
+
+.teamGraphValueEntry.active {
+   opacity: 1;
+   color: var(--primary);
+}
+
+.teamGraph {
+   display: flex;
+   flex-grow: 1;
+   width: 10rem;
+   cursor: default;
+}
+
+.minimizedExpandedSettings {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+}
+
+.errorBox {
+   display: flex;
+   width: 100%;
+   height: 100%;
+   border-radius: 1rem;
+   border: 2px solid var(--text-background);
+   justify-content: center;
+   align-items: center;
+   margin-right: 1rem;
 }

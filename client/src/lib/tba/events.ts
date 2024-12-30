@@ -115,5 +115,31 @@ async function fetchTBAMatchSchedule(eventKey: string) {
    return matchSchedule;
 }
 
-export { fetchTBAEventTeams, fetchTBAMatchSchedule };
+async function fetchTeamEventCOPRs(
+   eventKey: string,
+) {
+   const OPRs = await fetchTBAData(
+      `/event/${eventKey}/oprs`,
+      "GET",
+   );
+
+   const COPRs = await fetchTBAData(
+      `/event/${eventKey}/coprs`,
+      "GET",
+   );
+
+   if (!OPRs || !COPRs) return;
+
+   const returnObject: Record<string, Record<string, number>> = {};
+
+   returnObject["Total Points"] = OPRs.oprs;
+
+   for (const value in COPRs) {
+      returnObject[value] = COPRs[value];
+   }
+
+   return returnObject;
+}
+
+export { fetchTBAEventTeams, fetchTBAMatchSchedule, fetchTeamEventCOPRs };
 export type { EventSchedule, TeamRank };

@@ -9,7 +9,7 @@
    padding: 1.75rem;
    padding-bottom: 0rem;
    gap: 1.25rem;
-   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.05);
+   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
 }
 
 .containerHeader {
@@ -348,4 +348,8 @@
    margin-inline: 1rem;
    display: flex;
    justify-content: space-between;
+}
+
+.teamCardContainer.active {
+   border-color: var(--primary-dark);
 }
