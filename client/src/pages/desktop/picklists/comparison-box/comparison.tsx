@@ -364,7 +364,7 @@ function ComparedTeamElement(
                            onClick={handleCompare}
                         />
                      </Tippy>
-                     <Tippy content="Minimize tab" placement="left">
+                     <Tippy content="Maximize tab" placement="left">
                         <i
                            className={`fa-solid fa-expand ${styles.elementOptionButton} ${styles.minimized}`}
                            onClick={handleMinimizeToggle}
