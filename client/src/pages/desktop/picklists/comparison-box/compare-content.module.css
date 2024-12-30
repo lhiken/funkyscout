@@ -1,0 +1,51 @@
+.container {
+   display: flex;
+   flex-direction: column;
+   max-width: 34rem;
+   flex-grow: 1;
+   padding-top: 0.8rem;
+   overflow: scroll;
+}
+
+.comparisonContainer {
+   display: flex;
+   flex-direction: column;
+   margin-bottom: 0.8rem;
+   gap: 0.8rem;
+}
+
+.container::-webkit-scrollbar {
+   display: none;
+}
+
+.sectionHeader {
+   display: flex;
+   justify-content: space-between;
+   color: var(--primary);
+   cursor: pointer;
+}
+
+.sectionHeaderIcon {
+   color: var(--text-secondary);
+   transition: 0.2s;
+}
+
+.sectionHeader:hover .sectionHeaderIcon {
+   color: var(--text-primary);
+}
+
+.fallbackBox {
+   flex-grow: 1;
+   width: 1rem;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   border: 2px solid var(--text-background);
+   border-radius: 1rem;
+}
+
+.teamInfoContainer {
+   display: flex;
+   flex-direction: row;
+   height: 13rem;
+}

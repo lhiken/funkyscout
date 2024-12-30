@@ -24,6 +24,7 @@ import PicklistBarGraph from "./graphs/bar";
 import { getUsedMetrics, setUsedMetrics } from "../picklist-state-handler";
 import { DisplayedMetric } from "../../../../schemas/defs";
 import { DesktopMetricsSelector } from "./metrics/metrics-selector";
+import ComparisonContent from "./compare-content";
 
 function ComparisonTab() {
    const targetPicklist = useContext(TargetPicklistContext);
@@ -233,6 +234,10 @@ function ComparedTeamElement(
                      <i
                         className={`fa-solid fa-compress ${styles.elementOptionButton}`}
                         onClick={handleMinimizeToggle}
+                        style={{
+                           fontSize: "1.2rem",
+                           paddingRight: 0,
+                        }}
                      />
                   </Tippy>
                   <Tippy content="Stop comparing">
@@ -369,6 +374,12 @@ function ComparedTeamElement(
                </motion.div>
             )}
          </AnimatePresence>
+         {!team.minimized && (
+            <>
+               <div className={styles.lineSeperator} />
+               <ComparisonContent teamKey={team.teamKey} />
+            </>
+         )}
       </Reorder.Item>
    );
 }
