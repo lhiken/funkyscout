@@ -14,12 +14,21 @@
 
 .containerHeader {
    color: var(--primary);
+   justify-content: space-between;
+   display: flex;
 }
 
 .contentContainer {
    display: flex;
    flex-direction: column;
    height: 100%;
+}
+
+.filter.enabled{
+   color:var(--primary);
+}
+.filter.disabled{
+   color:var(--text-secondary);
 }
 
 .picklistList {
