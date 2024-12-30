@@ -135,11 +135,8 @@ async function fetchTeamEventCOPRs(
    returnObject["Total Points"] = OPRs.oprs;
 
    for (const value in COPRs) {
-      console.log(value);
       returnObject[value] = COPRs[value];
    }
-
-   console.log(returnObject);
 
    return returnObject;
 }

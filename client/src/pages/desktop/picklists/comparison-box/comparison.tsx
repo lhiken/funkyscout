@@ -23,7 +23,7 @@ import Tippy from "@tippyjs/react";
 import PicklistBarGraph from "./graphs/bar";
 import { getUsedMetrics, setUsedMetrics } from "../picklist-state-handler";
 import { DisplayedMetric } from "../../../../schemas/defs";
-import { DesktopMetricsSelector } from "../../../../components/metrics/metrics-selector";
+import { DesktopMetricsSelector } from "./metrics/metrics-selector";
 
 function ComparisonTab() {
    const targetPicklist = useContext(TargetPicklistContext);
@@ -476,7 +476,8 @@ function TeamGraphElement({ metric, setMetric }: {
                         textOverflow: "ellipsis",
                      }}
                   >
-                     {metric.title}
+                     {metric.title.replace(/_/g, " ")
+                        .replace(/\b\w/g, (char) => char.toUpperCase())}
                   </div>
                </Tippy>
                {showRemove && (
@@ -515,7 +516,9 @@ function TeamGraphElement({ metric, setMetric }: {
                                  : "var(--text-secondary)"),
                            }}
                         >
-                           {parseFloat(val.value.toFixed(1))}
+                           {val.value < 1
+                              ? val.value.toFixed(2)
+                              : val.value.toFixed(1)}
                         </div>
                      </div>
                   );

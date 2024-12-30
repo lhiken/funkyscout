@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { updateTheme } from "./utils/theme";
 import AuthPage from "./pages/main/auth/auth";
 import Dashboard from "./pages/desktop/dashboard";
-import { getLocalUserData } from "./lib/supabase/auth";
+import { fetchSession, getLocalUserData } from "./lib/supabase/auth";
 import ErrorPage from "./pages/main/error/error";
 import EventSelector from "./pages/main/event-selector/event-selector";
 import { useQueries } from "@tanstack/react-query";
@@ -25,6 +25,7 @@ import {
 import { StatboticsTeamEPAs } from "./lib/statbotics/teams";
 import { Tables } from "./lib/supabase/database.types";
 import { GlobalTeamDataContext } from "./app-global-ctx";
+import throwNotification from "./components/app/toast/toast";
 
 export interface GlobalTeamData {
    EPAdata: Record<string, StatboticsTeamEPAs>;
@@ -163,6 +164,17 @@ export default function App() {
       });
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [results.map((res) => res.isFetching).join()]);
+
+   useEffect(() => {
+      fetchSession().then((res) => {
+         console.log("checked auth status");
+         if (!res || !res.session?.user.id && location != "/auth") {
+            throwNotification("error", "Please log in before continuing");
+            setLocation("/auth");
+         }
+      });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [location]);
 
    return (
       <>

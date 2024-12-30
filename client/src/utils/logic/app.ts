@@ -21,7 +21,7 @@ function getEvent() {
 function getEventYear(): keyof TeamMetrics {
    const event = getEvent();
    if (event) {
-      return Number(event.substring(3)) as keyof TeamMetrics;
+      return Number(event.substring(0, 4)) as keyof TeamMetrics;
    } else {
       return 0 as keyof TeamMetrics;
    }

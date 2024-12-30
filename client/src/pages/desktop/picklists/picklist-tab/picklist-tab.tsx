@@ -459,13 +459,13 @@ function PicklistTeamCard(
                         width: "10rem",
                      }}
                      title={teamEPAData
-                        ? teamEPAData.name
+                        ? teamEPAData.team_name
                         : teamTBAData
                         ? teamTBAData.name
                         : "N/A"}
                   >
                      {teamEPAData
-                        ? teamEPAData.name
+                        ? teamEPAData.team_name
                         : teamTBAData
                         ? teamTBAData.name
                         : "N/A"}

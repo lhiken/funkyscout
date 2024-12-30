@@ -29,6 +29,7 @@ export interface PitData {
    robotHeightInches: number;
    robotWeightInches: number;
    subjectiveRating: number;
+   robotArchetype: string;
    selfConfidence: number;
    comment: string;
 }
@@ -50,6 +51,7 @@ export type CombinedMatchMetrics<
 > = {
    gameYear: Year; // The year of the data
    epochTime: number; // The time, set by the scouting app
+   comment: string; // The comment, set by the scouting app
    metrics: MatchMetrics[Year]; // The metrics, based on schema.ts
 };
 
@@ -136,15 +138,16 @@ export class DataParser<T extends keyof (MatchMetrics | TeamMetrics)> {
       matchKey: string;
       teamKey: string;
       alliance: "red" | "blue";
+      comment: string;
       metrics: MatchMetrics[T];
       autoActions: AutoAction<T>[];
       teleActions: TeleopAction<T>[];
    }[] = [];
-   private team: string;
+   private teamKey: string;
 
    constructor(data: Tables<"event_match_data">[], teamKey?: string) {
       this.data = data;
-      this.team = teamKey || "";
+      this.teamKey = teamKey || "";
 
       if (teamKey) {
          this.data = data.filter((val) => val.team == teamKey);
@@ -158,11 +161,46 @@ export class DataParser<T extends keyof (MatchMetrics | TeamMetrics)> {
             matchKey: entry.match,
             teamKey: entry.team,
             alliance: entry.alliance,
+            comment: combinedMetrics.comment,
             metrics: combinedMetrics.metrics,
             autoActions: combinedActions.autoActions,
             teleActions: combinedActions.teleopActions,
          });
       }
+   }
+
+   convertTeamKeyObjectToArray(array: Record<string, number[]>) {
+      return Object.entries(array).flatMap((val) => ({
+         teamKey: val[0],
+         value: val[1],
+      }));
+   }
+
+   convertValueArrayToMeanArray(array: { teamKey: string; value: number[] }[]) {
+      return array.map((val) => ({
+         teamKey: val.teamKey,
+         value: val.value.reduce((a, b) => a + b) / val.value.length,
+      }));
+   }
+
+   getTeamComments(teamKey?: string) {
+      const commentArray: {
+         matchKey: string;
+         comment: string;
+      }[] = [];
+
+      for (const entry of this.combinedData) {
+         if (
+            teamKey ? teamKey == entry.teamKey : this.teamKey == entry.teamKey
+         ) {
+            commentArray.push({
+               matchKey: entry.matchKey,
+               comment: entry.comment,
+            });
+         }
+      }
+
+      return commentArray;
    }
 
    getParserData() {
@@ -174,6 +212,6 @@ export class DataParser<T extends keyof (MatchMetrics | TeamMetrics)> {
    }
 
    getParserTeam() {
-      return this.team;
+      return this.teamKey;
    }
 }
