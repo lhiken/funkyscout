@@ -22,7 +22,6 @@ import { GlobalTeamDataContext } from "../../../../app-global-ctx";
 import { Reorder } from "motion/react";
 import Checkbox from "../../../../components/app/buttons/checkbox";
 import { setCurrentPicklist } from "../picklist-state-handler";
-import { filter } from "motion/react-client";
 
 function PicklistTab() {
    const targetPicklist = useContext(TargetPicklistContext);
@@ -77,14 +76,19 @@ function PicklistTab() {
                         <i className="fa-solid fa-list-ul" />
                         &nbsp; Picklists
                      </div>
-                     <div
-                        onClick={handleFilterClick}
-                        className={`${styles.filter} ${filtered ? styles.enabled : styles.disabled}`}
+                     <Tippy
+                        content="Only show your picklists"
+                        placement="right"
                      >
-                        <i className="fa-solid fa-filter" />
-                     </div>
-
-
+                        <div
+                           onClick={handleFilterClick}
+                           className={`${styles.filter} ${
+                              filtered ? styles.enabled : styles.disabled
+                           }`}
+                        >
+                           <i className="fa-solid fa-filter" />
+                        </div>
+                     </Tippy>
                   </>
                )
                : (
@@ -112,8 +116,9 @@ function PicklistTab() {
                                     outline: "none",
                                     fontSize: "inherit",
                                     paddingBottom: "3px",
-                                    width: `${inputWidth > 0 ? inputWidth + 20 : 120
-                                       }px`,
+                                    width: `${
+                                       inputWidth > 0 ? inputWidth + 20 : 120
+                                    }px`,
                                     maxWidth: "14rem",
                                     display: "inline-block",
                                     whiteSpace: "nowrap",
@@ -126,8 +131,9 @@ function PicklistTab() {
                                     border: "1px dashed var(--text-secondary)",
                                     width: `${inputWidth}px`,
                                     maxWidth: "14rem",
-                                    display: `${inputWidth == 0 ? "none" : "block"
-                                       }`,
+                                    display: `${
+                                       inputWidth == 0 ? "none" : "block"
+                                    }`,
                                  }}
                               />
                            </div>
@@ -144,7 +150,7 @@ function PicklistTab() {
          </div>
          <div className={styles.contentContainer}>
             {!targetPicklist.val
-               ? <PicklistSelectionTab filtered={filtered}/>
+               ? <PicklistSelectionTab filtered={filtered} />
                : <PicklistEditingTab showSettings={showSettings} />}
          </div>
       </div>
@@ -388,11 +394,11 @@ function PicklistTeamCard(
    const teamEPA = teamEPAData ? teamEPAData.epa.total_points.mean : 0;
    const teamEPAPercentage = teamEPAData
       ? teamEPA /
-      Math.max(
-         ...Object.values(teamDataCtx.EPAdata).map(
-            (data) => data.epa.total_points.mean,
-         ),
-      )
+         Math.max(
+            ...Object.values(teamDataCtx.EPAdata).map(
+               (data) => data.epa.total_points.mean,
+            ),
+         )
       : 0;
 
    //Team rank stat card
@@ -402,7 +408,7 @@ function PicklistTeamCard(
    const teamRank = teamTBAData ? teamTBAData.rank : 0;
    const teamRankPercentage = teamTBAData
       ? 1 -
-      ((teamRank + 1) / (teamDataCtx.TBAdata.length))
+         ((teamRank + 1) / (teamDataCtx.TBAdata.length))
       : 0;
 
    const controls = useDragControls();
@@ -449,9 +455,10 @@ function PicklistTeamCard(
          as="div"
       >
          <div
-            className={`${styles.teamCardContainer} ${comparedTeams.val?.find((e) => e.teamKey == team.teamKey) &&
+            className={`${styles.teamCardContainer} ${
+               comparedTeams.val?.find((e) => e.teamKey == team.teamKey) &&
                styles.active
-               }`}
+            }`}
             style={{
                opacity: (team.excluded ? 0.25 : 1),
             }}
@@ -474,14 +481,14 @@ function PicklistTeamCard(
                      title={teamEPAData
                         ? teamEPAData.team_name
                         : teamTBAData
-                           ? teamTBAData.name
-                           : "N/A"}
+                        ? teamTBAData.name
+                        : "N/A"}
                   >
                      {teamEPAData
                         ? teamEPAData.team_name
                         : teamTBAData
-                           ? teamTBAData.name
-                           : "N/A"}
+                        ? teamTBAData.name
+                        : "N/A"}
                   </div>
                </div>
                <div className={styles.teamDetailsMono}>
@@ -591,7 +598,7 @@ function PicklistStatCard(
    );
 }
 
-function PicklistSelectionTab({filtered}: {filtered: boolean}) {
+function PicklistSelectionTab({ filtered }: { filtered: boolean }) {
    const [picklistQuery, setPicklistQuery] = useState("");
    const picklistData = useContext(PicklistDataContext);
    const teamData = useContext(GlobalTeamDataContext).TBAdata;
@@ -631,15 +638,18 @@ function PicklistSelectionTab({filtered}: {filtered: boolean}) {
       });
    }
 
-   const queriedPicklists = (picklistQuery == ""
-      ? picklistData.val?.picklists ? picklistData.val?.picklists : []
-      : picklistData.val?.picklists
-         ? picklistData.val?.picklists.filter(
+   const queriedPicklists =
+      (picklistQuery == ""
+         ? picklistData.val?.picklists ? picklistData.val.picklists : []
+         : picklistData.val?.picklists
+         ? picklistData.val.picklists.filter(
             (val) =>
                val.title.toLowerCase().includes(picklistQuery) ||
                val.uname.toLowerCase().includes(picklistQuery),
          )
-         : []).filter((val) => filtered ? val.uid == getLocalUserData().uid : true);
+         : []).filter((val) =>
+            filtered ? val.uid == getLocalUserData().uid : true
+         );
 
    return (
       <div className={styles.selectionContent}>
@@ -668,11 +678,11 @@ function PicklistSelectionTab({filtered}: {filtered: boolean}) {
             )}
             {queriedPicklists.length == 0 &&
                !picklistData.val?.queryProgress.isLoading && (
-                  <div className={styles.loadBox}>
-                     <i className="fa-regular fa-circle-xmark" />
-                     &nbsp;No picklists found
-                  </div>
-               )}
+               <div className={styles.loadBox}>
+                  <i className="fa-regular fa-circle-xmark" />
+                  &nbsp;No picklists found
+               </div>
+            )}
             {queriedPicklists.map((val, index) => {
                return <PicklistCard picklist={val} key={index} />;
             }) || ""}
@@ -698,7 +708,7 @@ function PicklistCard({ picklist }: { picklist: Tables<"event_picklist"> }) {
    function handleClick() {
       if (targetPicklist.setVal) targetPicklist.setVal(picklist);
    }
-   
+
    return (
       <motion.div
          initial={{ opacity: 0 }}
@@ -714,23 +724,24 @@ function PicklistCard({ picklist }: { picklist: Tables<"event_picklist"> }) {
          <div className={styles.picklistCardBottom}>
             {!hovered
                ? "Created " +
-               new Date(picklist.timestamp).toLocaleString("en-US", {
-                  hour: "numeric",
-                  minute: "numeric",
-                  month: "numeric",
-                  day: "numeric",
-                  hour12: false,
-               })
-               : `By ${picklist.uid == getLocalUserData().uid
-                  ? "you"
-                  : picklist.uname
+                  new Date(picklist.timestamp).toLocaleString("en-US", {
+                     hour: "numeric",
+                     minute: "numeric",
+                     month: "numeric",
+                     day: "numeric",
+                     hour12: false,
+                  })
+               : `By ${
+                  picklist.uid == getLocalUserData().uid
+                     ? "you"
+                     : picklist.uname
                }`}
             <Tippy
                content={picklist.type == "public"
                   ? "Visibility: Anyone can see this picklist"
                   : picklist.type == "private"
-                     ? "Visibility: Only you can see and edit this picklist"
-                     : "Visibility: Only you and admins can see and edit this picklist"}
+                  ? "Visibility: Only you can see and edit this picklist"
+                  : "Visibility: Only you and admins can see and edit this picklist"}
                placement="right"
             >
                <div className={styles.picklistCardType}>
