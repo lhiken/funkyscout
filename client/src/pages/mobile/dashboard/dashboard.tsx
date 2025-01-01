@@ -1,9 +1,8 @@
-import styles from './dashboard.module.css'
+import styles from "./dashboard.module.css";
 
-export default function MobileDashboard () {
-    return (
-        <div className={styles.container}>
-            
-        </div>
-    )
+export default function MobileDashboard() {
+   return (
+      <div className={styles.container}>
+      </div>
+   );
 }
