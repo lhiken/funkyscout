@@ -34,6 +34,14 @@ export interface PitData {
    comment: string;
 }
 
+export interface PitData2025 extends PitData {
+   canScoreReef: [boolean, boolean, boolean, boolean];
+   canScoreNet: boolean;
+   canScoreProcessor: boolean;
+   canClimbDeep: boolean;
+   canClimbShallow: boolean;
+}
+
 // Database-stored Data Types
 
 /** Note
@@ -114,23 +122,10 @@ export type PointValuesType = {
  * For each metric defined in schema.ts, there must exist a function
  * to get said metric.
  */
-export type RequiredFunctions<T extends keyof TeamMetrics> =
-   & TeamFunctions<T>
-   & MatchFunctions<T>;
-
-type TeamFunctions<T extends keyof TeamMetrics> = {
-   [K in keyof TeamMetrics[T] as `getTeam${Capitalize<string & K>}`]: (
-      teamKey?: string,
-   ) => CommonMetricReturnType<TeamMetrics[T][K]>;
+export type RequiredFunctions = {
+   getMatchTotalPoints: (matchKey: string) => number;
+   getMatchTeamPoints: (matchKey: string, teamKey: string) => number;
 };
-
-type MatchFunctions<T extends keyof MatchMetrics> = {
-   [Q in keyof MatchMetrics[T] as `getMatch${Capitalize<string & Q>}`]: (
-      matchKey: string,
-   ) => CommonMetricReturnType<MatchMetrics[T][Q]>;
-};
-
-type CommonMetricReturnType<T> = Record<string, T>; // {{teamKey, value}, {teamKey, value}}
 
 export class DataParser<T extends keyof (MatchMetrics | TeamMetrics)> {
    private data: Tables<"event_match_data">[] = [];
@@ -181,6 +176,57 @@ export class DataParser<T extends keyof (MatchMetrics | TeamMetrics)> {
          teamKey: val.teamKey,
          value: val.value.reduce((a, b) => a + b) / val.value.length,
       }));
+   }
+
+   getTeamMetricRecord<
+      T,
+      Year extends keyof MatchMetrics,
+   >(
+      metricKey: keyof MatchMetrics[Year],
+      teamKey?: string,
+   ) {
+      const data = this.getParserCombinedData().filter((val) =>
+         teamKey ? val.teamKey == teamKey : true
+      );
+      const returnData: Record<string, T[]> = {};
+
+      for (const entry of data) {
+         const value = entry
+            .metrics[metricKey as keyof typeof entry.metrics] as T;
+
+         if (value) {
+            returnData[entry.teamKey].push(
+               value,
+            );
+         }
+      }
+
+      return returnData;
+   }
+
+   getMatchMetricRecord<
+      T,
+      Year extends keyof MatchMetrics,
+   >(
+      metricKey: keyof MatchMetrics[Year],
+      matchKey: string,
+      teamKey?: string,
+   ) {
+      const data = this.getParserCombinedData().filter((val) =>
+         (teamKey ? val.teamKey == teamKey : true) && val.matchKey == matchKey
+      );
+      const returnData: Record<string, T> = {};
+
+      for (const entry of data) {
+         const value = entry
+            .metrics[metricKey as keyof typeof entry.metrics] as T;
+
+         if (value) {
+            returnData[entry.teamKey] = value;
+         }
+      }
+
+      return returnData;
    }
 
    getTeamComments(teamKey?: string) {

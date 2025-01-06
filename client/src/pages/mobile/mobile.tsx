@@ -7,7 +7,7 @@ import MobileDashboard from "./dashboard/dashboard";
 function MobileApp() {
    const [renderNavbar, setRenderNavbar] = useState(false);
    const [location] = useLocation();
-   const locationArray = ["/"];
+   const locationArray = ["/", "/scout"];
 
    useEffect(() => {
       console.log(location);

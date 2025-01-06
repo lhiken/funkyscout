@@ -4,11 +4,12 @@
  * passed to the "add metric" function.
  */
 
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useContext, useState } from "react";
 import { DisplayedMetric } from "../../../../schemas/defs";
-import { DataParser2024 } from "../../../../schemas/parser";
+import { DataParser2024, DataParser2025 } from "../../../../schemas/parser";
 import { MetricDescriptions } from "../../../../schemas/schema";
 import styles from "../comparison-box/metrics/metrics.module.css";
+import { GlobalTeamDataContext } from "../../../../app-global-ctx";
 
 export function MetricCategory2024(
    { addMetric, metrics }: {
@@ -27,7 +28,9 @@ export function MetricCategory2024(
 
    function handleSelectNotesScored() { // A function that adds the metric to the list of metrics
       const data = parser.convertValueArrayToMeanArray(
-         parser.convertTeamKeyObjectToArray(parser.getTeamNotesScored()),
+         parser.convertTeamKeyObjectToArray(
+            parser.getTeamMetricRecord<number, 2024>("notesScored"),
+         ),
       );
 
       console.log(data);
@@ -52,6 +55,45 @@ export function MetricCategory2024(
                   entryName={metricDescriptions.notesScored.title}
                   fn={handleSelectNotesScored}
                   active={entryIsActive(metricDescriptions.notesScored.title)}
+               />
+            </div>
+         )}
+      </div>
+   );
+}
+
+export function MetricCategory2025(
+   { addMetric, metrics }: {
+      addMetric: (metric: DisplayedMetric) => void;
+      metrics: DisplayedMetric[];
+   },
+) {
+   function entryIsActive(entryName: string) { // A function that checks if a given metric is displayed
+      return metrics.filter((val) => val.title == entryName).length > 0;
+   }
+
+   const [showAll, setShowAll] = useState(false);
+
+   const collectedData = useContext(GlobalTeamDataContext).InternalMatchData;
+   const metricDescriptions = MetricDescriptions[2025]; // Get the descriptions for the year
+   const parser = new DataParser2025(collectedData);
+
+   console.log(parser);
+   console.log(addMetric);
+
+   return (
+      <div className={styles.metricCategory}>
+         <MetricCategoryHeader
+            title="Scouting Data"
+            show={showAll}
+            setShow={setShowAll}
+         />
+         {showAll && (
+            <div className={styles.metricsList}>
+               <MetricEntry
+                  entryName={metricDescriptions.L1Scored.title}
+                  fn={() => {}}
+                  active={entryIsActive(metricDescriptions.L1Scored.title)}
                />
             </div>
          )}
