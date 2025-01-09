@@ -29,8 +29,14 @@ export type RobotActions = {
       | "noteDrop"
       | "noteMiss";
    2025:
-      | "exampleDisable"
-      | "exampleExplode";
+      | "algaeDrop"
+      | "coralDrop"
+      | "algaeMiss"
+      | "coralMiss"
+      | "algaePickup"
+      | "coralPickup"
+      | "robotDisabled"
+      | "robotReenabled";
 };
 
 /** Scoring actions
@@ -43,8 +49,15 @@ export type ScoreActions = {
       | "noteScore"
       | "robotClimb";
    2025:
-      | "exampleScore"
-      | "exampleClimb";
+      | "leaveLine"
+      | "climbPark"
+      | "climbDeep"
+      | "climbShallow"
+      | "scoreL1"
+      | "scoreL2"
+      | "scoreL3"
+      | "scoreL4"
+      | "scoreProcessor";
 };
 
 /** Scoring action points
@@ -59,8 +72,15 @@ export const PointValues: PointValuesType = {
       robotClimb: 2,
    },
    2025: {
-      exampleScore: 0,
-      exampleClimb: 0,
+      leaveLine: 3,
+      climbPark: 2,
+      climbDeep: 12,
+      climbShallow: 6,
+      scoreL1: 2, // teleop only
+      scoreL2: 3, // teleop only
+      scoreL3: 4, // teleop only
+      scoreL4: 5, // teleop only
+      scoreProcessor: 2.4, // Assume human player scores 90% of the time
    },
 };
 
@@ -86,7 +106,20 @@ export type MatchMetrics = {
       robotClimb: boolean;
    };
    2025: {
-      exampleMetric: number;
+      L1Scored: number;
+      L2Scored: number;
+      L3Scored: number;
+      L4Scored: number;
+      netScored: number;
+      processorScored: number;
+      totalAlgae: number;
+      totalCoral: number;
+      climbTime: number;
+      climbDeep: boolean;
+      climbShallow: boolean;
+      defenseScore: number;
+      drivingScore: number;
+      failureTime: number; // Amount of time robot is disabled for
    };
 };
 
@@ -103,7 +136,20 @@ export type TeamMetrics = {
       robotDisabled: boolean[];
    };
    2025: {
-      exampleMetric: number[];
+      L1Scored: number[];
+      L2Scored: number[];
+      L3Scored: number[];
+      L4Scored: number[];
+      netScored: number[];
+      processorScored: number[];
+      totalAlgae: number[];
+      totalCoral: number[];
+      climbTime: number[];
+      climbDeep: boolean[];
+      climbShallow: boolean[];
+      defenseScore: number[];
+      drivingScore: number[];
+      failureTime: number[]; // Amount of time robot is disabled for
    };
 };
 
@@ -124,8 +170,61 @@ export const MetricDescriptions: MetricDescriptionsType = {
       },
    },
    2025: {
-      exampleMetric: {
-         title: "Example metric",
+      totalCoral: {
+         title: "Coral Scored - Combined",
+         queryHint: "totalCoral",
+      },
+      totalAlgae: {
+         title: "Algae Scored - Combined",
+         queryHint: "totalAlgae",
+      },
+      L1Scored: {
+         title: "Coral Scored (L1)",
+         queryHint: "L1Scored",
+      },
+      L2Scored: {
+         title: "Coral Scored (L2)",
+         queryHint: "L2Scored",
+      },
+      L3Scored: {
+         title: "Coral Scored (L3)",
+         queryHint: "L3Scored",
+      },
+      L4Scored: {
+         title: "Coral Scored (L4)",
+         queryHint: "L4Scored",
+      },
+      netScored: {
+         title: "Algae Scored (Net)",
+         queryHint: "netScored",
+      },
+      processorScored: {
+         title: "Algae Scored (Processor)",
+         queryHint: "processorScored",
+      },
+      climbTime: {
+         title: "Climb - Seconds before end",
+         queryHint: "climbTime",
+      },
+      climbDeep: {
+         title: "Climb - Deep",
+         queryHint: "climbDeep",
+      },
+      climbShallow: {
+         title: "Climb - Shallow",
+         queryHint: "climbShallow",
+      },
+      defenseScore: {
+         title: "Defense Rating",
+         queryHint: "defenseScore",
+      },
+      drivingScore: {
+         title: "Driver Rating",
+         queryHint: "drivingScore",
+      },
+      failureTime: {
+         title: "Failure Duration",
+         queryHint: "failureTime",
       },
    },
 };

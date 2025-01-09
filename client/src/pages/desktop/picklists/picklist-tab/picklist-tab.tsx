@@ -29,6 +29,7 @@ function PicklistTab() {
 
    const inputRef = useRef(null);
    const [inputWidth, setInputWidth] = useState(0);
+   const [filtered, setFiltered] = useState(false);
 
    //just pretend this isnt even here, i dont even know what it does
    useEffect(() => {
@@ -61,14 +62,33 @@ function PicklistTab() {
 
    const [showSettings, setShowSettings] = useState(false);
 
+   function handleFilterClick() {
+      setFiltered((prev) => !prev);
+   }
+
    return (
       <div className={styles.container}>
          <div className={styles.containerHeader}>
             {!targetPicklist.val
                ? (
                   <>
-                     <i className="fa-solid fa-list-ul" />
-                     &nbsp; Picklists
+                     <div>
+                        <i className="fa-solid fa-list-ul" />
+                        &nbsp; Picklists
+                     </div>
+                     <Tippy
+                        content="Only show your picklists"
+                        placement="right"
+                     >
+                        <div
+                           onClick={handleFilterClick}
+                           className={`${styles.filter} ${
+                              filtered ? styles.enabled : styles.disabled
+                           }`}
+                        >
+                           <i className="fa-solid fa-filter" />
+                        </div>
+                     </Tippy>
                   </>
                )
                : (
@@ -130,7 +150,7 @@ function PicklistTab() {
          </div>
          <div className={styles.contentContainer}>
             {!targetPicklist.val
-               ? <PicklistSelectionTab />
+               ? <PicklistSelectionTab filtered={filtered} />
                : <PicklistEditingTab showSettings={showSettings} />}
          </div>
       </div>
@@ -578,7 +598,7 @@ function PicklistStatCard(
    );
 }
 
-function PicklistSelectionTab() {
+function PicklistSelectionTab({ filtered }: { filtered: boolean }) {
    const [picklistQuery, setPicklistQuery] = useState("");
    const picklistData = useContext(PicklistDataContext);
    const teamData = useContext(GlobalTeamDataContext).TBAdata;
@@ -618,15 +638,18 @@ function PicklistSelectionTab() {
       });
    }
 
-   const queriedPicklists = picklistQuery == ""
-      ? picklistData.val?.picklists ? picklistData.val?.picklists : []
-      : picklistData.val?.picklists
-      ? picklistData.val?.picklists.filter(
-         (val) =>
-            val.title.toLowerCase().includes(picklistQuery) ||
-            val.uname.toLowerCase().includes(picklistQuery),
-      )
-      : [];
+   const queriedPicklists =
+      (picklistQuery == ""
+         ? picklistData.val?.picklists ? picklistData.val.picklists : []
+         : picklistData.val?.picklists
+         ? picklistData.val.picklists.filter(
+            (val) =>
+               val.title.toLowerCase().includes(picklistQuery) ||
+               val.uname.toLowerCase().includes(picklistQuery),
+         )
+         : []).filter((val) =>
+            filtered ? val.uid == getLocalUserData().uid : true
+         );
 
    return (
       <div className={styles.selectionContent}>

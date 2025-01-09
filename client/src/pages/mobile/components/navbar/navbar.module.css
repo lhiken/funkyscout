@@ -1,0 +1,25 @@
+.container {
+   display: flex;
+   flex-direction: row;
+   justify-content: space-between;
+   position: absolute;
+   align-items: center;
+   background-color: var(--surface);
+   width: calc(100% - 3rem);
+   height: 4rem;
+   bottom: 1.5rem;
+   margin: auto;
+   border-radius: 1rem;
+   font-size: 1.5rem;
+   padding: 0 2rem;
+}
+
+.pageIcon {
+   color: var(--text-secondary);
+   transition: 0.2s;
+   cursor: pointer;
+}
+
+.pageIcon.active {
+   color: var(--primary);
+}
