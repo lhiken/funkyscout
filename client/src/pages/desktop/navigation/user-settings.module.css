@@ -32,3 +32,30 @@
    background: var(--surface);
    border-radius: 10rem;
 }
+.focusTeamSection {
+   margin-top: 1rem; 
+   display: flex;
+   flex-direction: column; 
+   gap: 0.75rem; 
+}
+
+.teamInput {
+   padding: 0.5rem;
+   border: 1px solid var(--surface);
+   border-radius: 4px;
+   width: 100%; 
+}
+
+.focusButton {
+   padding: 0.5rem 1rem;
+   background-color: var(--primary-hover);
+   color: rgb(255, 255, 255);
+   border: none;
+   border-radius: 4px;
+   cursor: pointer;
+   text-align: center;
+}
+
+.focusButton:hover {
+   background-color: var(--primary);
+}
