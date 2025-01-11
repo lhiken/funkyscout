@@ -1,3 +1,4 @@
+import throwNotification from "../../components/app/toast/toast";
 import {
    setComparedTeams,
    setCurrentPicklist,
@@ -55,6 +56,32 @@ async function signupWithPassword(
    } catch (error) {
       handleError(error);
       return false;
+   }
+}
+
+//sends email
+async function sendEmail(email : string) {
+   try{
+
+      const {error} = await supabase.auth.resetPasswordForEmail(email,{redirectTo:'https://funkyscout.vercel.app/reset-page-link',})
+
+   }catch (error){
+      throwNotification("error", "This email is not valid. Please try again");
+      }
+   }
+   
+//Updates the user's password
+async function updatePass(nPassword:string){
+   try{
+      const {data, error} = await supabase.auth.updateUser({password: nPassword});
+      if(data)
+      {
+      throwNotification("success","The password is now updated");
+      }
+   }
+   catch(error)
+   {
+      throwNotification("error", "The password is not valid");
    }
 }
 
@@ -233,4 +260,6 @@ export {
    logout,
    signupWithPassword,
    storeLocalUserData,
+   sendEmail,
+   updatePass,
 };
