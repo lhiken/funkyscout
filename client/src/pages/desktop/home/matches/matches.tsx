@@ -11,7 +11,7 @@ import { AnimatePresence } from "motion/react";
 function MatchesTab() {
    const { isPending, error, data } = useQuery({
       queryKey: ["matchesTabFetchMatches"],
-      queryFn: () => getNexusEventStatus("demo8631"),
+      queryFn: () => getNexusEventStatus(getEvent() || ""),
       refetchInterval: 20 * 1000,
       refetchOnWindowFocus: false,
    });

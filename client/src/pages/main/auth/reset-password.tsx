@@ -1,14 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 //import { loginWithPassword } from "../../../lib/supabase/auth";
-import { useLocation, useRoute } from "wouter";
 import { motion } from "motion/react";
 import styles from "./mode.module.css";
 import authStyles from "./auth.module.css";
 import throwNotification from "../../../components/app/toast/toast";
 //fixed following line - make sure later!!
-import supabase from "../../../lib/supabase/supabase"; 
 import { updatePass }from "../../../lib/supabase/auth";
-import style from "../../desktop/home/info/styles.module.css"
 
 
 function ResetPassword() {

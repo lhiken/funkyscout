@@ -33,6 +33,7 @@ export type RobotActions = {
       | "coralDrop"
       | "algaeMiss"
       | "coralMiss"
+      | "algaeRemove"
       | "algaePickup"
       | "coralPickup"
       | "robotDisabled"

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useLocation, useRoute } from "wouter";
+import { useState } from "react";
+import { useRoute } from "wouter";
 import { motion } from "motion/react";
 import styles from "./mode.module.css";
 import authStyles from "./auth.module.css";

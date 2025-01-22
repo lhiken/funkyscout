@@ -26,7 +26,7 @@ function InfoTab() {
          },
          {
             queryKey: ["dashboardTeamInfoFetchNexusStatus"],
-            queryFn: () => getNexusEventStatus("demo8631"),
+            queryFn: () => getNexusEventStatus(getEvent() || ""),
             refetchInterval: 60 * 1000,
             refetchOnWindowFocus: false,
          },
