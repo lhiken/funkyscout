@@ -3,7 +3,7 @@ import MatchCard from "./matchcard";
 import styles from "./styles.module.css";
 import { getNexusEventStatus } from "../../../../lib/nexus/events";
 import Skeleton from "../../../../components/app/skeleton/skeleton";
-import { getFocusTeam } from "../../../../utils/logic/app";
+import { getEvent, getFocusTeam } from "../../../../utils/logic/app";
 import { useState } from "react";
 import { motion } from "motion/react";
 import { AnimatePresence } from "motion/react";

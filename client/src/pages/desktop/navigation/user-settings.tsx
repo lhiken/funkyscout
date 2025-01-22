@@ -23,8 +23,8 @@ function UserSettings({
       setFocusTeam(teamKey); // Set the focus team in localStorage or similar (if needed)
       alert(`Focused on team: ${teamKey}`);
     } else {
-      setFocusTeamState(null); // Reset focus if input is empty
-      setFocusTeam(null); // Reset in localStorage
+      setFocusTeamState(""); // Reset focus if input is empty
+      setFocusTeam(""); // Reset in localStorage
       alert("Focus reset.");
     }
   };
