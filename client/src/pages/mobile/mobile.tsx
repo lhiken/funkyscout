@@ -3,9 +3,11 @@ import ErrorPage from "../main/error/error";
 import { useEffect, useState } from "react";
 import MobileNavbar from "./components/navbar/navbar";
 import MobileDashboard from "./dashboard/dashboard";
+import MobileTopbar from "./components/topbar/topbar";
 
 function MobileApp() {
    const [renderNavbar, setRenderNavbar] = useState(false);
+   const [topbarText, setTopbarText] = useState("");
    const [location] = useLocation();
    const locationArray = ["/", "/scout"];
 
@@ -16,8 +18,21 @@ function MobileApp() {
       } else {
          setRenderNavbar(false);
       }
+
+      switch (location) {
+         case "/":
+            setTopbarText("Dashboard")
+            break;
+         case "/scout":
+            setTopbarText("Scouting")
+            break;
+         default: 
+            setTopbarText("");
+      }
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [location]);
+
+   
 
    return (
       <>
@@ -29,6 +44,7 @@ function MobileApp() {
             </Route>
          </Switch>
          {renderNavbar && <MobileNavbar />}
+         {topbarText && <MobileTopbar text={topbarText}/>}
       </>
    );
 }

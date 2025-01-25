@@ -7,17 +7,22 @@
    background-color: var(--surface);
    width: calc(100% - 3rem);
    height: 4rem;
-   bottom: 1.5rem;
+   bottom: 1rem;
    margin: auto;
    border-radius: 1rem;
    font-size: 1.5rem;
-   padding: 0 2rem;
+   border: 3px solid var(--text-background);
 }
 
 .pageIcon {
    color: var(--text-secondary);
    transition: 0.2s;
    cursor: pointer;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   width: 100%;
+   height: 100%;
 }
 
 .pageIcon.active {

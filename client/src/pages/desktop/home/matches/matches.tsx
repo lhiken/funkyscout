@@ -3,7 +3,7 @@ import MatchCard from "./matchcard";
 import styles from "./styles.module.css";
 import { getNexusEventStatus } from "../../../../lib/nexus/events";
 import Skeleton from "../../../../components/app/skeleton/skeleton";
-import { getFocusTeam } from "../../../../utils/logic/app";
+import { getEvent, getFocusTeam } from "../../../../utils/logic/app";
 import { useState } from "react";
 import { motion } from "motion/react";
 import { AnimatePresence } from "motion/react";
@@ -11,7 +11,7 @@ import { AnimatePresence } from "motion/react";
 function MatchesTab() {
    const { isPending, error, data } = useQuery({
       queryKey: ["matchesTabFetchMatches"],
-      queryFn: () => getNexusEventStatus("demo8631"),
+      queryFn: () => getNexusEventStatus(getEvent() || ""),
       refetchInterval: 20 * 1000,
       refetchOnWindowFocus: false,
    });
