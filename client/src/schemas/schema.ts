@@ -76,10 +76,10 @@ export const PointValues: PointValuesType = {
       climbPark: 2,
       climbDeep: 12,
       climbShallow: 6,
-      scoreL1: 2, // teleop only
-      scoreL2: 3, // teleop only
-      scoreL3: 4, // teleop only
-      scoreL4: 5, // teleop only
+      scoreL1: 2, // teleop only (auto is seperate)
+      scoreL2: 3, // teleop only (auto is seperate)
+      scoreL3: 4, // teleop only (auto is seperate)
+      scoreL4: 5, // teleop only (auto is seperate)
       scoreProcessor: 2.4, // Assume human player scores 90% of the time
    },
 };

@@ -4,7 +4,10 @@ import { AnimatePresence, motion } from "motion/react";
 import styles from "./metrics.module.css";
 import { GlobalTeamDataContext } from "../../../../../app-global-ctx";
 import { getEventYear } from "../../../../../utils/logic/app";
-import { MetricCategory2024 } from "../../components/graphs";
+import {
+   MetricCategory2024,
+   MetricCategory2025,
+} from "../../components/graphs";
 
 export function DesktopMetricsSelector(
    { setMetrics, setShow, displayedMetrics }: {
@@ -17,7 +20,10 @@ export function DesktopMetricsSelector(
    const COPRs = useContext(GlobalTeamDataContext).COPRdata;
    const EPAs = useContext(GlobalTeamDataContext).EPAdata;
 
-   const EPABreakdown = Object.keys(Object.values(EPAs)[0].epa.breakdown)
+   const EPABreakdown = Object.keys(() => {
+      const reference = Object.values(EPAs)[0].epa;
+      return reference.breakdown ? reference.breakdown : ["N/A"];
+   })
       .filter((val) => val.toLowerCase() == val).map((val) => {
          return `EPA - ${
             val // Formatting Statbotics' snake case
@@ -82,14 +88,20 @@ export function DesktopMetricsSelector(
       }
 
       const teamValueArray = Object.keys(EPAs).map((val) => {
-         const finalValue = indexKey == "total_points"
-            ? EPAs[val].epa.total_points.mean
-            : indexKey != "breakdown"
-            ? EPAs[val].epa[indexKey]
-            : EPAs[val].epa // unformatting into snake case
-               .breakdown[itemKey.substring(6).toLowerCase().replace(/ /g, "_")]
-               .mean;
-         return { teamKey: val, value: finalValue };
+         if (EPAs[val].epa.total_points) {
+            const finalValue = indexKey == "total_points"
+               ? EPAs[val].epa.total_points.mean
+               : indexKey != "breakdown"
+               ? EPAs[val].epa[indexKey]
+               : EPAs[val].epa // unformatting into snake case
+                  .breakdown[
+                     itemKey.substring(6).toLowerCase().replace(/ /g, "_")
+                  ]
+                  .mean;
+            return { teamKey: val, value: finalValue };
+         } else {
+            return { teamKey: val, value: 0 };
+         }
       });
 
       const newMetric: DisplayedMetric = {
@@ -126,6 +138,12 @@ export function DesktopMetricsSelector(
             {/* yearly rewrite required: add line for new MetricCategory202X, but it must be written first */}
             {year == 2024 && (
                <MetricCategory2024
+                  addMetric={addMetric}
+                  metrics={displayedMetrics}
+               />
+            )}
+            {year == 2025 && (
+               <MetricCategory2025
                   addMetric={addMetric}
                   metrics={displayedMetrics}
                />
