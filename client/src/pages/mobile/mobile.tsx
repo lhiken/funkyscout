@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import MobileNavbar from "./components/navbar/navbar";
 import MobileDashboard from "./dashboard/dashboard";
 import MobileTopbar from "./components/topbar/topbar";
+import MobileScoutingPage from "./scouting-page/scouting-page";
+import styles from './mobile.module.css';
 
 function MobileApp() {
    const [renderNavbar, setRenderNavbar] = useState(false);
@@ -37,8 +39,11 @@ function MobileApp() {
    return (
       <>
          <Switch>
-            <Route path="/" component={MobileDashboard} />
-            <Route path="/scout" />
+            <div className={styles.dashboardStyleContainer}>
+               <Route path="/" component={MobileDashboard} />
+               <Route path="/scout" component={MobileScoutingPage}/>
+               <Route path="/data" />
+            </div>
             <Route>
                <ErrorPage style={{ height: "calc(100% - 1rem)" }} />
             </Route>

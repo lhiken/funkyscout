@@ -1,1 +1,7 @@
-
+.dashboardStyleContainer {
+   width: 100vw;
+   height: calc(100vh - 9rem);
+   padding-inline: 1.75rem;
+   margin: 4rem 0 5rem 0;
+   z-index: -10;
+}
