@@ -18,7 +18,7 @@ import {
    useDragControls,
 } from "motion/react";
 import { GlobalTeamDataContext } from "../../../../app-global-ctx";
-import { getFocusTeam, parseTeamKey } from "../../../../utils/logic/app";
+import { parseTeamKey } from "../../../../utils/logic/app";
 import Tippy from "@tippyjs/react";
 import PicklistBarGraph from "./graphs/bar";
 import { getUsedMetrics, setUsedMetrics } from "../picklist-state-handler";
@@ -543,7 +543,6 @@ function TeamGraphElement({ metric, setMetric }: {
                   indexByKey="teamKey"
                   keysOfSeries={["value"]}
                   axisTicks={0}
-                  focusTeam={getFocusTeam() || ""}
                />
             )}
          </div>

@@ -9,7 +9,6 @@ interface PicklistBarGraphProps {
    indexByKey: string;
    keysOfSeries: string[];
    axisTicks: number;
-   focusTeam: string | null; 
 }
 
 export default function PicklistBarGraph({
@@ -17,14 +16,12 @@ export default function PicklistBarGraph({
    indexByKey,
    keysOfSeries,
    axisTicks,
-   focusTeam, 
 }: PicklistBarGraphProps) {
-
    if (valueObject.length === 0) return null;
 
    const maxValue = valueObject.reduce(
       (max, val) => (val.value > max.value ? val : max),
-      valueObject[0]
+      valueObject[0],
    );
 
    const gridYlist: number[] = [maxValue.value];
@@ -50,8 +47,8 @@ export default function PicklistBarGraph({
          indexScale={{ type: "band", round: true }}
          theme={NivoChartTheme}
          colors={(d) => {
-            return focusTeam && focusTeam === d.data.teamKey
-               ? "var(--primary)"  // Highlight the focused team
+            return d.data.teamKey == maxValue.teamKey
+               ? "var(--primary)" // Highlight the focused team
                : "var(--primary-dark)";
          }}
          borderRadius={4}
@@ -59,16 +56,14 @@ export default function PicklistBarGraph({
             from: "color",
             modifiers: [["darker", 1.6]],
          }}
-         axisLeft={
-            axisTicks > 0
-               ? {
-                    tickSize: 4,
-                    tickPadding: 3,
-                    legend: "",
-                    tickValues: 4,
-                 }
-               : null
-         }
+         axisLeft={axisTicks > 0
+            ? {
+               tickSize: 4,
+               tickPadding: 3,
+               legend: "",
+               tickValues: 4,
+            }
+            : null}
          axisBottom={null}
          enableGridX={true}
          gridYValues={gridYlist}
