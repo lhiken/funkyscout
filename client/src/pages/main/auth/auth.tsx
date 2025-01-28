@@ -31,13 +31,12 @@ function AuthPage() {
                         fontSize: "1.05rem",
                      }}
                      onClick={toggleTheme}
-                     
-                  > 
+                  >
                      <Tippy content="Switch theme">
                         <i className="fa-solid fa-circle-half-stroke">
                         </i>
                      </Tippy>
-                  </button> 
+                  </button>
                </div>
                <div className={styles.modebox}>
                   <button

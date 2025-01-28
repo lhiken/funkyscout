@@ -33,17 +33,17 @@
    border-radius: 10rem;
 }
 .focusTeamSection {
-   margin-top: 1rem; 
+   margin-top: 1rem;
    display: flex;
-   flex-direction: column; 
-   gap: 0.75rem; 
+   flex-direction: column;
+   gap: 0.75rem;
 }
 
 .teamInput {
    padding: 0.5rem;
    border: 1px solid var(--surface);
    border-radius: 4px;
-   width: 100%; 
+   width: 100%;
 }
 
 .focusButton {

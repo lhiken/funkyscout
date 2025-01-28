@@ -60,36 +60,35 @@ async function signupWithPassword(
 }
 
 //sends email
-async function sendEmail(email : string) {
-   try{
-
-      const {error} = await supabase.auth.resetPasswordForEmail(email,{redirectTo:'https://funkyscout.vercel.app/reset-page-link',})
+async function sendEmail(email: string) {
+   try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+         redirectTo: "https://funkyscout.vercel.app/reset-page-link",
+      });
 
       if (error) {
          throw new Error(error.message);
       }
-
-   }catch (error){
+   } catch (error) {
       throwNotification("error", "This email is not valid. Please try again");
-      }
    }
-   
+}
+
 //Updates the user's password
-async function updatePass(nPassword:string){
-   try{
-      const {data, error} = await supabase.auth.updateUser({password: nPassword});
-      
+async function updatePass(nPassword: string) {
+   try {
+      const { data, error } = await supabase.auth.updateUser({
+         password: nPassword,
+      });
+
       if (error) {
          throw new Error(error.message);
       }
-      
-      if(data)
-      {
-      throwNotification("success","The password is now updated");
+
+      if (data) {
+         throwNotification("success", "The password is now updated");
       }
-   }
-   catch(error)
-   {
+   } catch (error) {
       throwNotification("error", "The password is not valid");
    }
 }
@@ -267,8 +266,8 @@ export {
    getLocalUserData,
    loginWithPassword,
    logout,
+   sendEmail,
    signupWithPassword,
    storeLocalUserData,
-   sendEmail,
    updatePass,
 };

@@ -28,7 +28,6 @@ import { GlobalTeamDataContext } from "./app-global-ctx";
 import ForgotPassword from "./pages/main/auth/forgot-password";
 import ResetPassword from "./pages/main/auth/reset-password";
 
-
 export interface GlobalTeamData {
    EPAdata: Record<string, StatboticsTeamEPAs>;
    TBAdata: TeamRank[];
@@ -178,7 +177,10 @@ export default function App() {
                   <Route path="/events/new" component={EventSelector} />
                   <Route path="/dashboard" component={Dashboard} nest />
                   <Route path="/m" component={MobileApp} nest />
-                  <Route path="/auth/forgot-password" component={ForgotPassword} />
+                  <Route
+                     path="/auth/forgot-password"
+                     component={ForgotPassword}
+                  />
                   <Route path="/reset-page-link" component={ResetPassword} />
                   <Route>
                      <ErrorPage />

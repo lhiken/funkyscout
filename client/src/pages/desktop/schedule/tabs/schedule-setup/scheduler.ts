@@ -39,8 +39,7 @@ function assignUsersToMatches(
    if (!Array.isArray(users)) {
       console.error("Expected 'users' to be an array, but got:", users);
       return [];
-   }
-   else {
+   } else {
       console.log(users);
    }
    const unavailableScouterPool: UnavailableScouter[] = users.map((user) => ({
@@ -69,18 +68,28 @@ function assignUsersToMatches(
             console.log(`Comparing team ${a} with team ${b}`);
             const aPriority = priorityTeams && priorityTeams.includes(a);
             const bPriority = priorityTeams && priorityTeams.includes(b);
-            const aLowPriority = lowPriorityTeams && lowPriorityTeams.includes(a);
-            const bLowPriority = lowPriorityTeams && lowPriorityTeams.includes(b);
+            const aLowPriority = lowPriorityTeams &&
+               lowPriorityTeams.includes(a);
+            const bLowPriority = lowPriorityTeams &&
+               lowPriorityTeams.includes(b);
 
             if (aPriority && !bPriority) return -1;
             if (bPriority && !aPriority) return 1;
             if (aLowPriority && !bLowPriority) return 1;
             if (bLowPriority && !aLowPriority) return -1;
 
-            const aScoutedMatches = shifts.filter((shift) => shift.team === a && shift.name != null).length;
-            console.log(shifts.filter((shift) => shift.team === a && shift.name != null));
-            const bScoutedMatches = shifts.filter((shift) => shift.team === b && shift.name != null).length;
-            console.log(shifts.filter((shift) => shift.team === b && shift.name != null));
+            const aScoutedMatches = shifts.filter((shift) =>
+               shift.team === a && shift.name != null
+            ).length;
+            console.log(
+               shifts.filter((shift) => shift.team === a && shift.name != null),
+            );
+            const bScoutedMatches = shifts.filter((shift) =>
+               shift.team === b && shift.name != null
+            ).length;
+            console.log(
+               shifts.filter((shift) => shift.team === b && shift.name != null),
+            );
 
             /*if (aScoutedMatches < bScoutedMatches) return -1
             if (bScoutedMatches < aScoutedMatches) return 1

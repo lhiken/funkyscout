@@ -3,3 +3,44 @@
    flex-direction: column;
    width: 100%;
 }
+
+.buttonContainer {
+   display: flex;
+   flex-direction: row;
+   gap: 1rem;
+}
+
+.scoutingButton {
+   position: relative;
+   display: flex;
+   flex-direction: column;
+   flex-grow: 1;
+   aspect-ratio: 1;
+   background-color: var(--surface);
+   border-radius: 1rem;
+   padding: 1.25rem;
+   justify-content: space-between;
+   overflow: hidden;
+   height: 10rem;
+   z-index: 100;
+}
+
+.scoutingButtonHeader {
+   color: var(--primary);
+   z-index: 2;
+}
+
+.scoutingButtonProgress {
+   display: flex;
+   flex-direction: row;
+   justify-content: space-between;
+   align-items: end;
+   z-index: 2;
+}
+
+.buttonIcon {
+   position: absolute;
+   top: 3rem;
+   left: 2.5rem;
+   z-index: 1;
+}

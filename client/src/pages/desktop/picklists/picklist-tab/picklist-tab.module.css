@@ -24,11 +24,11 @@
    height: 100%;
 }
 
-.filter.enabled{
-   color:var(--primary);
+.filter.enabled {
+   color: var(--primary);
 }
-.filter.disabled{
-   color:var(--text-secondary);
+.filter.disabled {
+   color: var(--text-secondary);
 }
 
 .picklistList {

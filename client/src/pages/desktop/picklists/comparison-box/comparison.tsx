@@ -105,9 +105,10 @@ function ComparedTeams() {
       >
          {focusTeams.val.sort((a, b) =>
             Number(a.minimized) - Number(b.minimized)
-         ).map((val) => {
-            return <ComparedTeamElement key={val.teamKey} team={val} />;
-         })}
+         )
+            .map((val) => {
+               return <ComparedTeamElement key={val.teamKey} team={val} />;
+            })}
       </Reorder.Group>
    );
 }

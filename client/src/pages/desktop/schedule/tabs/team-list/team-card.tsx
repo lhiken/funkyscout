@@ -19,15 +19,20 @@ function TeamAssignmentCard({
             // Priority -> Low Priority
             if (updatedPriorityTeams.includes(teamData.key)) {
                console.log(`(${teamData.key}): Priority -> Low Priority`);
-               updatedPriorityTeams = updatedPriorityTeams.filter((team) => team !== teamData.key);
-               updatedLowPriorityTeams = [...updatedLowPriorityTeams, teamData.key];
-            }
-            // Low Priority -> Inactive
+               updatedPriorityTeams = updatedPriorityTeams.filter((team) =>
+                  team !== teamData.key
+               );
+               updatedLowPriorityTeams = [
+                  ...updatedLowPriorityTeams,
+                  teamData.key,
+               ];
+            } // Low Priority -> Inactive
             else if (updatedLowPriorityTeams.includes(teamData.key)) {
                console.log(`(${teamData.key}): Low Priority -> Inactive`);
-               updatedLowPriorityTeams = updatedLowPriorityTeams.filter((team) => team !== teamData.key);
-            }
-            // Inactive -> Priority
+               updatedLowPriorityTeams = updatedLowPriorityTeams.filter((
+                  team,
+               ) => team !== teamData.key);
+            } // Inactive -> Priority
             else {
                console.log(`(${teamData.key}): Inactive -> Priority`);
                updatedPriorityTeams = [...updatedPriorityTeams, teamData.key];
@@ -94,7 +99,9 @@ function TeamAssignmentCard({
                   className={`${styles.teamStarIcon} ${
                      assignmentData.val?.priorityTeams.includes(teamData.key)
                         ? styles.active
-                        : assignmentData.val?.lowPriorityTeams.includes(teamData.key)
+                        : assignmentData.val?.lowPriorityTeams.includes(
+                              teamData.key,
+                           )
                         ? styles.lowPriority
                         : styles.inactive
                   }`}
