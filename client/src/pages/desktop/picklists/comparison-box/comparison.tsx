@@ -74,16 +74,38 @@ function ComparedTeams() {
                   : val
             );
          }
-
+         console.log(newTeams.length);
+         console.log(`newTeams before: ${console.log(JSON.stringify(newTeams, null, 2))}`)
          if (newTeams.length > 4) {
             const lastMinimizedIndex = newTeams
                .map((val, index) => ({ ...val, index }))
                .filter((val) => val.minimized)
                .slice(-1)[0]?.index;
 
-            if (lastMinimizedIndex !== undefined) {
-               newTeams.splice(lastMinimizedIndex, 1);
-            }
+               if (lastMinimizedIndex !== undefined) {
+                  let index = newTeams.length - 1;
+                  while (newTeams[index].pinned) {
+                     index--;
+                  }
+                  console.log(`index: ${index}`);
+                  newTeams.splice(index, 1);
+                  console.log(`newTeams changed: ${console.log(JSON.stringify(newTeams, null, 2))}`)
+                  /*const isPinned = newTeams[lastMinimizedIndex].pinned;
+                  if (isPinned) {
+                     const nextNonPinnedIndex = newTeams.findIndex(
+                        (val, index) => !val.pinned && index > lastMinimizedIndex
+                     );
+                     console.log(`nextNonPinnedIndex: ${nextNonPinnedIndex}`);
+                     
+                     if (nextNonPinnedIndex !== -1) {
+                        newTeams.splice(nextNonPinnedIndex, 1);
+                     }
+                  } else {
+                     newTeams.splice(lastMinimizedIndex, 1);
+                  }*/
+               }
+               
+            console.log(newTeams);
          }
 
          focusTeams.setVal(
@@ -113,7 +135,7 @@ function ComparedTeams() {
 }
 
 function ComparedTeamElement(
-   { team }: { team: { teamKey: string; minimized: boolean } },
+   { team }: { team: { teamKey: string; minimized: boolean; pinned: boolean } },
 ) {
    const focusTeams = useContext(ComparedTeamKeysContext);
    const picklistCommands = useContext(PicklistCommandContext);
@@ -150,12 +172,53 @@ function ComparedTeamElement(
                {
                   teamKey: team.teamKey,
                   minimized: false,
+                  pinned:false,
                },
             ];
          });
       }
    }
 
+   function handlePinToggle() {
+      console.log("Clicked!");
+      if (focusTeams.setVal && focusTeams.val) {
+         const maxTeams = focusTeams.val.filter((val) => !val.pinned);
+
+         focusTeams.setVal((prev) => {
+            console.log(`${team.pinned}`);
+            if (!team.pinned) {
+               return prev.map((val) => {
+                   if (val.teamKey === team.teamKey) {
+                       console.log(`${team.teamKey} set to PINNED`);
+                       const updatedVal = { ...val, pinned: true }; // Create updated value
+                       console.log("Updated val:", updatedVal); // Log the updated value
+                       return updatedVal;
+                   }
+                   console.log("Unchanged val:", val); // Log values that remain unchanged
+                   return val;
+               });
+           }
+
+            const updatedTeams = prev.map((val) => ({
+               ...val,
+               pinned: maxTeams.length >= 2 &&
+                     val.teamKey ===
+                        maxTeams[maxTeams.length - 1].teamKey
+                  ? true
+                  : val.pinned,
+            }));
+
+            return [
+               ...updatedTeams.filter((val) => val.teamKey !== team.teamKey),
+               {
+                  teamKey: team.teamKey,
+                  minimized: false,
+                  pinned: false,
+               },
+            ];
+         });
+      }
+   }
    function handleCompare() {
       if (focusTeams.setVal) {
          focusTeams.setVal((prev) =>
@@ -175,6 +238,10 @@ function ComparedTeamElement(
    function handleExclude() {
       picklistCommands.excludeTeam(team.teamKey);
    }
+   /*
+   function handlePin() {
+      picklistCommands.pinTeam(team.teamKey);
+   }*/
 
    const [showSettings, setShowSettings] = useState(false);
 
@@ -238,6 +305,16 @@ function ComparedTeamElement(
                            fontSize: "1.2rem",
                            paddingRight: 0,
                         }}
+                     />
+                  </Tippy>
+                  <Tippy content="Pin">
+                     <i
+                        className={`fa-solid fa-thumbtack ${styles.elementOptionButton} ${styles.minimized}`}
+                        style={{
+                           fontSize: "0.95rem",
+                           padding: "0.3rem 0rem",
+                        }}
+                        onClick={handlePinToggle}
                      />
                   </Tippy>
                   <Tippy content="Stop comparing">
@@ -364,7 +441,17 @@ function ComparedTeamElement(
                            onClick={handleCompare}
                         />
                      </Tippy>
-                     <Tippy content="Minimize tab" placement="left">
+                     <Tippy content="Pin" placement="left">
+                        <i
+                           className={`fa-solid fa-thumbtack ${styles.elementOptionButton} ${styles.minimized}`}
+                           style={{
+                              fontSize: "0.95rem",
+                              padding: "0.3rem 0rem",
+                           }}
+                           onClick={handlePinToggle}
+                        />
+                     </Tippy>
+                     <Tippy content="Expand tab" placement="left">
                         <i
                            className={`fa-solid fa-expand ${styles.elementOptionButton} ${styles.minimized}`}
                            onClick={handleMinimizeToggle}

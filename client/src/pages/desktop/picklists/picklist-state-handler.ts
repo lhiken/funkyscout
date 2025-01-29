@@ -20,7 +20,7 @@ export function setComparedTeams(
 
 export function getComparedTeams() {
    return getLocalStorageItem<
-      { teamKey: string; minimized: boolean }[] | undefined
+      { teamKey: string; minimized: boolean; pinned: boolean }[] | undefined
    >(
       "picklist_compared_teams",
    );

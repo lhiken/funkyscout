@@ -13,14 +13,15 @@ export const TargetPicklistContext = createContext<{
 }>({});
 
 export const ComparedTeamKeysContext = createContext<{
-   val?: { teamKey: string; minimized: boolean }[];
-   setVal?: Dispatch<SetStateAction<{ teamKey: string; minimized: boolean }[]>>;
+   val?: { teamKey: string; minimized: boolean; pinned: boolean }[];
+   setVal?: Dispatch<SetStateAction<{ teamKey: string; minimized: boolean; pinned: boolean }[]>>;
 }>({});
 
 export const PicklistCommandContext = createContext<PicklistCommands>({
    moveTeamUp: () => {},
    moveTeamDown: () => {},
    excludeTeam: () => {},
+   pinTeam: () => {},
    changePicklistVisibility: () => {},
    renamePicklist: () => {},
    deletePicklist: () => {},

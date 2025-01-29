@@ -99,6 +99,16 @@
    color: var(--primary);
 }
 
+.pinButton {
+   color: var(--text-secondary);
+   cursor: pointer;
+   padding-inline: 0.25rem;
+   transition: 0.2s;
+}
+.pinButton:active {
+   color: var(--primary);
+}
+
 .comparedTeamsMinimized {
    display: flex;
    flex-direction: column;
@@ -111,6 +121,26 @@
 }
 
 .elementOptionsMinimized {
+   display: flex;
+   flex-direction: column;
+   
+   font-size: 1.1rem;
+   line-height: 1rem;
+   align-items: center;
+}
+
+.comparedTeamsPinned {
+   display: flex;
+   flex-direction: column;
+   justify-content: space-between;
+   padding: 1.75rem 0.75rem 0.75rem;
+   background-color: var(--surface);
+   border-radius: 0.75rem;
+   user-select: none;
+   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
+}
+
+.elementOptionsPinned {
    display: flex;
    flex-direction: column;
    font-size: 1.1rem;

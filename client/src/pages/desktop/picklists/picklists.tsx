@@ -42,6 +42,7 @@ export interface PicklistCommands {
    moveTeamUp: (teamKey: string) => void;
    moveTeamDown: (teamKey: string) => void;
    excludeTeam: (teamKey: string) => void;
+   pinTeam: (teamKey: string) => void;
    renamePicklist: (name: string) => void;
    changePicklistVisibility: (
       visibility: "default" | "private" | "public",
@@ -59,7 +60,7 @@ function PicklistPage() {
    });
 
    const [comparedTeamKeys, setComparedTeamKeys] = useState<
-      { teamKey: string; minimized: boolean }[]
+      { teamKey: string; minimized: boolean; pinned: boolean }[]
    >([]);
 
    const [targetPicklist, setTargetPicklist] = useState<
@@ -146,7 +147,10 @@ function PicklistPage() {
          });
       },
 
-      changePicklistVisibility: (
+      pinTeam: (teamKey: string) => {
+
+      }
+      ,changePicklistVisibility: (
          visiblity: "default" | "private" | "public",
       ) => {
          if (targetPicklist?.uid == getLocalUserData().uid) { // Yes its joever if someone bypasses this but its not that important anyways and nobody will notice!

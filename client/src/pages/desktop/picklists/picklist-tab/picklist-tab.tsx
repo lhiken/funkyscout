@@ -407,6 +407,10 @@ function PicklistTeamCard(
       picklistCommands.excludeTeam(team.teamKey);
    }
 
+   /*function handlePin() {
+      picklistCommands.pinTeam(team.teamKey);
+   }*/
+
    const comparedTeams = useContext(ComparedTeamKeysContext);
 
    function handleCompare() {
@@ -417,7 +421,8 @@ function PicklistTeamCard(
          if (teamIndex == -1) {
             comparedTeams.setVal((
                prev,
-            ) => [{ teamKey: team.teamKey, minimized: false }, ...prev]);
+               // 
+            ) => [{ teamKey: team.teamKey, minimized: false, pinned: false }, ...prev]);
          } else {
             comparedTeams.setVal((prev) =>
                prev.filter((val) => val.teamKey != team.teamKey)
