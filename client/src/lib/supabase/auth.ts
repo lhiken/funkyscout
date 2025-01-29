@@ -71,6 +71,7 @@ async function sendEmail(email: string) {
       }
    } catch (error) {
       throwNotification("error", "This email is not valid. Please try again");
+      handleError(error);
    }
 }
 
@@ -90,6 +91,7 @@ async function updatePass(nPassword: string) {
       }
    } catch (error) {
       throwNotification("error", "The password is not valid");
+      handleError(error);
    }
 }
 
