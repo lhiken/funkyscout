@@ -32,7 +32,7 @@
    font-size: 2.5rem;
    line-height: 0rem;
    margin-top: 1.25rem;
-   font-weight: 400;
+   font-weight: 500;
    display: flex;
    flex-direction: row;
    align-items: baseline;
@@ -41,4 +41,71 @@
 .scoutingStatCardTitle {
    font-size: 0.9rem;
    color: var(--primary);
+}
+
+.nextMatchDetails {
+   flex-grow: 1;
+   display: flex;
+   flex-direction: column;
+}
+
+.nextMatchHeader {
+   display: flex;
+   gap: 0.25rem;
+}
+
+.nextMatchTime {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   font-size: 4rem;
+   font-weight: 500;
+}
+
+.nextMatchStartScouting {
+   display: flex;
+   flex-direction: column;
+   background-color: var(--surface);
+   border-radius: 1rem;
+   padding: 1.25rem;
+   gap: 0.4rem;
+   margin-bottom: 1rem;
+}
+
+.nextMatchTeamStats {
+   display: flex;
+   flex-direction: column;
+   background-color: var(--surface);
+   border-radius: 1rem;
+   padding: 1.25rem;
+   gap: 0.4rem;
+   flex-grow: 1;
+}
+
+.teamHeader {
+   display: flex;
+   gap: 0.25rem;
+   color: var(--primary);
+}
+
+.boxBottom {
+   display: flex;
+   flex-grow: 1;
+   align-items: end;
+   flex-direction: row;
+   justify-content: space-between;
+   gap: 1rem;
+}
+
+.stats {
+   display: flex;
+   flex-direction: column;
+   gap: 0.5rem;
+   width: 6.5rem;
+}
+
+.statLine {
+   display: flex;
+   flex-direction: row;
+   justify-content: space-between;
 }
