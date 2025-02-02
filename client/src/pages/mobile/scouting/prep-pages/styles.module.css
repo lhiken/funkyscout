@@ -3,6 +3,7 @@
    position: absolute;
    flex-direction: column;
    justify-content: space-between;
+   align-items: center;
    top: 0;
    left: 0;
    width: 100vw;
@@ -35,4 +36,15 @@
    text-align: center;
    color: var(--text-secondary);
    font-size: 0.95rem;
+}
+
+.matchSelectionBox {
+   display: flex;
+   flex-direction: column;
+   width: 18rem;
+}
+
+.inputContainer {
+   display: flex;
+   flex-direction: column;
 }

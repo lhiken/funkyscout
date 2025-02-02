@@ -84,6 +84,13 @@ interface EventSchedule {
    };
 }
 
+export interface EventScheduleEntry {
+   matchKey: string;
+   redTeams: string[];
+   blueTeams: string[];
+   estTime: number;
+}
+
 async function fetchTBAMatchSchedule(eventKey: string) {
    const matchStatus = await fetchTBAData(
       `/event/${eventKey}/matches/simple`,

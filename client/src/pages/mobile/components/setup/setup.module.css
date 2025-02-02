@@ -1,0 +1,36 @@
+.container {
+   display: flex;
+   flex-direction: column;
+   width: 100vw;
+   height: 100vh;
+   position: absolute;
+   top: 0;
+   left: 0;
+   justify-content: center;
+   align-items: center;
+   gap: 1rem;
+}
+
+.header {
+   color: var(--primary);
+}
+
+svg path,
+svg rect {
+   fill: var(--primary-variant);
+}
+
+.loader {
+   margin: 0 0 2em;
+   height: 100px;
+   width: 20%;
+   text-align: center;
+   padding: 1em;
+   margin: 0 auto 1em;
+   display: inline-block;
+   vertical-align: top;
+}
+
+.progressText {
+   color: var(--text-secondary);
+}

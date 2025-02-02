@@ -27,6 +27,17 @@ export default defineConfig({
                      },
                   },
                },
+               {
+                  urlPattern: /.*\.svg$/,
+                  handler: "CacheFirst",
+                  options: {
+                     cacheName: "svg-cache",
+                     expiration: {
+                        maxEntries: 50,
+                        maxAgeSeconds: 60 * 24 * 60 * 60, // Cache for 60 days
+                     },
+                  },
+               },
             ],
             navigateFallback: "/index.html",
             cleanupOutdatedCaches: true,

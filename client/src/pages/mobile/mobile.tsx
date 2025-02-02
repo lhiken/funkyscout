@@ -8,12 +8,33 @@ import MobileScoutingPage from "./scouting-page/scouting-page";
 import styles from "./mobile.module.css";
 import MobileStartPitScouting from "./scouting/prep-pages/pit-scouting";
 import MobileStartMatchScouting from "./scouting/prep-pages/match-scouting";
+import { fetchSession, logout } from "../../lib/supabase/auth";
+import { checkDatabaseInitialization } from "../../lib/mobile-cache-handler/init";
+import MobileSetupPage from "./components/setup/setup";
 
 function MobileApp() {
    const [renderNavbar, setRenderNavbar] = useState(false);
    const [topbarText, setTopbarText] = useState("");
-   const [location] = useLocation();
+   const [location, navigate] = useLocation();
    const locationArray = ["/", "/scout"];
+
+   useEffect(() => {
+      fetchSession().then((res) => {
+         if (res?.session == null) {
+            logout();
+            navigate("~/auth");
+         }
+      });
+
+      if (location == "/") {
+         checkDatabaseInitialization().then((res) => {
+            if (!res) {
+               navigate("/setup");
+            }
+         });
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, []);
 
    useEffect(() => {
       console.log(location);
@@ -43,6 +64,7 @@ function MobileApp() {
                <Route path="/" component={MobileDashboard} />
                <Route path="/scout" component={MobileScoutingPage} />
                <Route path="/scout/pit" component={MobileStartPitScouting} />
+               <Route path="/setup" component={MobileSetupPage} />
                <Route
                   path="/scout/match"
                   component={MobileStartMatchScouting}

@@ -1,3 +1,4 @@
+import MobileCardHeader from "../../components/cards/card-universal-components/card-header";
 import styles from "./styles.module.css";
 
 export default function MobileStartMatchScouting() {
@@ -14,6 +15,11 @@ export default function MobileStartMatchScouting() {
                Return
             </div>
             <div className={styles.seperator} />
+         </div>
+         <div className={styles.matchSelectionBox}>
+            <MobileCardHeader titleText="Match Scouting" />
+            <div className={styles.selectionBox}>
+            </div>
          </div>
          <div className={styles.notice}>
             Remember to lock screen orientation or turn off auto-rotate before

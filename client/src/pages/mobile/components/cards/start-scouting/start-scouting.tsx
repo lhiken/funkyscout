@@ -1,12 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MobileCardHeader from "../card-universal-components/card-header";
 import styles from "./start-scouting.module.css";
 import { getUserScoutingProgress } from "../../../../../lib/user-stats/user-progression";
 import { useLocation } from "wouter";
 
 export default function MobileStartScoutingCard() {
-   const [scoutingData] = useState(getUserScoutingProgress());
+   const [scoutingData, setScoutingData] = useState({
+      pitScouting: { assigned: 0, done: 0 },
+      matchScouting: { assigned: 0, done: 0 },
+   });
    const [, setLocation] = useLocation();
+
+   useEffect(() => {
+      getUserScoutingProgress().then((res) => {
+         setScoutingData(res);
+         console.log(res);
+      });
+   }, []);
 
    const pitProgress = scoutingData.pitScouting
       ? scoutingData.pitScouting.assigned < scoutingData.pitScouting.done
