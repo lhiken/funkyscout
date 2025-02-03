@@ -1,31 +1,61 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import styles from "./next-match.module.css";
-import { getUserScoutingProgress } from "../../../../../lib/user-stats/user-progression";
+import { getUserScoutingProgress } from "../../../../../lib/app/user-progression";
+import { getNextAssignedMatch } from "../../../../../lib/app/helpers";
+import {
+   parseMatchKey,
+   parseTeamKey,
+   timeFromNow,
+   to24HourTime,
+} from "../../../../../utils/logic/app";
+import { Tables } from "../../../../../lib/supabase/database.types";
+import { GlobalTeamDataContext } from "../../../../../app-global-ctx";
 
 export function MobileNextMatchCard() {
    const [shiftsDone, setShiftsDone] = useState(0);
    const [shiftsLeft, setShiftsLeft] = useState(0);
-   const [timeToBreak] = useState(12);
+
+   const globalData = useContext(GlobalTeamDataContext);
+
+   const [nextMatch, setNextMatch] = useState<
+      { data: Tables<"event_schedule">; time: number } | null
+   >();
 
    useEffect(() => {
       getUserScoutingProgress().then((res) => {
          setShiftsDone(res.matchScouting.done);
          setShiftsLeft(res.matchScouting.assigned - res.matchScouting.done);
       });
-   });
+
+      getNextAssignedMatch().then((res) => {
+         setNextMatch(res);
+      });
+   }, []);
+
+   console.log(nextMatch?.time);
+   const nextMatchDateObject = nextMatch?.time
+      ? new Date(nextMatch?.time * 1000)
+      : new Date();
+
+   console.log(nextMatchDateObject);
 
    return (
       <div className={styles.nextMatchContainer}>
          <div className={styles.nextMatchScoutStats}>
             <ScoutingStatCard value={shiftsDone + ""} title="shifts done" />
             <ScoutingStatCard value={shiftsLeft + ""} title="shifts left" />
-            <ScoutingStatCard value={timeToBreak + "m"} title="to break" />
+            <ScoutingStatCard value={"0" + "m"} title="to break" />
          </div>
          <div className={styles.nextMatchDetails}>
             <div className={styles.nextMatchHeader}>
                Next Match{" "}
                <div style={{ color: "var(--text-secondary)" }}>|</div>{" "}
-               <div style={{ color: "var(--primary)" }}>6m</div>
+               <div style={{ color: "var(--primary)" }}>
+                  {timeFromNow(nextMatchDateObject).value}{" "}
+                  {timeFromNow(nextMatchDateObject).sign == "+"
+                     ? "from now"
+                     : "ago"}
+               </div>
             </div>
             <div className={styles.nextMatchTime}>
                <i
@@ -35,15 +65,26 @@ export function MobileNextMatchCard() {
                   }}
                   className="fa-regular fa-clock"
                />
-               12:15
+               {to24HourTime(new Date(nextMatchDateObject))}
             </div>
             <div className={styles.nextMatchStartScouting}>
-               <div style={{ color: "var(--primary)" }}>Qualification 23</div>
+               <div style={{ color: "var(--primary)" }}>
+                  {parseMatchKey(
+                     nextMatch?.data.match || "Loading...",
+                     "nexus",
+                  )}
+               </div>
                <div style={{ display: "flex" }}>
-                  Team 254&nbsp;
+                  {nextMatch?.data.team
+                     ? "Team " + parseTeamKey(nextMatch?.data.team || "0")
+                     : "Loading..."}&nbsp;
                   <div
                      style={{
-                        color: "var(--error)",
+                        color: `${
+                           nextMatch?.data.alliance == "blue"
+                              ? "var(--blue-alliance)"
+                              : "var(--red-alliance)"
+                        }`,
                         lineHeight: "1.25rem",
                         fontSize: "2rem",
                      }}
@@ -54,21 +95,38 @@ export function MobileNextMatchCard() {
             </div>
             <div className={styles.nextMatchTeamStats}>
                <div className={styles.teamHeader}>
-                  254
+                  {nextMatch?.data.team
+                     ? parseTeamKey(nextMatch?.data.team || "0")
+                     : "N/A"}{" "}
                   <div style={{ color: "var(--text-background)" }}>|</div>
                   <div style={{ color: "var(--text-primary)" }}>
-                     The Cheesy Poofs
+                     {globalData.TBAdata.find((val) =>
+                        val.key == nextMatch?.data.team
+                     )?.name || "Loading..."}
                   </div>
                </div>
                <div className={styles.boxBottom}>
                   <div className={styles.stats}>
                      <div className={styles.statLine}>
                         <div style={{ color: "var(--primary)" }}>Rank</div>
-                        <div>#13</div>
+                        <div>
+                           #{globalData.TBAdata.find((val) =>
+                              val.key == nextMatch?.data.team
+                           )?.rank || "N/A"}
+                        </div>
                      </div>
                      <div className={styles.statLine}>
                         <div style={{ color: "var(--primary)" }}>EPA</div>
-                        <div>16.2</div>
+                        <div>
+                           {globalData
+                                 .EPAdata[
+                                    parseTeamKey(nextMatch?.data.team || "")
+                                 ]
+                              ? globalData
+                                 .EPAdata[nextMatch?.data.name || ""]
+                                 .epa.total_points.mean
+                              : "N/A"}
+                        </div>
                      </div>
                   </div>
                   <i

@@ -76,8 +76,13 @@ async function fetchNewData(
       const teamEPAs: Record<string, StatboticsTeamEPAs> = {};
       let fetchedCount = 0;
       let errorCount = 0;
+      let shouldAbort = false;
 
       const teamDataPromises = teams.map(async (team) => {
+         if (shouldAbort) {
+            return;
+         }
+
          try {
             const teamStatboticsData = await fetchStatboticsTeamEPA(
                team.team.substring(3),
@@ -88,6 +93,10 @@ async function fetchNewData(
                teamEPAs[team.team] = teamStatboticsData;
             } else {
                errorCount++;
+            }
+
+            if (errorCount > 5) {
+               shouldAbort = true;
             }
          } catch (error) {
             console.error(
@@ -102,7 +111,11 @@ async function fetchNewData(
          }
       });
 
-      await Promise.all(teamDataPromises);
+      try {
+         await Promise.all(teamDataPromises);
+      } catch (error) {
+         handleError(error);
+      }
 
       localStorage.setItem("statboticsTeamData", JSON.stringify(teamEPAs));
       localStorage.setItem(

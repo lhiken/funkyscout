@@ -1,7 +1,7 @@
 import {
    getAllData,
-   localScheduleStoreName,
-   localScoutedMatchesStoreName,
+   getScheduleStoreName,
+   getScoutedMatchesStoreName,
 } from "../mobile-cache-handler/init";
 import { getLocalUserData } from "../supabase/auth";
 import { Tables } from "../supabase/database.types";
@@ -9,10 +9,10 @@ import { Tables } from "../supabase/database.types";
 export async function getUserScoutingProgress() {
    const userId = getLocalUserData().uid;
    const matchesAssigned =
-      ((await getAllData(localScheduleStoreName)) as Tables<"event_schedule">[])
+      ((await getAllData(getScheduleStoreName())) as Tables<"event_schedule">[])
          .filter((val) => val.uid == userId).length;
    const matchesDone =
-      ((await getAllData(localScoutedMatchesStoreName)) as Tables<
+      ((await getAllData(getScoutedMatchesStoreName())) as Tables<
          "event_schedule"
       >[]).filter((val) => val.uid == userId).length;
 

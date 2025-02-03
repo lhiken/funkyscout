@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import MobileCardHeader from "../card-universal-components/card-header";
 import styles from "./start-scouting.module.css";
-import { getUserScoutingProgress } from "../../../../../lib/user-stats/user-progression";
+import { getUserScoutingProgress } from "../../../../../lib/app/user-progression";
 import { useLocation } from "wouter";
 
 export default function MobileStartScoutingCard() {

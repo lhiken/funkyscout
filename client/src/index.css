@@ -77,6 +77,8 @@ a {
    --inset: rgba(13, 13, 13, 1);
    --surface: rgba(19, 19, 19, 1);
    --error: rgba(191, 65, 65, 1);
+   --red-alliance: rgba(191, 65, 65, 1);
+   --blue-alliance: rgb(65, 136, 191);
    --success: rgba(102, 183, 68, 1);
    --text-primary: rgba(187, 187, 187, 1);
    --text-secondary: rgba(81, 81, 81, 1);
@@ -94,6 +96,8 @@ a {
    --inset: rgba(251, 251, 251, 1);
    --surface: rgba(247, 247, 247, 1);
    --error: rgba(191, 65, 65, 1);
+   --red-alliance: rgba(191, 65, 65, 1);
+   --blue-alliance: rgb(65, 136, 191);
    --success: rgba(102, 183, 68, 1);
    --text-primary: rgba(40, 40, 40, 1);
    --text-secondary: rgba(155, 155, 155, 1);

@@ -6,26 +6,27 @@ import {
    fetchTeamsByEvent,
 } from "../supabase/data";
 import { Json, Tables } from "../supabase/database.types";
-import { EventScheduleEntry, fetchTBAMatchSchedule } from "../tba/events";
+import {
+   EventSchedule,
+   EventScheduleEntry,
+   fetchTBAMatchSchedule,
+} from "../tba/events";
 
-export const DB_VERSION = 3;
+export const DB_VERSION = 4;
 
-export const idbName = `cacheDB_${getLocalUserData()?.uid || "NOUSER"}`;
-export const localScheduleStoreName = `localSchedule_${
-   getEvent() || "NOEVENT"
-}`;
-export const localScoutedMatchesStoreName = `localScoutedMatches_${
-   getEvent() || "NOEVENT"
-}`;
-export const localServerMatchesStoreName = `localServerMatches_${
-   getEvent() || "NOEVENT"
-}`;
-export const localMatchDetailsStoreName = `localMatchDetails_${
-   getEvent() || "NOEVENT"
-}`;
-export const localTeamDetailsStoreName = `localTeamDetails_${
-   getEvent() || "NOEVENT"
-}`;
+export const idbName = () => `cacheDB_${getLocalUserData()?.uid || "NOUSER"}`;
+export const getScheduleStoreName = () =>
+   `localSchedule_${getEvent() || "NOEVENT"}`;
+export const getScoutedMatchesStoreName = () =>
+   `localScoutedMatches_${getEvent() || "NOEVENT"}`;
+export const getServerMatchesStoreName = () =>
+   `localServerMatches_${getEvent() || "NOEVENT"}`;
+export const getMatchDetailsStoreName = () =>
+   `localMatchDetails_${getEvent() || "NOEVENT"}`;
+export const getTeamDetailsStoreName = () =>
+   `localTeamDetails_${getEvent() || "NOEVENT"}`;
+export const getLocalTBADataName = () =>
+   `localTBAData_${getEvent() || "NOEVENT"}`;
 
 export default async function initializeMobileCache(
    progressCallback?: (progress: string) => void,
@@ -45,8 +46,9 @@ export default async function initializeMobileCache(
    const teamDetails: Tables<"event_team_data">[] =
       await fetchTeamsByEvent(eventKey) || [];
    if (progressCallback) progressCallback("(4/6) Fetching match details");
+   const TBAMatchSchedule = await fetchTBAMatchSchedule(eventKey);
    const matchDetails: EventScheduleEntry[] = Object.entries(
-      (await fetchTBAMatchSchedule(eventKey)) || {},
+      TBAMatchSchedule || {},
    ).map(([key, value]) => {
       return {
          matchKey: key,
@@ -58,12 +60,25 @@ export default async function initializeMobileCache(
    if (progressCallback) progressCallback("(5/6) Creating local cache");
 
    await openLocalCache();
+   updateLocalTBACache(TBAMatchSchedule);
 
-   bulkUpsertData(localScheduleStoreName, eventSchedule);
+   bulkUpsertData(getScheduleStoreName(), eventSchedule);
    if (progressCallback) progressCallback("(6/6) Updating local cache");
-   bulkUpsertData(localServerMatchesStoreName, serverMatches);
-   bulkUpsertData(localTeamDetailsStoreName, teamDetails);
-   bulkUpsertData(localMatchDetailsStoreName, matchDetails);
+   bulkUpsertData(getServerMatchesStoreName(), serverMatches);
+   bulkUpsertData(getTeamDetailsStoreName(), teamDetails);
+   bulkUpsertData(getMatchDetailsStoreName(), matchDetails);
+}
+
+export function updateLocalTBACache(data: EventSchedule | undefined) {
+   if (data) {
+      localStorage.setItem(getLocalTBADataName(), JSON.stringify(data));
+   }
+}
+
+export function getLocalTBAData() {
+   return JSON.parse(
+      localStorage.getItem(getLocalTBADataName()) || "[]",
+   ) as EventSchedule;
 }
 
 export async function insertData(storeName: string, data: Json) {
@@ -197,32 +212,32 @@ export async function getAllData<T>(
 
 async function openLocalCache(): Promise<IDBDatabase> {
    return new Promise((resolve, reject) => {
-      const idbOpenRequest = indexedDB.open(idbName, DB_VERSION);
+      const idbOpenRequest = indexedDB.open(idbName(), DB_VERSION);
 
       idbOpenRequest.onupgradeneeded = (event) => {
          const db = (event.target as IDBOpenDBRequest).result;
-         if (!db.objectStoreNames.contains(localScheduleStoreName)) {
-            db.createObjectStore(localScheduleStoreName, {
+         if (!db.objectStoreNames.contains(getScheduleStoreName())) {
+            db.createObjectStore(getScheduleStoreName(), {
                keyPath: ["event", "match", "team"],
             });
          }
-         if (!db.objectStoreNames.contains(localScoutedMatchesStoreName)) {
-            db.createObjectStore(localScoutedMatchesStoreName, {
+         if (!db.objectStoreNames.contains(getScoutedMatchesStoreName())) {
+            db.createObjectStore(getScoutedMatchesStoreName(), {
                keyPath: ["event", "match", "team"],
             });
          }
-         if (!db.objectStoreNames.contains(localServerMatchesStoreName)) {
-            db.createObjectStore(localServerMatchesStoreName, {
+         if (!db.objectStoreNames.contains(getServerMatchesStoreName())) {
+            db.createObjectStore(getServerMatchesStoreName(), {
                keyPath: ["event", "match", "team"],
             });
          }
-         if (!db.objectStoreNames.contains(localMatchDetailsStoreName)) {
-            db.createObjectStore(localMatchDetailsStoreName, {
+         if (!db.objectStoreNames.contains(getMatchDetailsStoreName())) {
+            db.createObjectStore(getMatchDetailsStoreName(), {
                keyPath: ["matchKey"],
             });
          }
-         if (!db.objectStoreNames.contains(localTeamDetailsStoreName)) {
-            db.createObjectStore(localTeamDetailsStoreName, {
+         if (!db.objectStoreNames.contains(getTeamDetailsStoreName())) {
+            db.createObjectStore(getTeamDetailsStoreName(), {
                keyPath: ["team"],
             });
          }
@@ -249,18 +264,18 @@ async function openTransaction(
 
 export async function checkDatabaseInitialization(): Promise<boolean> {
    return new Promise((resolve, reject) => {
-      const request = indexedDB.open(idbName);
+      const request = indexedDB.open(idbName());
 
       request.onsuccess = () => {
          const db = request.result;
 
          const storeNames = Array.from(db.objectStoreNames);
          const allStoresExist = [
-            localScheduleStoreName,
-            localScoutedMatchesStoreName,
-            localServerMatchesStoreName,
-            localTeamDetailsStoreName,
-            localMatchDetailsStoreName,
+            getScheduleStoreName(),
+            getScoutedMatchesStoreName(),
+            getServerMatchesStoreName(),
+            getTeamDetailsStoreName(),
+            getMatchDetailsStoreName(),
          ].every((store) => storeNames.includes(store));
 
          db.close();

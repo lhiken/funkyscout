@@ -104,6 +104,36 @@ function parseTeamKey(key: string) {
    }
 }
 
+function timeFromNow(date: Date): { sign: "+" | "-"; value: string } {
+   const now = new Date();
+   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+   const sign = diffInSeconds >= 0 ? "-" : "+";
+   const absDiffInSeconds = Math.abs(diffInSeconds);
+
+   const units = [
+      { label: "y", seconds: 31536000 },
+      { label: "d", seconds: 86400 },
+      { label: "h", seconds: 3600 },
+      { label: "m", seconds: 60 },
+      { label: "s", seconds: 1 },
+   ];
+
+   for (const unit of units) {
+      const value = Math.floor(absDiffInSeconds / unit.seconds);
+      if (value >= 1) {
+         return { sign, value: `${value}${unit.label}` };
+      }
+   }
+
+   return { sign: "-", value: "0s" };
+}
+
+function to24HourTime(date: Date) {
+   const hours = date.getHours().toString().padStart(2, "0");
+   const minutes = date.getMinutes().toString().padStart(2, "0");
+   return `${hours}:${minutes}`;
+}
+
 export {
    getEvent,
    getEventYear,
@@ -112,4 +142,6 @@ export {
    parseMatchKey,
    parseTeamKey,
    setFocusTeam,
+   timeFromNow,
+   to24HourTime,
 };

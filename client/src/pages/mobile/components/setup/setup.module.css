@@ -15,8 +15,7 @@
    color: var(--primary);
 }
 
-svg path,
-svg rect {
+.svgLoader {
    fill: var(--primary-variant);
 }
 
