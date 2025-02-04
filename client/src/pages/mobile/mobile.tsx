@@ -37,7 +37,6 @@ function MobileApp() {
    }, []);
 
    useEffect(() => {
-      console.log(location);
       if (locationArray.includes(location)) {
          setRenderNavbar(true);
       } else {

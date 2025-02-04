@@ -48,3 +48,30 @@
    display: flex;
    flex-direction: column;
 }
+
+.selectionBox {
+   display: flex;
+   flex-direction: column;
+   background-color: var(--surface);
+   width: 100%;
+   border-radius: 1rem;
+   gap: 1rem;
+   padding: 1.25rem 1rem;
+}
+
+.nextContainer {
+   display: flex;
+   flex-direction: row;
+   gap: 1rem;
+}
+
+.continueButton {
+   background-color: var(--primary);
+   flex-grow: 1;
+   color: var(--text-background);
+   justify-content: center;
+   align-items: center;
+   font-size: 1.75rem;
+   display: flex;
+   border-radius: 10rem;
+}

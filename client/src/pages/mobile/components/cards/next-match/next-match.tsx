@@ -32,12 +32,9 @@ export function MobileNextMatchCard() {
       });
    }, []);
 
-   console.log(nextMatch?.time);
    const nextMatchDateObject = nextMatch?.time
       ? new Date(nextMatch?.time * 1000)
       : new Date();
-
-   console.log(nextMatchDateObject);
 
    return (
       <div className={styles.nextMatchContainer}>

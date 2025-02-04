@@ -49,3 +49,66 @@
 .inputWrapper input {
    padding-right: 30px;
 }
+
+.genericCombobox {
+   display: flex;
+   height: 3.25rem;
+   padding: 0.625rem 0.625rem 0.625rem 1.375rem;
+   align-items: center;
+   gap: 0.625rem;
+   align-self: stretch;
+
+   border-radius: 6.25rem;
+   background: var(--inset);
+   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25) inset;
+}
+
+.comboboxInput {
+   color: var(--text-primary);
+   width: 8rem;
+}
+
+.comboboxDropdownContainer {
+   background-color: var(--inset);
+   width: 14rem;
+   height: 10rem;
+   padding-bottom: 0.25rem;
+
+   display: flex;
+   flex-direction: column;
+   color: var(--text-primary);
+
+   border-radius: 0.6rem;
+   border: solid 2px var(--surface);
+   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.05);
+}
+
+.comboboxDropdownOption {
+   font-size: 1rem;
+   padding-top: 0.25em;
+   padding-bottom: 0.25rem;
+   padding-left: 1rem;
+   transition: 0.3s;
+}
+
+.combobox-option:hover {
+   background-color: var(--surface);
+}
+
+.comboboxDropdownHeader {
+   font-size: 1rem;
+   margin-bottom: 0.3rem;
+   margin-top: 0.5rem;
+   margin-left: 1rem;
+   font-weight: 400;
+   color: var(--primary);
+}
+
+.comboboxDropdownLine {
+   width: 85%;
+   height: 0.15rem;
+   background-color: var(--surface);
+   align-self: center;
+   margin-bottom: 0.4rem;
+   border-radius: 20rem;
+}

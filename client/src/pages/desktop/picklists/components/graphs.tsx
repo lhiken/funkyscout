@@ -33,8 +33,6 @@ export function MetricCategory2024(
          ),
       );
 
-      console.log(data);
-
       addMetric({
          title: "Notes Scored",
          values: data,

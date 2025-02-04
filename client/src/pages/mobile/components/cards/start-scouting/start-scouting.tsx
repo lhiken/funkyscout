@@ -14,12 +14,11 @@ export default function MobileStartScoutingCard() {
    useEffect(() => {
       getUserScoutingProgress().then((res) => {
          setScoutingData(res);
-         console.log(res);
       });
    }, []);
 
    const pitProgress = scoutingData.pitScouting
-      ? scoutingData.pitScouting.assigned < scoutingData.pitScouting.done
+      ? scoutingData.pitScouting.assigned > scoutingData.pitScouting.done
          ? ((scoutingData.pitScouting.done /
             scoutingData.pitScouting.assigned) *
             100).toFixed(0) + "% done"
@@ -27,11 +26,11 @@ export default function MobileStartScoutingCard() {
       : "N/A";
 
    const matchProgress = scoutingData.matchScouting
-      ? scoutingData.matchScouting.assigned < scoutingData.matchScouting.done
+      ? scoutingData.matchScouting.assigned > scoutingData.matchScouting.done
          ? ((scoutingData.matchScouting.done /
             scoutingData.matchScouting.assigned) *
             100).toFixed(0) + "% done"
-         : "All done!"
+         : `All done!`
       : "N/A";
 
    function handlePitScoutClick() {

@@ -36,8 +36,6 @@ export function DesktopMetricsSelector(
       setMetrics((prev) => {
          const newMetric = prev.slice();
 
-         console.log(newMetric);
-
          if (prev.filter((val) => val.title == metric.title).length > 0) {
             return newMetric.filter((val) => val.title != metric.title);
          }
@@ -53,8 +51,6 @@ export function DesktopMetricsSelector(
 
       const values = COPRs[newKey] || COPRs[itemKey.substring(6)] ||
          COPRs[itemKey.substring(6).toLowerCase()];
-
-      console.log(values);
 
       const teamValueArray = Object.keys(values).map((val) => {
          return { teamKey: val, value: values[val] };
