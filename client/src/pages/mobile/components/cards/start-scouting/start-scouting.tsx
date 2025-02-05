@@ -3,6 +3,7 @@ import MobileCardHeader from "../card-universal-components/card-header";
 import styles from "./start-scouting.module.css";
 import { getUserScoutingProgress } from "../../../../../lib/app/user-progression";
 import { useLocation } from "wouter";
+import { getNextAssignedMatch } from "../../../../../lib/app/helpers";
 
 export default function MobileStartScoutingCard() {
    const [scoutingData, setScoutingData] = useState({
@@ -38,7 +39,11 @@ export default function MobileStartScoutingCard() {
    }
 
    function handleMatchScoutClick() {
-      setLocation("/scout/match");
+      getNextAssignedMatch().then((res) => {
+         setLocation(`/scout/match/${res?.data.match}`)
+      }).catch(() => {
+         setLocation(`/scout/match/`)
+      })
    }
 
    return (

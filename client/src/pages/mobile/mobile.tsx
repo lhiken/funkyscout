@@ -65,7 +65,7 @@ function MobileApp() {
                <Route path="/scout/pit" component={MobileStartPitScouting} />
                <Route path="/setup" component={MobileSetupPage} />
                <Route
-                  path="/scout/match"
+                  path="/scout/match/:matchNumber"
                   component={MobileStartMatchScouting}
                />
                <Route path="/data" />

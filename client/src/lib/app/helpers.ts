@@ -170,7 +170,11 @@ export async function getNextNearAssignedMatches() {
 
    // Pre-calculate array length for bounds checking
    const arrayLength = matchesWithMetadata.length;
-   const result = new Array(5).fill(null);
+   const result: {
+      data: Tables<"event_schedule">,
+      time: number | null,
+      scouted: boolean
+   }[] = new Array(5).fill(null);
 
    // Fill in matches centered around the next match
    for (let i = -2; i <= 2; i++) {

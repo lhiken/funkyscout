@@ -57,6 +57,7 @@
    border-radius: 1rem;
    gap: 1rem;
    padding: 1.25rem 1rem;
+   margin-bottom: 1rem;
 }
 
 .nextContainer {
@@ -74,4 +75,37 @@
    font-size: 1.75rem;
    display: flex;
    border-radius: 10rem;
+}
+
+.alternateMatches {
+   display: flex;
+   flex-direction: column;
+   background-color: var(--surface);
+   width: 100%;
+   border-radius: 1rem;
+   gap: 1rem;
+   padding: 1.25rem 1.25rem;
+   height: 16rem;
+   overflow-y: scroll;
+}
+
+.alternateMatchContainer {
+   display: flex;
+   flex-direction: column;
+   background-color: var(--text-background);
+   padding: 1rem 1.25rem;
+   border-radius: 1rem;
+   gap: 0.25rem;
+}
+
+.matchHeader {
+   font-size: 0.95rem;
+   color: var(--primary);
+}
+
+.teamHeader {
+   font-size: 0.935rem;
+   display: flex;
+   flex-direction: row;
+   justify-content: space-between;
 }

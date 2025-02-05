@@ -57,6 +57,7 @@
    align-items: center;
    gap: 0.625rem;
    align-self: stretch;
+   transition: 0.2s;
 
    border-radius: 6.25rem;
    background: var(--inset);
@@ -111,4 +112,9 @@
    align-self: center;
    margin-bottom: 0.4rem;
    border-radius: 20rem;
+}
+
+.disabled {
+   opacity: 0.5;
+   color: var(--text-secondary);
 }
