@@ -75,6 +75,7 @@
    font-size: 1.75rem;
    display: flex;
    border-radius: 10rem;
+   transition: 0.2s;
 }
 
 .alternateMatches {

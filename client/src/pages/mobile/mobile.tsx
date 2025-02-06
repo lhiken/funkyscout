@@ -11,6 +11,7 @@ import MobileStartMatchScouting from "./scouting/prep-pages/match-scouting";
 import { fetchSession, logout } from "../../lib/supabase/auth";
 import { checkDatabaseInitialization } from "../../lib/mobile-cache-handler/init";
 import MobileSetupPage from "./components/setup/setup";
+import ScoutingInmatch from "../scouting/inmatch";
 
 function MobileApp() {
    const [renderNavbar, setRenderNavbar] = useState(false);
@@ -69,6 +70,7 @@ function MobileApp() {
                   component={MobileStartMatchScouting}
                />
                <Route path="/data" />
+               <Route path="/inmatch/" component={ScoutingInmatch} nest />
             </div>
             <Route>
                <ErrorPage style={{ height: "calc(100% - 1rem)" }} />

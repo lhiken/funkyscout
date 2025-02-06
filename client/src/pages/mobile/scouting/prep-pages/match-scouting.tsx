@@ -11,6 +11,7 @@ import { EventScheduleEntry } from "../../../../lib/tba/events";
 import { parseMatchKey, parseTeamKey } from "../../../../utils/logic/app";
 import { getNextAssignedMatch, getNextNearAssignedMatches } from "../../../../lib/app/helpers";
 import { Tables } from "../../../../lib/supabase/database.types";
+import { useLocation } from "wouter";
 
 export default function MobileStartMatchScouting() {
    const [matchQuery, setMatchQuery] = useState("");
@@ -25,6 +26,8 @@ export default function MobileStartMatchScouting() {
 
    const [noChange] = useState(true);
 
+   const [, navigate] = useLocation();
+
    useEffect(() => {
       if (noChange) {
          getNextAssignedMatch().then((res) => {
@@ -33,7 +36,6 @@ export default function MobileStartMatchScouting() {
             console.log(selectedMatch);
          })
       } else {
-         console.log("did something else")
          if (selectedMatch) {
          } else {
             setTeamData([]);
@@ -77,6 +79,12 @@ export default function MobileStartMatchScouting() {
       const targetMatch = matchData.find((val) => val.matchKey == match.data.match) || null;
       setSelectedMatch(targetMatch);
       setSelectedTeam(`${match.data.alliance == "blue" ? "B" : "R"}${match.data.team}`)
+   }
+
+   function handleStartScouting() {
+      if (selectedMatch != null && selectedTeam != null && [...selectedMatch.blueTeams, ...selectedMatch.redTeams].includes(selectedTeam.substring(1))) {
+         navigate(`/inmatch/${/*UgetEventYear()*/2025}/m=${selectedMatch.matchKey}&t=${selectedTeam}&a=${selectedMatch.redTeams.includes(selectedTeam.substring(1)) ? "r" : "b"}`)
+      }
    }
 
    return (
@@ -132,7 +140,11 @@ export default function MobileStartMatchScouting() {
                      label="Select team"
                      active={selectedMatch != null}
                   />
-                  <div className={styles.continueButton}>
+                  <div className={styles.continueButton} style={{
+                     opacity: `${!selectedTeam ? "0.5" : "1"
+                        }`
+                  }}
+                     onClick={handleStartScouting}>
                      <i className="fa-solid fa-arrow-right" />
                   </div>
                </div>
@@ -160,8 +172,7 @@ export default function MobileStartMatchScouting() {
             </motion.div>
          </motion.div>
          <div className={styles.notice}>
-            Remember to lock screen orientation or turn off auto-rotate before
-            scouting
+            The match does NOT start after clicking the the arrow button. Please lock orientation or turn off autorotate before scouting.
          </div>
       </div>
    );

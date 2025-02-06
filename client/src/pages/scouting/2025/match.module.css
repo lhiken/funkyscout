@@ -1,0 +1,35 @@
+.inmatchContainer {
+    transform: rotate(90deg);
+    transform-origin: top left;
+    width: 100vh;
+    height: 100vw;
+    top: 0;
+    left: 100vw;
+    position: absolute;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    padding: 1rem;
+}
+
+.helperSidebar {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--surface);
+    padding: 1rem;
+    border-radius: 1rem;
+    border: 2px solid var(--text-background);
+    align-items: center;
+}
+
+.helperSidebarHeader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.helperSidebarIcons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
