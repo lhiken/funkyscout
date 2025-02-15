@@ -4,7 +4,6 @@ import { motion } from "motion/react";
 import styles from "./mode.module.css";
 import authStyles from "./auth.module.css";
 import throwNotification from "../../../components/app/toast/toast";
-//fixed following line - make sure later!!
 import { updatePass } from "../../../lib/supabase/auth";
 
 function ResetPassword() {
