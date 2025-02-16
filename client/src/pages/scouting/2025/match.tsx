@@ -522,10 +522,45 @@ function FieldMap() {
 }
 
 function MatchControls() {
+   const [selection] = useState<"algae" | "coral" | "climb" | null>(null);
+
    return (
       <>
-         <div className={styles.matchControls}>
-         </div>
+         {!selection &&
+            (
+               <div className={styles.matchControls}>
+                  <div
+                     style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        gap: "0.5rem",
+                        height: "100%",
+                     }}
+                  >
+                     <div
+                        style={{
+                           display: "flex",
+                           flexDirection: "column",
+                           width: "100%",
+                           gap: "0.5rem",
+                        }}
+                     >
+                        <div className={styles.controlCategory}>
+                           Algae
+                        </div>
+                        <div className={styles.controlCategory}>
+                           Coral
+                        </div>
+                     </div>
+                     <div className={styles.controlCategory}>
+                        Climb
+                     </div>
+                  </div>
+                  <div className={styles.disabled}>
+                     disabled
+                  </div>
+               </div>
+            )}
       </>
    );
 }
