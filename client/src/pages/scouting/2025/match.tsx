@@ -69,6 +69,7 @@ export interface MatchContextType {
       SetStateAction<null | RobotActions[2025] | ScoreActions[2025]>
    >;
    fieldOrientation: "normal" | "rotated";
+   setFieldOrientation: Dispatch<SetStateAction<"normal" | "rotated">>;
 }
 
 export default function Inmatch2025() {
@@ -99,9 +100,13 @@ export default function Inmatch2025() {
 
    const [selectedAction, setSelectedAction] = useState<
       RobotActions[2025] | ScoreActions[2025] | null
-   >(null);
+   >("coralPickup");
 
    const [gameStartTime, setGameStartTime] = useState<number>();
+
+   const [fieldOrientation, setFieldOrientation] = useState<
+      "normal" | "rotated"
+   >("normal");
 
    let matchInterval: NodeJS.Timeout;
 
@@ -117,7 +122,7 @@ export default function Inmatch2025() {
       if (gameState == "teleop") {
          setTeleopActions(actions);
          setTeleRedoStack(redoStack);
-      } else if (gameState == "auto") {
+      } else if (gameState == "auto" || gameState == "unstarted") {
          setAutoActions(actions);
          setAutoRedoStack(redoStack);
       }
@@ -156,11 +161,14 @@ export default function Inmatch2025() {
    async function startMatch() {
       setGameState("auto");
       setGameElapsed(0);
-      setGameStartTime(Date.now());
+      const startTime = Date.now();
+      setGameStartTime(startTime);
 
       const interval = setInterval(
-         () => setGameElapsed(gameStartTime || 0 - Date.now()),
-         10,
+         () => {
+            setGameElapsed(Date.now() - startTime);
+         },
+         100,
       );
 
       matchInterval = interval;
@@ -308,7 +316,8 @@ export default function Inmatch2025() {
       endMatch: endMatch,
       selectedAction: selectedAction,
       setSelectedAction: setSelectedAction,
-      fieldOrientation: "normal",
+      fieldOrientation: fieldOrientation,
+      setFieldOrientation: setFieldOrientation,
    };
 
    useEffect(() => {
@@ -316,8 +325,8 @@ export default function Inmatch2025() {
       let coralPosession = false;
       for (const action of [...autoActions, ...teleopActions]) {
          if (evaluateAction(action) == "lostAlgae") algaePosession = false;
-         if (evaluateAction(action) == "lostCoral") coralPosession = true;
-         if (evaluateAction(action) == "gainedAlgae") algaePosession = false;
+         if (evaluateAction(action) == "lostCoral") coralPosession = false;
+         if (evaluateAction(action) == "gainedAlgae") algaePosession = true;
          if (evaluateAction(action) == "gainedCoral") coralPosession = true;
       }
       setAlgaePosession(algaePosession);
@@ -377,25 +386,72 @@ function HelperSidebar() {
             {parseTeamKey(matchInfo?.teamKey || "")}
          </div>
          <div className={styles.helperSidebarIcons}>
-            <img
-               src={"/app/icons/algae.svg"}
-               alt="Medal icon"
-               className={styles.buttonIcon}
-            />
-            <img
-               src={"/app/icons/coral.svg"}
-               alt="Medal icon"
-               className={styles.buttonIcon}
-               style={{ // does not work lmao
-                  fill: matchCtx?.coralPosession
+            <svg
+               width="25"
+               height="25"
+               viewBox="0 0 25 25"
+               fill="none"
+               xmlns="http://www.w3.org/2000/svg"
+               style={{ transition: "0.2s" }}
+            >
+               <g clip-path="url(#clip0_1169_12)">
+                  <circle
+                     cx="12.5"
+                     cy="12.5"
+                     r="12.5"
+                     fill={matchCtx?.algaePosession
+                        ? "var(--primary)"
+                        : "var(--text-background)"}
+                  />
+                  <path
+                     d="M5.74192 15.6131C4.89353 16.1029 3.78967 15.8145 3.47547 14.8866C3.03593 13.5886 2.89608 12.1995 3.077 10.8253C3.3356 8.86101 4.23511 7.03696 5.63604 5.63604C7.03696 4.23511 8.86101 3.3356 10.8253 3.077C12.1995 2.89608 13.5886 3.03593 14.8866 3.47547C15.8145 3.78967 16.1029 4.89353 15.6131 5.74192C15.1233 6.59032 14.0344 6.84737 13.074 6.65441C12.49 6.53708 11.8868 6.51544 11.2883 6.59424C10.0983 6.7509 8.99328 7.29585 8.14457 8.14457C7.29585 8.99328 6.7509 10.0983 6.59424 11.2883C6.51544 11.8868 6.53708 12.49 6.65441 13.074C6.84737 14.0344 6.59032 15.1233 5.74192 15.6131Z"
+                     fill="#0D0D0D"
+                  />
+               </g>
+               <defs>
+                  <clipPath id="clip0_1169_12">
+                     <rect width="25" height="25" fill="white" />
+                  </clipPath>
+               </defs>
+            </svg>
+            <svg
+               width="28"
+               height="28"
+               viewBox="0 0 28 28"
+               fill="none"
+               xmlns="http://www.w3.org/2000/svg"
+               style={{ transition: "0.2s" }}
+            >
+               <path
+                  d="M6.74192 17.6131C5.89353 18.1029 4.78967 17.8145 4.47547 16.8866C4.03593 15.5886 3.89608 14.1995 4.077 12.8253C4.3356 10.861 5.23511 9.03696 6.63604 7.63604C8.03696 6.23511 9.86101 5.3356 11.8253 5.077C13.1995 4.89608 14.5886 5.03593 15.8866 5.47547C16.8145 5.78967 17.1029 6.89353 16.6131 7.74192C16.1233 8.59032 15.0344 8.84737 14.074 8.65441C13.49 8.53708 12.8868 8.51544 12.2883 8.59424C11.0983 8.7509 9.99328 9.29585 9.14457 10.1446C8.29585 10.9933 7.7509 12.0983 7.59424 13.2883C7.51544 13.8868 7.53708 14.49 7.65441 15.074C7.84737 16.0344 7.59032 17.1233 6.74192 17.6131Z"
+                  fill="#0D0D0D"
+               />
+               <rect
+                  x="20.2759"
+                  width="11.2205"
+                  height="28.6746"
+                  rx="1"
+                  transform="rotate(45 20.2759 0)"
+                  fill={matchCtx?.coralPosession
                      ? "var(--primary)"
-                     : "var(--text-secondary)",
-               }}
-            />
+                     : "var(--text-background)"}
+               />
+               <path
+                  d="M19 7L9 17"
+                  stroke="#0D0D0D"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+               />
+            </svg>
          </div>
          <div className={styles.helperSidebarControls}>
             <i className="fa-solid fa-gear" />
-            <i className="fa-solid fa-rotate-left" onClick={matchCtx?.undo} />
+            <i
+               className="fa-solid fa-rotate-left"
+               onClick={matchCtx?.gameState != "unstarted"
+                  ? matchCtx?.undo
+                  : undefined}
+            />
             <i className="fa-solid fa-rotate-right" onClick={matchCtx?.redo} />
          </div>
       </div>
@@ -408,17 +464,17 @@ function TimeSidebar() {
       <div className={styles.progressWrapper}>
          <progress
             className={styles.timeProgress}
-            value={150 / (matchContext?.gameElapsedMilliseconds || 0.1 / 1000)}
+            value={(150 - (matchContext?.gameElapsedMilliseconds || 0.1) /
+                  1000) / 150}
          />
       </div>
    );
 }
-
 function FieldMap() {
    const matchContext = useContext(MatchContext);
    const matchInfo = useContext(MatchInfoContext);
 
-   const svgAspectRatio = matchInfo?.alliance == "blue"
+   const svgAspectRatio = matchInfo?.alliance === "blue"
       ? "xMinYMid slice"
       : "xMaxYMid slice";
 
@@ -437,17 +493,27 @@ function FieldMap() {
          point.x = event.clientX;
          point.y = event.clientY;
 
-         const svgPoint = point.matrixTransform(svg!.getScreenCTM()!.inverse());
+         const svgPoint = point.matrixTransform(svg.getScreenCTM()!.inverse());
 
-         if (matchContext.gameState == "auto") {
+         if (matchContext.gameState === "auto") {
             matchContext.addAutoAction({
                timestamp: Date.now(),
                location: { x: svgPoint.x, y: svgPoint.y },
                action: matchContext.selectedAction,
             });
-         } else if (matchContext.gameState == "teleop") {
+         } else if (matchContext.gameState === "teleop") {
             matchContext.addTeleAction({
                timestamp: Date.now(),
+               location: { x: svgPoint.x, y: svgPoint.y },
+               action: matchContext.selectedAction,
+            });
+         } else if (
+            matchContext.gameState === "unstarted" &&
+            (matchContext.selectedAction === "coralPickup" ||
+               matchContext.selectedAction === "coralDrop")
+         ) {
+            matchContext.addAutoAction({
+               timestamp: -1,
                location: { x: svgPoint.x, y: svgPoint.y },
                action: matchContext.selectedAction,
             });
@@ -470,6 +536,76 @@ function FieldMap() {
       };
    }, []);
 
+   // Compute tangent vectors for each point.
+   const computeTangents = (
+      points: AutoAction<2025>[] | TeleopAction<2025>[],
+   ) => {
+      const tangents = [];
+      const n = points.length;
+      for (let i = 0; i < n; i++) {
+         const p = points[i].location;
+         let tangent;
+         if (i === 0) {
+            // For the first point, use the difference to the next point.
+            const next = points[i + 1].location;
+            tangent = { x: next!.x - p!.x, y: next!.y - p!.y };
+         } else if (i === n - 1) {
+            // For the last point, use the difference from the previous point.
+            const prev = points[i - 1].location;
+            tangent = { x: p!.x - prev!.x, y: p!.y - prev!.y };
+         } else {
+            // For interior points, use the average of the differences.
+            const next = points[i + 1].location;
+            const prev = points[i - 1].location;
+            tangent = {
+               x: (next!.x - prev!.x) / 2,
+               y: (next!.y - prev!.y) / 2,
+            };
+         }
+         tangents.push(tangent);
+      }
+      return tangents;
+   };
+
+   // Convert the Hermite spline to a cubic Bézier path.
+   const computeHermitePath = (
+      points: AutoAction<2025>[] | TeleopAction<2025>[],
+   ) => {
+      if (points.length < 2) return "";
+
+      const tangents = computeTangents(points);
+      let path = `M ${points[0]?.location?.x} ${points[0]?.location?.y}`;
+
+      for (let i = 0; i < points.length - 1; i++) {
+         const p0 = points[i].location;
+         const p1 = points[i + 1].location;
+         const m0 = tangents[i];
+         const m1 = tangents[i + 1];
+
+         // Convert Hermite to Bézier control points.
+         const c1 = { x: p0!.x + m0.x / 3, y: p0!.y + m0.y / 3 };
+         const c2 = { x: p1!.x - m1.x / 3, y: p1!.y - m1.y / 3 };
+
+         path += ` C ${c1.x} ${c1.y}, ${c2.x} ${c2.y}, ${p1!.x} ${p1!.y}`;
+      }
+
+      return path;
+   };
+
+   const allActions = [
+      ...matchContext?.autoActions || [],
+      ...matchContext?.teleopActions || [],
+   ];
+   const pathData = computeHermitePath(allActions);
+
+   // Compute gradient endpoints based on the first and last point.
+   const startPoint = allActions.length > 0
+      ? allActions[0].location
+      : { x: 0, y: 0 };
+   const endPoint = allActions.length > 0
+      ? allActions[allActions.length - 1].location
+      : { x: 1000, y: 500 };
+
    return (
       <div
          style={{
@@ -483,7 +619,7 @@ function FieldMap() {
             padding: `${currentPadding}rem 0`,
             overflow: "hidden",
             background: "var(--surface)",
-            transform: matchContext?.fieldOrientation == "rotated"
+            transform: matchContext?.fieldOrientation === "rotated"
                ? "rotate(180deg)"
                : "none",
          }}
@@ -499,6 +635,21 @@ function FieldMap() {
             }}
             onClick={handleClick}
          >
+            {/* Define the gradient for the spline */}
+            <defs>
+               <linearGradient
+                  id="splineGradient"
+                  gradientUnits="userSpaceOnUse"
+                  x1={startPoint?.x}
+                  y1={startPoint?.y}
+                  x2={endPoint?.x}
+                  y2={endPoint?.y}
+               >
+                  <stop offset="0%" stopColor="rgba(230, 80, 10, 0.02)" />
+                  <stop offset="100%" stopColor="rgba(230, 180, 10, 0.02)" />
+               </linearGradient>
+            </defs>
+
             {/* Map */}
             <image
                href="/app/field/2025field.svg"
@@ -508,37 +659,132 @@ function FieldMap() {
                height="500"
             />
 
+            {/* Draw Hermite spline as a cubic Bézier curve with gradient stroke and rounded caps */}
+            {pathData && (
+               <path
+                  d={pathData}
+                  stroke="url(#splineGradient)"
+                  strokeWidth="6"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+               />
+            )}
+
             {/* Render points */}
-            {[...matchContext!.autoActions!, ...matchContext!.teleopActions!]
-               .map((val) => {
-                  return { x: val.location?.x, y: val.location?.y };
-               }).map((point, index) => (
-                  <circle
-                     key={index}
-                     cx={point.x}
-                     cy={point.y}
-                     r="10"
-                     fill="rgba(200, 145, 50, 0.1)"
-                  />
-               ))}
+            {allActions.map((point, index) => (
+               <circle
+                  key={index}
+                  cx={point?.location?.x}
+                  cy={point?.location?.y}
+                  r={point.timestamp === -1 ? 25 : 10}
+                  fill={`rgba(200, 145, 50, ${
+                     point.timestamp === -1 ? 0.5 : 0.1
+                  })`}
+               />
+            ))}
          </svg>
       </div>
    );
 }
 
 function MatchControls() {
-   const [selection] = useState<"algae" | "coral" | "climb" | null>(null);
+   const matchContext = useContext(MatchContext);
+
+   const [selection, setSelection] = useState<
+      "algae" | "coral" | "climb" | "defense" | null
+   >(null);
+
+   function handleDisabled() {
+      if (matchContext?.gameState == "teleop") {
+         matchContext.setSelectedAction("robotDisabled");
+      }
+   }
+
+   function handleSelectAction(
+      action: RobotActions[2025] | ScoreActions[2025],
+      nullify?: boolean,
+   ) {
+      if (nullify) {
+         setSelection(null);
+         return;
+      }
+      if (matchContext?.gameState != "unstarted") {
+         if (matchContext?.selectedAction == action) {
+            matchContext.setSelectedAction(null);
+         } else {
+            matchContext?.setSelectedAction(action);
+         }
+      }
+   }
 
    return (
       <>
-         {!selection &&
+         {matchContext?.gameState == "unstarted" &&
+            (
+               <div className={styles.previewStage}>
+                  Define starting configuration
+                  <div
+                     className={styles.startingButton}
+                     onClick={() =>
+                        matchContext.setFieldOrientation((prev) =>
+                           prev == "normal" ? "rotated" : "normal"
+                        )}
+                  >
+                     Flip field
+                  </div>
+                  <div
+                     style={{
+                        width: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: "1rem",
+                     }}
+                  >
+                     <div
+                        className={styles.startingButton}
+                        style={{
+                           opacity: matchContext.autoActions.length > 0
+                              ? 1
+                              : 0.5,
+                        }}
+                        onClick={() => {
+                           if (matchContext.autoActions.length > 0) {
+                              matchContext.undo();
+                              matchContext.setSelectedAction("coralPickup");
+                           }
+                        }}
+                     >
+                        Reset starting position
+                     </div>
+                     <div
+                        className={styles.startingButton}
+                        style={{
+                           opacity: matchContext.autoActions.length > 0
+                              ? 1
+                              : 0.5,
+                        }}
+                        onClick={() => {
+                           if (matchContext.autoActions.length > 0) {
+                              matchContext.startMatch();
+                           }
+                        }}
+                     >
+                        Start match<i className="fa-solid fa-play" />
+                     </div>
+                  </div>
+               </div>
+            )}
+         {!selection && (matchContext?.gameState == "auto" ||
+            matchContext?.gameState == "teleop") &&
             (
                <div className={styles.matchControls}>
                   <div
                      style={{
                         display: "flex",
                         flexDirection: "row",
-                        gap: "0.5rem",
+                        gap: "0.75rem",
                         height: "100%",
                      }}
                   >
@@ -547,26 +793,417 @@ function MatchControls() {
                            display: "flex",
                            flexDirection: "column",
                            width: "100%",
-                           gap: "0.5rem",
+                           gap: "0.75rem",
                         }}
                      >
-                        <div className={styles.controlCategory}>
-                           Algae
+                        <div
+                           className={styles.controlCategory}
+                           style={{ height: "200%" }}
+                           onClick={() => setSelection("defense")}
+                        >
+                           Defense
                         </div>
-                        <div className={styles.controlCategory}>
+                        <div
+                           className={styles.controlCategory}
+                           onClick={() => setSelection("climb")}
+                        >
+                           Climb
+                        </div>
+                     </div>
+                     <div
+                        style={{
+                           display: "flex",
+                           flexDirection: "column",
+                           width: "100%",
+                           gap: "0.75rem",
+                        }}
+                     >
+                        <div
+                           className={styles.controlCategory}
+                           onClick={() => setSelection("coral")}
+                        >
                            Coral
                         </div>
-                     </div>
-                     <div className={styles.controlCategory}>
-                        Climb
+                        <div
+                           className={styles.controlCategory}
+                           onClick={() => setSelection("algae")}
+                        >
+                           Algae
+                        </div>
                      </div>
                   </div>
-                  <div className={styles.disabled}>
+                  <div className={styles.disabled} onClick={handleDisabled}>
                      disabled
                   </div>
                </div>
             )}
+         {selection == "algae" && (
+            <AlgaeSelections selectAction={handleSelectAction} />
+         )}
+         {selection == "coral" && (
+            <CoralSelections selectAction={handleSelectAction} />
+         )}
+         {selection == "climb" && (
+            <ClimbSelections selectAction={handleSelectAction} />
+         )}
+         {selection == "defense" && (
+            <DefenseSelections selectAction={handleSelectAction} />
+         )}
       </>
+   );
+}
+
+function ReturnComponent(
+   { selectAction }: {
+      selectAction: (
+         action: RobotActions[2025] | ScoreActions[2025],
+         nullify: boolean,
+      ) => void;
+   },
+) {
+   return (
+      <div
+         className={styles.returnControl}
+         onClick={() => selectAction("leaveLine", true)}
+      >
+         Return <i className="fa-solid fa-rotate-left" />
+      </div>
+   );
+}
+
+function CoralSelections(
+   { selectAction }: {
+      selectAction: (
+         action: RobotActions[2025] | ScoreActions[2025],
+         nullify?: boolean,
+      ) => void;
+   },
+) {
+   const matchContext = useContext(MatchContext);
+
+   return (
+      <div className={styles.matchControls}>
+         <div
+            style={{
+               display: "flex",
+               flexDirection: "row",
+               height: "100%",
+               gap: "0.75rem",
+            }}
+         >
+            <div
+               style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
+                  width: "100%",
+                  gap: "0.75rem",
+                  opacity: matchContext?.coralPosession ? 1 : 0.5,
+               }}
+            >
+               <div
+                  className={styles.selectionButton}
+                  style={{
+                     color: matchContext?.selectedAction == "scoreL4"
+                        ? "var(--primary)"
+                        : "var(--text-primary)",
+                  }}
+                  onClick={() =>
+                     matchContext?.coralPosession && selectAction("scoreL4")}
+               >
+                  Score L4
+               </div>
+               <div
+                  className={styles.selectionButton}
+                  style={{
+                     color: matchContext?.selectedAction == "scoreL3"
+                        ? "var(--primary)"
+                        : "var(--text-primary)",
+                  }}
+                  onClick={() =>
+                     matchContext?.coralPosession && selectAction("scoreL3")}
+               >
+                  Score L3
+               </div>
+               <div
+                  className={styles.selectionButton}
+                  style={{
+                     color: matchContext?.selectedAction == "scoreL2"
+                        ? "var(--primary)"
+                        : "var(--text-primary)",
+                  }}
+                  onClick={() =>
+                     matchContext?.coralPosession && selectAction("scoreL2")}
+               >
+                  Score L2
+               </div>
+               <div
+                  className={styles.selectionButton}
+                  style={{
+                     color: matchContext?.selectedAction == "scoreL1"
+                        ? "var(--primary)"
+                        : "var(--text-primary)",
+                  }}
+                  onClick={() =>
+                     matchContext?.coralPosession && selectAction("scoreL1")}
+               >
+                  Score L1
+               </div>
+            </div>
+            <div
+               style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
+                  width: "100%",
+                  gap: "0.75rem",
+               }}
+            >
+               <div
+                  className={styles.selectionButton}
+                  style={{
+                     color: matchContext?.selectedAction == "coralPickup"
+                        ? "var(--primary)"
+                        : "var(--text-primary)",
+                     opacity: matchContext?.coralPosession ? 0.5 : 1,
+                  }}
+                  onClick={() =>
+                     !matchContext?.coralPosession &&
+                     selectAction("coralPickup")}
+               >
+                  Pickup Coral
+               </div>
+               <div
+                  className={styles.selectionButton}
+                  style={{
+                     color: matchContext?.selectedAction == "coralMiss"
+                        ? "var(--primary)"
+                        : "var(--text-primary)",
+                     opacity: matchContext?.coralPosession ? 1 : 0.5,
+                  }}
+                  onClick={() =>
+                     matchContext?.coralPosession && selectAction("coralMiss")}
+               >
+                  Miss Coral
+               </div>
+               <div
+                  className={styles.selectionButton}
+                  style={{
+                     color: matchContext?.selectedAction == "coralDrop"
+                        ? "var(--primary)"
+                        : "var(--text-primary)",
+                     opacity: matchContext?.coralPosession ? 1 : 0.5,
+                  }}
+                  onClick={() =>
+                     matchContext?.coralPosession && selectAction("coralDrop")}
+               >
+                  Drop Coral
+               </div>
+            </div>
+         </div>
+         <ReturnComponent selectAction={selectAction} />
+      </div>
+   );
+}
+
+function AlgaeSelections(
+   { selectAction }: {
+      selectAction: (
+         action: RobotActions[2025] | ScoreActions[2025],
+         nullify?: boolean,
+      ) => void;
+   },
+) {
+   const matchContext = useContext(MatchContext);
+
+   return (
+      <div className={styles.matchControls}>
+         <div
+            style={{
+               display: "flex",
+               flexDirection: "row",
+               height: "100%",
+               gap: "0.75rem",
+            }}
+         >
+            <div
+               style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
+                  width: "100%",
+                  gap: "0.75rem",
+                  opacity: matchContext?.algaePosession ? 1 : 0.5,
+               }}
+            >
+               <div
+                  className={styles.selectionButton}
+                  style={{
+                     color: matchContext?.selectedAction == "scoreProcessor"
+                        ? "var(--primary)"
+                        : "var(--text-primary)",
+                  }}
+                  onClick={() =>
+                     matchContext?.algaePosession &&
+                     selectAction("scoreProcessor")}
+               >
+                  Processor
+               </div>
+               <div
+                  className={styles.selectionButton}
+                  style={{
+                     color: matchContext?.selectedAction == "scoreNet"
+                        ? "var(--primary)"
+                        : "var(--text-primary)",
+                  }}
+                  onClick={() =>
+                     matchContext?.algaePosession && selectAction("scoreNet")}
+               >
+                  Net
+               </div>
+            </div>
+            <div
+               style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
+                  width: "100%",
+                  gap: "0.75rem",
+               }}
+            >
+               <div
+                  className={styles.selectionButton}
+                  style={{
+                     color: matchContext?.selectedAction == "algaePickup"
+                        ? "var(--primary)"
+                        : "var(--text-primary)",
+                     opacity: matchContext?.algaePosession ? 0.5 : 1,
+                  }}
+                  onClick={() =>
+                     !matchContext?.algaePosession &&
+                     selectAction("algaePickup")}
+               >
+                  Pickup Algae
+               </div>
+               <div
+                  className={styles.selectionButton}
+                  style={{
+                     color: matchContext?.selectedAction == "algaeMiss"
+                        ? "var(--primary)"
+                        : "var(--text-primary)",
+                     opacity: matchContext?.algaePosession ? 1 : 0.5,
+                  }}
+                  onClick={() =>
+                     matchContext?.algaePosession && selectAction("algaeMiss")}
+               >
+                  Miss Algae
+               </div>
+               <div
+                  className={styles.selectionButton}
+                  style={{
+                     color: matchContext?.selectedAction == "algaeDrop"
+                        ? "var(--primary)"
+                        : "var(--text-primary)",
+                     opacity: matchContext?.algaePosession ? 1 : 0.5,
+                  }}
+                  onClick={() =>
+                     matchContext?.algaePosession && selectAction("algaeDrop")}
+               >
+                  Drop Algae
+               </div>
+            </div>
+         </div>
+         <ReturnComponent selectAction={selectAction} />
+      </div>
+   );
+}
+
+function ClimbSelections(
+   { selectAction }: {
+      selectAction: (
+         action: RobotActions[2025] | ScoreActions[2025],
+         nullify?: boolean,
+      ) => void;
+   },
+) {
+   const matchContext = useContext(MatchContext);
+
+   return (
+      <div className={styles.matchControls}>
+         <div
+            className={styles.selectionButton}
+            style={{
+               color: matchContext?.selectedAction == "climbDeep"
+                  ? "var(--primary)"
+                  : "var(--text-primary)",
+            }}
+            onClick={() => selectAction("climbDeep")}
+         >
+            Deep Climb
+         </div>
+         <div
+            className={styles.selectionButton}
+            style={{
+               color: matchContext?.selectedAction == "climbShallow"
+                  ? "var(--primary)"
+                  : "var(--text-primary)",
+            }}
+            onClick={() => selectAction("climbShallow")}
+         >
+            Shallow Climb
+         </div>
+         <div
+            className={styles.selectionButton}
+            style={{
+               color: matchContext?.selectedAction == "climbPark"
+                  ? "var(--primary)"
+                  : "var(--text-primary)",
+            }}
+            onClick={() => selectAction("climbPark")}
+         >
+            Park
+         </div>
+         <ReturnComponent selectAction={selectAction} />
+      </div>
+   );
+}
+
+function DefenseSelections(
+   { selectAction }: {
+      selectAction: (
+         action: RobotActions[2025] | ScoreActions[2025],
+         nullify?: boolean,
+      ) => void;
+   },
+) {
+   const matchContext = useContext(MatchContext);
+
+   return (
+      <div className={styles.matchControls}>
+         <div
+            className={styles.selectionButton}
+            style={{
+               color: matchContext?.selectedAction == "defend"
+                  ? "var(--primary)"
+                  : "var(--text-primary)",
+            }}
+            onClick={() => selectAction("defend")}
+         >
+            Play defense
+         </div>
+         <div
+            className={styles.selectionButton}
+            style={{
+               color: matchContext?.selectedAction == "beDefended"
+                  ? "var(--primary)"
+                  : "var(--text-primary)",
+            }}
+            onClick={() => selectAction("beDefended")}
+         >
+            Be defended
+         </div>
+         <ReturnComponent selectAction={selectAction} />
+      </div>
    );
 }
 

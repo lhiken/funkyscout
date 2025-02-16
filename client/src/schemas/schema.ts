@@ -37,7 +37,10 @@ export type RobotActions = {
       | "algaePickup"
       | "coralPickup"
       | "robotDisabled"
-      | "robotReenabled";
+      | "robotReenabled"
+      | "startingPosition"
+      | "defend"
+      | "beDefended";
 };
 
 /** Scoring actions
