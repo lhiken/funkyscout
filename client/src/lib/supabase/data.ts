@@ -1,4 +1,10 @@
 import { handleError } from "../../utils/errorHandler";
+import {
+   deleteData,
+   getScoutedMatchesStoreName,
+   getServerMatchesStoreName,
+   upsertData,
+} from "../mobile-cache-handler/init";
 import { Tables } from "./database.types";
 import supabase from "./supabase";
 
@@ -176,6 +182,32 @@ async function fetchTeamDataByEvent(event: string) {
    }
 }
 
+async function uploadMatch(matchData: Tables<"event_match_data">) {
+   upsertData(getScoutedMatchesStoreName(), matchData);
+
+   try {
+      const { error } = await supabase
+         .from("event_match_data")
+         .upsert(matchData);
+
+      if (error) {
+         throw new Error(error.message);
+      } else {
+         deleteData(getScoutedMatchesStoreName(), [
+            matchData.event,
+            matchData.match,
+            matchData.team,
+         ]);
+         upsertData(getServerMatchesStoreName(), matchData);
+
+         return true;
+      }
+   } catch (error) {
+      handleError(error);
+      return false;
+   }
+}
+
 export {
    deletePicklist,
    fetchEventByKey,
@@ -187,4 +219,5 @@ export {
    fetchTeamDataByEvent,
    fetchTeamsByEvent,
    updatePicklist,
+   uploadMatch,
 };

@@ -58,7 +58,8 @@ export type ScoreActions = {
       | "scoreL2"
       | "scoreL3"
       | "scoreL4"
-      | "scoreProcessor";
+      | "scoreProcessor"
+      | "scoreNet";
 };
 
 /** Scoring action points
@@ -82,6 +83,7 @@ export const PointValues: PointValuesType = {
       scoreL3: 4, // teleop only (auto is seperate)
       scoreL4: 5, // teleop only (auto is seperate)
       scoreProcessor: 2.4, // Assume human player scores 90% of the time
+      scoreNet: 4,
    },
 };
 

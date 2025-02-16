@@ -9,7 +9,10 @@ import {
 } from "../../../../lib/mobile-cache-handler/init";
 import { EventScheduleEntry } from "../../../../lib/tba/events";
 import { parseMatchKey, parseTeamKey } from "../../../../utils/logic/app";
-import { getNextAssignedMatch, getNextNearAssignedMatches } from "../../../../lib/app/helpers";
+import {
+   getNextAssignedMatch,
+   getNextNearAssignedMatches,
+} from "../../../../lib/app/helpers";
 import { Tables } from "../../../../lib/supabase/database.types";
 import { useLocation } from "wouter";
 
@@ -31,23 +34,27 @@ export default function MobileStartMatchScouting() {
    useEffect(() => {
       if (noChange) {
          getNextAssignedMatch().then((res) => {
-            const targetMatch = matchData.find((val) => val.matchKey == res?.data.match) || null;
+            const targetMatch = matchData.find((val) =>
+               val.matchKey == res?.data.match
+            ) || null;
             setSelectedMatch(targetMatch);
             console.log(selectedMatch);
-         })
+         });
       } else {
-         if (selectedMatch) {
-         } else {
+         if (!selectedMatch) {
             setTeamData([]);
             setSelectedTeam(null);
          }
       }
-   }, [])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, []);
 
    const filteredMatches = matchQuery == ""
       ? matchData
       : matchData.filter((val) =>
-         parseMatchKey(val.matchKey, "long").toLowerCase().includes(matchQuery.toLowerCase())
+         parseMatchKey(val.matchKey, "long").toLowerCase().includes(
+            matchQuery.toLowerCase(),
+         )
       );
 
    const filteredTeams = teamQuery == ""
@@ -57,12 +64,14 @@ export default function MobileStartMatchScouting() {
       );
 
    interface AlternateMatch {
-      data: Tables<"event_schedule">,
-      time: number | null,
-      scouted: boolean,
+      data: Tables<"event_schedule">;
+      time: number | null;
+      scouted: boolean;
    }
 
-   const [alternateMatches, setAlternateMatches] = useState<AlternateMatch[]>([]);
+   const [alternateMatches, setAlternateMatches] = useState<AlternateMatch[]>(
+      [],
+   );
 
    useEffect(() => {
       getAllData<EventScheduleEntry>(getMatchDetailsStoreName()).then((res) => {
@@ -71,19 +80,32 @@ export default function MobileStartMatchScouting() {
 
       getNextNearAssignedMatches().then((res) => {
          setAlternateMatches(res.filter((val) => val != null));
-      })
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+      });
    }, []);
 
    function handleSelectAlternate(match: AlternateMatch) {
-      const targetMatch = matchData.find((val) => val.matchKey == match.data.match) || null;
+      const targetMatch =
+         matchData.find((val) => val.matchKey == match.data.match) || null;
       setSelectedMatch(targetMatch);
-      setSelectedTeam(`${match.data.alliance == "blue" ? "B" : "R"}${match.data.team}`)
+      setSelectedTeam(
+         `${match.data.alliance == "blue" ? "B" : "R"}${match.data.team}`,
+      );
    }
 
    function handleStartScouting() {
-      if (selectedMatch != null && selectedTeam != null && [...selectedMatch.blueTeams, ...selectedMatch.redTeams].includes(selectedTeam.substring(1))) {
-         navigate(`/inmatch/${/*UgetEventYear()*/2025}/m=${selectedMatch.matchKey}&t=${selectedTeam}&a=${selectedMatch.redTeams.includes(selectedTeam.substring(1)) ? "r" : "b"}`)
+      if (
+         selectedMatch != null && selectedTeam != null &&
+         [...selectedMatch.blueTeams, ...selectedMatch.redTeams].includes(
+            selectedTeam.substring(1),
+         )
+      ) {
+         navigate(
+            `/inmatch/${/*UgetEventYear()*/ 2025}/m=${selectedMatch.matchKey}&t=${selectedTeam}&a=${
+               selectedMatch.redTeams.includes(selectedTeam.substring(1))
+                  ? "r"
+                  : "b"
+            }`,
+         );
       }
    }
 
@@ -120,7 +142,12 @@ export default function MobileStartMatchScouting() {
                   selectedItem={selectedMatch}
                   onChange={(e) => {
                      setSelectedMatch(e);
-                     if (e) setTeamData([...e.blueTeams.map((val) => `B${val}`), ...e.redTeams.map((val) => `R${val}`)])
+                     if (e) {
+                        setTeamData([
+                           ...e.blueTeams.map((val) => `B${val}`),
+                           ...e.redTeams.map((val) => `R${val}`),
+                        ]);
+                     }
                   }}
                   items={filteredMatches}
                   setQuery={setMatchQuery}
@@ -136,15 +163,23 @@ export default function MobileStartMatchScouting() {
                      items={filteredTeams}
                      setQuery={setTeamQuery}
                      displayValue={(val) =>
-                        `${val ? val?.substring(0, 1) == "B" ? "Blue - " : "Red - " : ""}` + parseTeamKey((val || "").substring(1))}
+                        `${
+                           val
+                              ? val?.substring(0, 1) == "B"
+                                 ? "Blue - "
+                                 : "Red - "
+                              : ""
+                        }` + parseTeamKey((val || "").substring(1))}
                      label="Select team"
                      active={selectedMatch != null}
                   />
-                  <div className={styles.continueButton} style={{
-                     opacity: `${!selectedTeam ? "0.5" : "1"
-                        }`
-                  }}
-                     onClick={handleStartScouting}>
+                  <div
+                     className={styles.continueButton}
+                     style={{
+                        opacity: `${!selectedTeam ? "0.5" : "1"}`,
+                     }}
+                     onClick={handleStartScouting}
+                  >
                      <i className="fa-solid fa-arrow-right" />
                   </div>
                </div>
@@ -156,23 +191,33 @@ export default function MobileStartMatchScouting() {
                className={styles.alternateMatches}
             >
                Recommended Matches
-               {alternateMatches.map((val) => {
-                  return (
-                     <div className={styles.alternateMatchContainer} onClick={() => handleSelectAlternate(val)}>
-                        <div className={styles.matchHeader}>
-                           {parseMatchKey(val.data.match, "nexus")}
+               {alternateMatches.length > 0
+                  ? alternateMatches.map((val) => {
+                     return (
+                        <div
+                           className={styles.alternateMatchContainer}
+                           onClick={() => handleSelectAlternate(val)}
+                        >
+                           <div className={styles.matchHeader}>
+                              {parseMatchKey(val.data.match, "nexus")}
+                           </div>
+                           <div className={styles.teamHeader}>
+                              {parseTeamKey(val.data.team)} -{" "}
+                              {val.data.alliance == "red" ? "Red" : "Blue"}
+                              <i
+                                 style={{ color: "var(--text-secondary)" }}
+                                 className="fa-solid fa-chevron-right"
+                              />
+                           </div>
                         </div>
-                        <div className={styles.teamHeader}>
-                           {parseTeamKey(val.data.team)} - {val.data.alliance == "red" ? "Red" : "Blue"}
-                           <i style={{ color: "var(--text-secondary)" }} className="fa-solid fa-chevron-right" />
-                        </div>
-                     </div>
-                  );
-               })}
+                     );
+                  })
+                  : <div className={styles.errBox}>No matches found</div>}
             </motion.div>
          </motion.div>
          <div className={styles.notice}>
-            The match does NOT start after clicking the the arrow button. Please lock orientation or turn off autorotate before scouting.
+            The match does NOT start after clicking the the arrow button. Please
+            lock orientation or turn off autorotate before scouting.
          </div>
       </div>
    );

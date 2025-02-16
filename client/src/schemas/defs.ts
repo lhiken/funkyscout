@@ -81,13 +81,13 @@ export type CombinedMatchActions<
  * or climbing. Each "action" has a time, location, and action (as defined
  * in schema.ts).
  */
-type TeleopAction<Year extends keyof (ScoreActions | RobotActions)> = {
+export type TeleopAction<Year extends keyof (ScoreActions | RobotActions)> = {
    timestamp: number; // Timestamp of the action
    location?: { x: number; y: number }; // Position on the field, can be arbitrary year-to-year.
    action: RobotActions[Year] | ScoreActions[Year]; // The action taken by the robot.
 };
 
-type AutoAction<Year extends keyof (ScoreActions | RobotActions)> = {
+export type AutoAction<Year extends keyof (ScoreActions | RobotActions)> = {
    timestamp: number; // Timestamp of the action
    location?: { x: number; y: number }; // Position on the field, can be arbitrary year-to-year.
    action: RobotActions[Year] | ScoreActions[Year]; // The action taken by the robot.
