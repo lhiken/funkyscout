@@ -403,9 +403,14 @@ function HelperSidebar() {
 }
 
 function TimeSidebar() {
+   const matchContext = useContext(MatchContext);
    return (
-      <>
-      </>
+      <div className={styles.progressWrapper}>
+         <progress
+            className={styles.timeProgress}
+            value={150 / (matchContext?.gameElapsedMilliseconds || 0.1 / 1000)}
+         />
+      </div>
    );
 }
 

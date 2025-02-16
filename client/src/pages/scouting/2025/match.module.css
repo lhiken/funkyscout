@@ -72,3 +72,33 @@
    border: 2px solid var(--error);
    height: 3.5rem;
 }
+
+.progressWrapper {
+   height: 100%;
+   width: 1rem;
+}
+
+.timeProgress {
+   display: flex;
+   width: calc(100vw - 2rem);
+   height: 0.5rem;
+   transform: rotate(-90deg) translate(calc(-100vw + 2rem));
+   transform-origin: left top; /* Adjust rotation origin */
+   appearance: none;
+   background-color: var(--primary-variant);
+   border-radius: 10rem;
+}
+
+.timeProgress::-webkit-progress-bar {
+   background-color: transparent;
+}
+
+.timeProgress::-webkit-progress-value {
+   background-color: var(--primary); /* Progress color */
+   border-radius: 10rem;
+}
+
+.timeProgress::-moz-progress-bar {
+   background-color: var(--primary);
+   border-radius: 10rem;
+}
