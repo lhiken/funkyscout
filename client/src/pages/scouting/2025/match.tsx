@@ -39,6 +39,8 @@ const MatchInfoContext = createContext<
    } | null
 >(null);
 
+const DEBUG_MATCH_MODE = null;
+
 export interface MatchContextType {
    algaePosession: boolean;
    coralPosession: boolean;
@@ -173,6 +175,19 @@ export default function Inmatch2025() {
 
       matchInterval = interval;
    }
+
+   useEffect(() => {
+      if (
+         DEBUG_MATCH_MODE == null && gameElapsed > 15 * 1000 &&
+         gameElapsed < 153 * 1000
+      ) {
+         setGameState("teleop");
+      } else if (DEBUG_MATCH_MODE == null && gameElapsed >= 153 * 1000) {
+         setGameState("end");
+      } else if (DEBUG_MATCH_MODE != null) {
+         setGameState(DEBUG_MATCH_MODE);
+      }
+   }, [gameElapsed]);
 
    function endMatch(
       comment: string,
@@ -718,6 +733,12 @@ function MatchControls() {
       }
    }
 
+   const [showMatchSummary, setShowMatchSummary] = useState<boolean>(false);
+
+   function handleMatchSummaryClick() {
+      setShowMatchSummary(true);
+   }
+
    return (
       <>
          {matchContext?.gameState == "unstarted" &&
@@ -849,6 +870,34 @@ function MatchControls() {
          {selection == "defense" && (
             <DefenseSelections selectAction={handleSelectAction} />
          )}
+         {matchContext?.gameState == "end" &&
+            (
+               <div className={styles.previewStage}>
+                  Match has ended
+                  <div className={styles.statsBox}>
+                     Coral Scored: {[
+                        ...matchContext.autoActions,
+                        ...matchContext.teleopActions,
+                     ].map((val) => val.action.substring(0, 5) == "scoreL")
+                        .length}
+                     <br />
+                     Algae Scored: {[
+                        ...matchContext.autoActions,
+                        ...matchContext.teleopActions,
+                     ].map((val) => val.action == "scoreNet" ||
+                        val.action == "scoreProcessor"
+                     )
+                        .length}
+                  </div>
+                  <div
+                     className={styles.endMatch}
+                     onClick={handleMatchSummaryClick}
+                  >
+                     Go to match summary
+                  </div>
+               </div>
+            )}
+         {showMatchSummary && <MatchEndingNotes />}
       </>
    );
 }
@@ -1203,6 +1252,133 @@ function DefenseSelections(
             Be defended
          </div>
          <ReturnComponent selectAction={selectAction} />
+      </div>
+   );
+}
+
+function MatchEndingNotes() {
+   const [driverRating, setDriverRating] = useState<number>(3);
+   const handleDriverRatingChange = (
+      e: React.ChangeEvent<HTMLInputElement>,
+   ) => {
+      setDriverRating(Math.round(Number(e.target.value)));
+   };
+
+   const [robotRating, setRobotRating] = useState<number>(3);
+   const handleRobotRatingChange = (
+      e: React.ChangeEvent<HTMLInputElement>,
+   ) => {
+      setRobotRating(Math.round(Number(e.target.value)));
+   };
+
+   const [teamNotes, setTeamNotes] = useState<string>();
+
+   return (
+      <div className={styles.finalContainer}>
+         <div className={styles.notesContainer}>
+            <div className={styles.header}>
+               Match Notes
+            </div>
+            <div className={styles.notesCategory}>
+               <div className={styles.notesHeader}>
+                  Driver Rating
+               </div>
+               <div
+                  className={styles.ratingSlider}
+               >
+                  <div
+                     style={{
+                        width: "100%",
+                        height: "0.35rem",
+                        borderRadius: "1rem",
+                        background: "var(--primary-variant)",
+                        position: "relative",
+                     }}
+                  >
+                     <div
+                        style={{
+                           position: "absolute",
+                           left: `${((driverRating - 1) / (5 - 1)) * 100}%`,
+                           top: "50%",
+                           transform: "translate(-50%, -50%)",
+                           width: "1rem",
+                           height: "1rem",
+                           background: "var(--primary)",
+                           borderRadius: "50%",
+                        }}
+                     />
+                  </div>
+                  <input
+                     type="range"
+                     min={1}
+                     max={5}
+                     step={0.1}
+                     value={driverRating}
+                     onChange={handleDriverRatingChange}
+                     style={{ width: "100%", opacity: 0 }}
+                  />
+               </div>
+            </div>
+            <div className={styles.notesCategory}>
+               <div className={styles.notesHeader}>
+                  Robot Rating
+               </div>
+               <div
+                  className={styles.ratingSlider}
+               >
+                  <div
+                     style={{
+                        width: "100%",
+                        height: "0.35rem",
+                        borderRadius: "1rem",
+                        background: "var(--primary-variant)",
+                        position: "relative",
+                     }}
+                  >
+                     <div
+                        style={{
+                           position: "absolute",
+                           left: `${((robotRating - 1) / (5 - 1)) * 100}%`,
+                           top: "50%",
+                           transform: "translate(-50%, -50%)",
+                           width: "1rem",
+                           height: "1rem",
+                           background: "var(--primary)",
+                           borderRadius: "50%",
+                        }}
+                     />
+                  </div>
+                  <input
+                     type="range"
+                     min={1}
+                     max={5}
+                     step={0.1}
+                     value={robotRating}
+                     onChange={handleRobotRatingChange}
+                     style={{ width: "100%", opacity: 0 }}
+                  />
+               </div>
+            </div>
+            <div className={styles.notesCategory}>
+               <div className={styles.notesHeader}>
+                  Team Notes
+               </div>
+               <textarea
+                  className={styles.inputBox}
+                  id="textBox"
+                  value={teamNotes}
+                  placeholder="Write down some notes about this team's performance this match"
+                  onChange={(e) => setTeamNotes(e.target.value)}
+               />
+            </div>
+         </div>
+         <div className={styles.uploadButton}>
+            Save/upload match
+            <i
+               style={{ fontSize: "1.15rem", lineHeight: "1rem" }}
+               className="fa-solid fa-floppy-disk"
+            />
+         </div>
       </div>
    );
 }
