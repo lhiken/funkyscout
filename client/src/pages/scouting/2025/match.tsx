@@ -30,6 +30,7 @@ import {
 } from "../../../schemas/schema";
 import { MatchContext } from "./matchCtx";
 import throwNotification from "../../../components/app/toast/toast";
+import { navigate } from "wouter/use-browser-location";
 
 const MatchInfoContext = createContext<
    {
@@ -228,7 +229,15 @@ export default function Inmatch2025() {
          uid: getLocalUserData().uid,
       };
 
-      uploadMatch(newMatchEntry);
+      uploadMatch(newMatchEntry).then((res) => {
+         if (res) {
+            throwNotification("success", "Match was uploaded");
+         } else {
+            throwNotification("success", "Match was saved but not uploaded");
+         }
+      }).finally(() => {
+         navigate("/m/scout");
+      });
    }
 
    function getMetricsFromRawData(
@@ -252,6 +261,7 @@ export default function Inmatch2025() {
       const allActions = [...data.autoActions, ...data.teleopActions];
 
       for (const a of allActions) {
+         console.log(a);
          const action = a.action;
          if (action == "scoreL1") L1Scored++;
          if (action == "scoreL2") L2Scored++;
@@ -267,11 +277,17 @@ export default function Inmatch2025() {
             val.action == "climbPark"
          )[0];
 
-      if (climbEntry.action == "climbDeep") climbDeep = true;
-      if (climbEntry.action == "climbShallow") climbShallow = true;
+      if (climbEntry) {
+         if (climbEntry.action == "climbDeep") climbDeep = true;
+         if (climbEntry.action == "climbShallow") climbShallow = true;
 
-      climbTime = (gameStartTime || Date.now()) + 120 * 1000 -
-         climbEntry.timestamp;
+         climbTime = (gameStartTime || Date.now()) + 120 * 1000 -
+            climbEntry.timestamp;
+      }
+
+      if (!climbEntry) {
+         climbTime = -1;
+      }
 
       let disabled = false;
       let disabledTime = 0;
@@ -479,8 +495,8 @@ function TimeSidebar() {
       <div className={styles.progressWrapper}>
          <progress
             className={styles.timeProgress}
-            value={(150 - (matchContext?.gameElapsedMilliseconds || 0.1) /
-                  1000) / 150}
+            value={(153 - (matchContext?.gameElapsedMilliseconds || 0.1) /
+                  1000) / 153}
          />
       </div>
    );
@@ -637,6 +653,8 @@ function FieldMap() {
             transform: matchContext?.fieldOrientation === "rotated"
                ? "rotate(180deg)"
                : "none",
+            opacity: matchContext?.selectedAction ? 1 : 0.4,
+            transition: "0.2s",
          }}
       >
          <svg
@@ -692,9 +710,9 @@ function FieldMap() {
                   key={index}
                   cx={point?.location?.x}
                   cy={point?.location?.y}
-                  r={point.timestamp === -1 ? 25 : 10}
+                  r={point.timestamp === -1 ? 25 : 12}
                   fill={`rgba(200, 145, 50, ${
-                     point.timestamp === -1 ? 0.5 : 0.1
+                     point.timestamp === -1 ? 0.5 : 0.25
                   })`}
                />
             ))}
@@ -710,9 +728,17 @@ function MatchControls() {
       "algae" | "coral" | "climb" | "defense" | null
    >(null);
 
+   const [disabled, setDisabled] = useState<boolean>(false);
+
    function handleDisabled() {
       if (matchContext?.gameState == "teleop") {
-         matchContext.setSelectedAction("robotDisabled");
+         if (!disabled) {
+            matchContext.setSelectedAction("robotDisabled");
+            setDisabled(true);
+         } else {
+            matchContext.setSelectedAction("robotReenabled");
+            setDisabled(false);
+         }
       }
    }
 
@@ -736,6 +762,8 @@ function MatchControls() {
    const [showMatchSummary, setShowMatchSummary] = useState<boolean>(false);
 
    function handleMatchSummaryClick() {
+      console.log(matchContext?.autoActions);
+      console.log(matchContext?.teleopActions);
       setShowMatchSummary(true);
    }
 
@@ -854,20 +882,20 @@ function MatchControls() {
                      </div>
                   </div>
                   <div className={styles.disabled} onClick={handleDisabled}>
-                     disabled
+                     {disabled ? "reenable" : "disable"}
                   </div>
                </div>
             )}
-         {selection == "algae" && (
+         {selection == "algae" && matchContext?.gameState != "end" && (
             <AlgaeSelections selectAction={handleSelectAction} />
          )}
-         {selection == "coral" && (
+         {selection == "coral" && matchContext?.gameState != "end" && (
             <CoralSelections selectAction={handleSelectAction} />
          )}
-         {selection == "climb" && (
+         {selection == "climb" && matchContext?.gameState != "end" && (
             <ClimbSelections selectAction={handleSelectAction} />
          )}
-         {selection == "defense" && (
+         {selection == "defense" && matchContext?.gameState != "end" && (
             <DefenseSelections selectAction={handleSelectAction} />
          )}
          {matchContext?.gameState == "end" &&
@@ -878,13 +906,13 @@ function MatchControls() {
                      Coral Scored: {[
                         ...matchContext.autoActions,
                         ...matchContext.teleopActions,
-                     ].map((val) => val.action.substring(0, 5) == "scoreL")
+                     ].filter((val) => val.action.substring(0, 6) == "scoreL")
                         .length}
                      <br />
                      Algae Scored: {[
                         ...matchContext.autoActions,
                         ...matchContext.teleopActions,
-                     ].map((val) => val.action == "scoreNet" ||
+                     ].filter((val) => val.action == "scoreNet" ||
                         val.action == "scoreProcessor"
                      )
                         .length}
@@ -1264,6 +1292,8 @@ function MatchEndingNotes() {
       setDriverRating(Math.round(Number(e.target.value)));
    };
 
+   const matchContext = useContext(MatchContext);
+
    const [robotRating, setRobotRating] = useState<number>(3);
    const handleRobotRatingChange = (
       e: React.ChangeEvent<HTMLInputElement>,
@@ -1272,6 +1302,14 @@ function MatchEndingNotes() {
    };
 
    const [teamNotes, setTeamNotes] = useState<string>();
+
+   function handleUploadMatch() {
+      if (teamNotes && teamNotes.trim().length > 0) {
+         matchContext?.endMatch(teamNotes, driverRating / 5, robotRating / 5);
+      } else {
+         throwNotification("error", "Notes can't be blank");
+      }
+   }
 
    return (
       <div className={styles.finalContainer}>
@@ -1372,7 +1410,7 @@ function MatchEndingNotes() {
                />
             </div>
          </div>
-         <div className={styles.uploadButton}>
+         <div className={styles.uploadButton} onClick={handleUploadMatch}>
             Save/upload match
             <i
                style={{ fontSize: "1.15rem", lineHeight: "1rem" }}
