@@ -31,3 +31,58 @@
    font-size: 1.55rem;
    line-height: 1rem;
 }
+
+.settingContainer {
+   display: flex;
+   flex-direction: column;
+   position: absolute;
+   top: 0;
+   width: calc(100vw - 3rem);
+   background-color: var(--inset);
+   border: 2px solid var(--surface);
+   padding: 1.5rem 1.25rem;
+   gap: 1rem;
+   border-radius: 1rem;
+   height: calc(100vh - 2.5rem);
+   z-index: 10000;
+}
+
+.settingHeaderBox {
+   display: flex;
+   flex-direction: column;
+   gap: 0.5rem;
+   color: var(--text-secondary);
+}
+
+.settingHeader {
+   display: flex;
+   flex-direction: row;
+   color: var(--primary);
+   justify-content: space-between;
+}
+
+.seperator {
+   background-color: var(--text-background);
+   width: 100%;
+   height: 0.25rem;
+   border-radius: 1rem;
+}
+
+.settingsContent {
+   display: flex;
+   flex-direction: column;
+   gap: 1.25rem;
+   height: 100%;
+   justify-content: space-between;
+}
+
+.signoutButton {
+   display: flex;
+   width: 100%;
+   height: 4rem;
+   border: 2px solid var(--text-background);
+   justify-content: space-between;
+   align-items: center;
+   padding-inline: 1rem;
+   border-radius: 1rem;
+}

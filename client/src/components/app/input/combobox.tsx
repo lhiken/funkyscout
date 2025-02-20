@@ -31,7 +31,10 @@ export default function GenericCombobox<T>({
    active,
 }: GenericComboboxProps<T>) {
    return (
-      <Field className={`${styles.genericCombobox} ${!active && styles.disabled}`} disabled={!active}>
+      <Field
+         className={`${styles.genericCombobox} ${!active && styles.disabled}`}
+         disabled={!active}
+      >
          <Combobox value={selectedItem} onChange={onChange}>
             {({ open }) => (
                <>
@@ -46,7 +49,6 @@ export default function GenericCombobox<T>({
                      onChange={(event) => setQuery(event.target.value)}
                      displayValue={displayValue}
                      onFocus={onFocus}
-                     
                   />
                   <AnimatePresence>
                      {open && (

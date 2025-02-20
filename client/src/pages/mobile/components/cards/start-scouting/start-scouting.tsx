@@ -40,10 +40,10 @@ export default function MobileStartScoutingCard() {
 
    function handleMatchScoutClick() {
       getNextAssignedMatch().then((res) => {
-         setLocation(`/scout/match/${res?.data.match}`)
+         setLocation(`/scout/match/${res?.data.match}`);
       }).catch(() => {
-         setLocation(`/scout/match/`)
-      })
+         setLocation(`/scout/match/`);
+      });
    }
 
    return (
