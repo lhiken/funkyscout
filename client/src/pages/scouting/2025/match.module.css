@@ -46,15 +46,16 @@
 
 .matchControls {
    display: flex;
-   width: 32rem;
-   flex-direction: column;
+   width: 18rem;
+   flex-direction: row;
    height: 100%;
    gap: 0.75rem;
 }
 
 .previewStage {
    display: flex;
-   width: 30rem;
+   width: 17rem;
+
    height: 100%;
    background-color: var(--surface);
    border-radius: 1rem;
@@ -76,17 +77,6 @@
    justify-content: center;
    gap: 1rem;
    transition: 0.2s;
-}
-
-.controlCategory {
-   display: flex;
-   justify-content: center;
-   align-items: center;
-   background-color: var(--surface);
-   width: 100%;
-   height: 100%;
-   border-radius: 1rem;
-   border: 2px solid var(--text-background);
 }
 
 .disabled {
@@ -127,18 +117,6 @@
 .timeProgress::-moz-progress-bar {
    background-color: var(--primary);
    border-radius: 10rem;
-}
-
-.returnControl {
-   display: flex;
-   border: 2px solid var(--text-background);
-   width: 100%;
-   border-radius: 1rem;
-   padding: 1rem;
-   background-color: var(--surface);
-   justify-content: space-between;
-   align-items: center;
-   height: 4rem;
 }
 
 .selectionButton {
@@ -242,4 +220,70 @@
 .inputBox:focus {
    outline: none;
    border: 2px solid var(--text-secondary);
+}
+
+.robotActionButton {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   writing-mode: vertical-lr;
+   border: 2px solid var(--text-background);
+   border-radius: 0.75rem;
+   padding: 1rem;
+   flex-grow: 1;
+   background-color: var(--inset);
+   transition: 0.2s;
+}
+
+.controlButton {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   border: 2px solid var(--text-background);
+   border-radius: 0.75rem;
+   padding-inline: 1rem;
+   flex-grow: 1;
+   font-size: 0.9rem;
+   text-align: center;
+   background-color: var(--inset);
+   transition: 0.2s;
+}
+
+.coralControls > .controlButton {
+   border: 2px solid rgb(21, 28, 34);
+}
+
+.algaeControls > .controlButton {
+   border: 2px solid rgb(25, 34, 21);
+}
+
+.coralControls {
+   display: flex;
+   flex-direction: column;
+   gap: 0.75rem;
+   flex-grow: 1;
+}
+
+.algaeControls {
+   display: flex;
+   flex-direction: column;
+   gap: 0.75rem;
+   flex-grow: 1;
+}
+
+.robotActions {
+   display: flex;
+   flex-direction: column;
+   gap: 0.75rem;
+   width: 2.75rem;
+}
+
+img[src="/app/icons/coral.svg"] {
+   width: 1.25rem; /* Adjust the width as needed */
+   height: auto;
+}
+
+img[src="/app/icons/algae.svg"] {
+   width: 1.25rem; /* Adjust the width as needed */
+   height: auto;
 }

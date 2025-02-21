@@ -55,6 +55,7 @@ export interface MatchContextType {
    redo: () => void;
    addAutoAction: (action: AutoAction<2025>) => void;
    addTeleAction: (action: TeleopAction<2025>) => void;
+   setTeleAction: Dispatch<SetStateAction<TeleopAction<2025>[]>>;
    setCombinedActions: Dispatch<
       SetStateAction<CombinedMatchActions<2025> | undefined>
    >;
@@ -349,6 +350,7 @@ export default function Inmatch2025() {
       setSelectedAction: setSelectedAction,
       fieldOrientation: fieldOrientation,
       setFieldOrientation: setFieldOrientation,
+      setTeleAction: setTeleopActions,
    };
 
    useEffect(() => {
@@ -393,7 +395,6 @@ export default function Inmatch2025() {
                <HelperSidebar />
                <FieldMap />
                <MatchControls />
-               <TimeSidebar />
             </motion.div>
          </MatchInfoContext.Provider>
       </MatchContext.Provider>
@@ -415,6 +416,17 @@ function HelperSidebar() {
                   )[1]}
             </div>
             {parseTeamKey(matchInfo?.teamKey || "")}
+            <div
+               style={{
+                  color: "var(--text-secondary)",
+                  fontSize: "0.95rem",
+                  marginTop: "0.5rem",
+               }}
+            >
+               {(153 - (matchCtx?.gameElapsedMilliseconds || 0) / 1000).toFixed(
+                  0,
+               )}s
+            </div>
          </div>
          <div className={styles.helperSidebarIcons}>
             <svg
@@ -489,18 +501,6 @@ function HelperSidebar() {
    );
 }
 
-function TimeSidebar() {
-   const matchContext = useContext(MatchContext);
-   return (
-      <div className={styles.progressWrapper}>
-         <progress
-            className={styles.timeProgress}
-            value={(153 - (matchContext?.gameElapsedMilliseconds || 0.1) /
-                  1000) / 153}
-         />
-      </div>
-   );
-}
 function FieldMap() {
    const matchContext = useContext(MatchContext);
    const matchInfo = useContext(MatchInfoContext);
@@ -513,7 +513,7 @@ function FieldMap() {
 
    const calculatePadding = () => {
       const aspectRatio = window.innerHeight / window.innerWidth;
-      const padding = aspectRatio > 1.8 ? 0 : Math.abs(aspectRatio - 1.8) * 15;
+      const padding = aspectRatio > 2 ? 0 : Math.abs(aspectRatio - 2) * 20;
       setCurrentPadding(padding);
    };
 
@@ -655,6 +655,8 @@ function FieldMap() {
                : "none",
             opacity: matchContext?.selectedAction ? 1 : 0.4,
             transition: "0.2s",
+            flexGrow: "1",
+            width: "1rem",
          }}
       >
          <svg
@@ -724,33 +726,16 @@ function FieldMap() {
 function MatchControls() {
    const matchContext = useContext(MatchContext);
 
-   const [selection, setSelection] = useState<
-      "algae" | "coral" | "climb" | "defense" | null
-   >(null);
+   const [showMatchSummary, setShowMatchSummary] = useState<boolean>(false);
 
-   const [disabled, setDisabled] = useState<boolean>(false);
-
-   function handleDisabled() {
-      if (matchContext?.gameState == "teleop") {
-         if (!disabled) {
-            matchContext.setSelectedAction("robotDisabled");
-            setDisabled(true);
-         } else {
-            matchContext.setSelectedAction("robotReenabled");
-            setDisabled(false);
-         }
-      }
+   function handleMatchSummaryClick() {
+      console.log(matchContext?.autoActions);
+      console.log(matchContext?.teleopActions);
+      setShowMatchSummary(true);
    }
 
-   function handleSelectAction(
-      action: RobotActions[2025] | ScoreActions[2025],
-      nullify?: boolean,
-   ) {
-      if (nullify) {
-         setSelection(null);
-         return;
-      }
-      if (matchContext?.gameState != "unstarted") {
+   function setAction(action: RobotActions[2025] | ScoreActions[2025]) {
+      if (!disabled && !climbed) {
          if (matchContext?.selectedAction == action) {
             matchContext.setSelectedAction(null);
          } else {
@@ -759,12 +744,57 @@ function MatchControls() {
       }
    }
 
-   const [showMatchSummary, setShowMatchSummary] = useState<boolean>(false);
+   const [disabled, setDisabled] = useState(false);
+   const [climbed, setClimbed] = useState(false);
 
-   function handleMatchSummaryClick() {
-      console.log(matchContext?.autoActions);
-      console.log(matchContext?.teleopActions);
-      setShowMatchSummary(true);
+   function handleDisable() {
+      if (disabled) {
+         setDisabled(false);
+         if (matchContext?.gameState == "teleop") {
+            matchContext.addTeleAction({
+               timestamp: Date.now(),
+               location: { x: -1, y: -1 },
+               action: "robotDisabled",
+            });
+         }
+      } else {
+         setDisabled(true);
+         if (matchContext?.gameState == "teleop") {
+            matchContext.addTeleAction({
+               timestamp: Date.now(),
+               location: { x: -1, y: -1 },
+               action: "robotReenabled",
+            });
+         }
+      }
+   }
+
+   function handleClimbed() {
+      if (!disabled) {
+         if (
+            matchContext?.gameState == "teleop" &&
+            matchContext.teleopActions.filter((val) =>
+                  val.action == "climbPark"
+               ).length <= 0
+         ) {
+            matchContext.addTeleAction({
+               timestamp: Date.now(),
+               location: { x: -1, y: -1 },
+               action: "climbPark",
+            });
+            setClimbed(true);
+         } else if (
+            matchContext?.gameState == "teleop" &&
+            matchContext.teleopActions.filter((val) =>
+                  val.action == "climbPark"
+               ).length > 0
+         ) {
+            matchContext.setTeleAction((prev) =>
+               prev.filter((val) => val.action != "climbPark")
+            );
+            setClimbed(false);
+         }
+      }
    }
 
    return (
@@ -825,79 +855,155 @@ function MatchControls() {
                   </div>
                </div>
             )}
-         {!selection && (matchContext?.gameState == "auto" ||
-            matchContext?.gameState == "teleop") &&
+         {matchContext?.gameState != "end" &&
+            matchContext?.gameState != "unstarted" &&
             (
                <div className={styles.matchControls}>
-                  <div
-                     style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        gap: "0.75rem",
-                        height: "100%",
-                     }}
-                  >
+                  <div className={styles.robotActions}>
                      <div
+                        className={styles.robotActionButton}
                         style={{
-                           display: "flex",
-                           flexDirection: "column",
-                           width: "100%",
-                           gap: "0.75rem",
+                           opacity: disabled || climbed
+                              ? 0.5
+                              : matchContext?.gameState == "auto"
+                              ? 0.5
+                              : 1,
+                           borderColor: matchContext?.selectedAction == "defend"
+                              ? "var(--primary)"
+                              : "var(--text-background)",
                         }}
+                        onClick={() => setAction("defend")}
                      >
-                        <div
-                           className={styles.controlCategory}
-                           style={{ height: "200%" }}
-                           onClick={() => setSelection("defense")}
-                        >
-                           Defense
-                        </div>
-                        <div
-                           className={styles.controlCategory}
-                           onClick={() => setSelection("climb")}
-                        >
-                           Climb
-                        </div>
+                        Defend
                      </div>
                      <div
+                        className={styles.robotActionButton}
                         style={{
-                           display: "flex",
-                           flexDirection: "column",
-                           width: "100%",
-                           gap: "0.75rem",
+                           opacity: disabled
+                              ? 0.5
+                              : matchContext?.gameState == "auto"
+                              ? 0.5
+                              : 1,
+                           borderColor: climbed
+                              ? "var(--success)"
+                              : "var(--text-background)",
                         }}
+                        onClick={handleClimbed}
                      >
-                        <div
-                           className={styles.controlCategory}
-                           onClick={() => setSelection("coral")}
-                        >
-                           Coral
-                        </div>
-                        <div
-                           className={styles.controlCategory}
-                           onClick={() => setSelection("algae")}
-                        >
-                           Algae
-                        </div>
+                        {climbed ? "Unclimb" : "Climb"}
+                     </div>
+                     <div
+                        className={styles.robotActionButton}
+                        style={{
+                           borderColor: disabled
+                              ? "var(--success)"
+                              : "var(--error)",
+                        }}
+                        onClick={handleDisable}
+                     >
+                        {disabled ? "Reenable" : "Disabled"}
                      </div>
                   </div>
-                  <div className={styles.disabled} onClick={handleDisabled}>
-                     {disabled ? "reenable" : "disable"}
+                  <div
+                     className={styles.coralControls}
+                     style={disabled || climbed
+                        ? {
+                           opacity: 0.5,
+                        }
+                        : undefined}
+                  >
+                     <div
+                        className={styles.controlButton}
+                        style={{
+                           borderColor:
+                              matchContext?.selectedAction == "coralPickup"
+                                 ? "var(--primary)"
+                                 : "rgb(30, 18, 22)",
+                        }}
+                        onClick={() => setAction("coralPickup")}
+                     >
+                        <CoralIcon />&nbsp;&nbsp;&nbsp;Pickup
+                     </div>
+                     <div
+                        className={styles.controlButton}
+                        style={{
+                           borderColor:
+                              matchContext?.selectedAction == "coralDrop"
+                                 ? "var(--primary)"
+                                 : "rgb(30, 18, 22)",
+                        }}
+                        onClick={() => setAction("coralDrop")}
+                     >
+                        <CoralIcon />&nbsp;&nbsp;&nbsp;Drop
+                     </div>
+                     <ControlButton
+                        keyname="scoreL1"
+                        selectAction={setAction}
+                        label="L1"
+                     />
+                     <ControlButton
+                        keyname="scoreL2"
+                        selectAction={setAction}
+                        label="L2"
+                     />{" "}
+                     <ControlButton
+                        keyname="scoreL3"
+                        selectAction={setAction}
+                        label="L3"
+                     />
+                     <ControlButton
+                        keyname="scoreL4"
+                        selectAction={setAction}
+                        label="L4"
+                     />
+                  </div>
+                  <div
+                     className={styles.algaeControls}
+                     style={disabled || climbed
+                        ? {
+                           opacity: 0.5,
+                        }
+                        : undefined}
+                  >
+                     <div
+                        className={styles.controlButton}
+                        style={{
+                           borderColor:
+                              matchContext?.selectedAction == "algaePickup"
+                                 ? "var(--primary)"
+                                 : "rgb(34, 27, 21)",
+                           flexGrow: "0.3",
+                        }}
+                        onClick={() => setAction("algaePickup")}
+                     >
+                        <AlgaeIcon />&nbsp;&nbsp;&nbsp;Pickup
+                     </div>
+                     <div
+                        className={styles.controlButton}
+                        style={{
+                           borderColor:
+                              matchContext?.selectedAction == "algaeDrop"
+                                 ? "var(--primary)"
+                                 : "rgb(34, 27, 21)",
+                           flexGrow: "0.3",
+                        }}
+                        onClick={() => setAction("algaeDrop")}
+                     >
+                        <AlgaeIcon />&nbsp;&nbsp;&nbsp;Drop
+                     </div>
+                     <ControlButton
+                        keyname="scoreNet"
+                        selectAction={setAction}
+                        label="Net"
+                     />
+                     <ControlButton
+                        keyname="scoreProcessor"
+                        selectAction={setAction}
+                        label="Process"
+                     />
                   </div>
                </div>
             )}
-         {selection == "algae" && matchContext?.gameState != "end" && (
-            <AlgaeSelections selectAction={handleSelectAction} />
-         )}
-         {selection == "coral" && matchContext?.gameState != "end" && (
-            <CoralSelections selectAction={handleSelectAction} />
-         )}
-         {selection == "climb" && matchContext?.gameState != "end" && (
-            <ClimbSelections selectAction={handleSelectAction} />
-         )}
-         {selection == "defense" && matchContext?.gameState != "end" && (
-            <DefenseSelections selectAction={handleSelectAction} />
-         )}
          {matchContext?.gameState == "end" &&
             (
                <div className={styles.previewStage}>
@@ -930,356 +1036,24 @@ function MatchControls() {
    );
 }
 
-function ReturnComponent(
-   { selectAction }: {
-      selectAction: (
-         action: RobotActions[2025] | ScoreActions[2025],
-         nullify: boolean,
-      ) => void;
+function ControlButton(
+   { keyname, selectAction, label }: {
+      keyname: RobotActions[2025] | ScoreActions[2025];
+      selectAction: (keyname: RobotActions[2025] | ScoreActions[2025]) => void;
+      label: string;
    },
 ) {
+   const matchContext = useContext(MatchContext);
+
    return (
       <div
-         className={styles.returnControl}
-         onClick={() => selectAction("leaveLine", true)}
+         className={styles.controlButton}
+         style={matchContext?.selectedAction == keyname
+            ? { border: "2px solid var(--primary)" }
+            : undefined}
+         onClick={() => selectAction(keyname)}
       >
-         Return <i className="fa-solid fa-rotate-left" />
-      </div>
-   );
-}
-
-function CoralSelections(
-   { selectAction }: {
-      selectAction: (
-         action: RobotActions[2025] | ScoreActions[2025],
-         nullify?: boolean,
-      ) => void;
-   },
-) {
-   const matchContext = useContext(MatchContext);
-
-   return (
-      <div className={styles.matchControls}>
-         <div
-            style={{
-               display: "flex",
-               flexDirection: "row",
-               height: "100%",
-               gap: "0.75rem",
-            }}
-         >
-            <div
-               style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  height: "100%",
-                  width: "100%",
-                  gap: "0.75rem",
-                  opacity: matchContext?.coralPosession ? 1 : 0.5,
-               }}
-            >
-               <div
-                  className={styles.selectionButton}
-                  style={{
-                     color: matchContext?.selectedAction == "scoreL4"
-                        ? "var(--primary)"
-                        : "var(--text-primary)",
-                  }}
-                  onClick={() =>
-                     matchContext?.coralPosession && selectAction("scoreL4")}
-               >
-                  Score L4
-               </div>
-               <div
-                  className={styles.selectionButton}
-                  style={{
-                     color: matchContext?.selectedAction == "scoreL3"
-                        ? "var(--primary)"
-                        : "var(--text-primary)",
-                  }}
-                  onClick={() =>
-                     matchContext?.coralPosession && selectAction("scoreL3")}
-               >
-                  Score L3
-               </div>
-               <div
-                  className={styles.selectionButton}
-                  style={{
-                     color: matchContext?.selectedAction == "scoreL2"
-                        ? "var(--primary)"
-                        : "var(--text-primary)",
-                  }}
-                  onClick={() =>
-                     matchContext?.coralPosession && selectAction("scoreL2")}
-               >
-                  Score L2
-               </div>
-               <div
-                  className={styles.selectionButton}
-                  style={{
-                     color: matchContext?.selectedAction == "scoreL1"
-                        ? "var(--primary)"
-                        : "var(--text-primary)",
-                  }}
-                  onClick={() =>
-                     matchContext?.coralPosession && selectAction("scoreL1")}
-               >
-                  Score L1
-               </div>
-            </div>
-            <div
-               style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  height: "100%",
-                  width: "100%",
-                  gap: "0.75rem",
-               }}
-            >
-               <div
-                  className={styles.selectionButton}
-                  style={{
-                     color: matchContext?.selectedAction == "coralPickup"
-                        ? "var(--primary)"
-                        : "var(--text-primary)",
-                     opacity: matchContext?.coralPosession ? 0.5 : 1,
-                  }}
-                  onClick={() =>
-                     !matchContext?.coralPosession &&
-                     selectAction("coralPickup")}
-               >
-                  Pickup Coral
-               </div>
-               <div
-                  className={styles.selectionButton}
-                  style={{
-                     color: matchContext?.selectedAction == "coralMiss"
-                        ? "var(--primary)"
-                        : "var(--text-primary)",
-                     opacity: matchContext?.coralPosession ? 1 : 0.5,
-                  }}
-                  onClick={() =>
-                     matchContext?.coralPosession && selectAction("coralMiss")}
-               >
-                  Miss Coral
-               </div>
-               <div
-                  className={styles.selectionButton}
-                  style={{
-                     color: matchContext?.selectedAction == "coralDrop"
-                        ? "var(--primary)"
-                        : "var(--text-primary)",
-                     opacity: matchContext?.coralPosession ? 1 : 0.5,
-                  }}
-                  onClick={() =>
-                     matchContext?.coralPosession && selectAction("coralDrop")}
-               >
-                  Drop Coral
-               </div>
-            </div>
-         </div>
-         <ReturnComponent selectAction={selectAction} />
-      </div>
-   );
-}
-
-function AlgaeSelections(
-   { selectAction }: {
-      selectAction: (
-         action: RobotActions[2025] | ScoreActions[2025],
-         nullify?: boolean,
-      ) => void;
-   },
-) {
-   const matchContext = useContext(MatchContext);
-
-   return (
-      <div className={styles.matchControls}>
-         <div
-            style={{
-               display: "flex",
-               flexDirection: "row",
-               height: "100%",
-               gap: "0.75rem",
-            }}
-         >
-            <div
-               style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  height: "100%",
-                  width: "100%",
-                  gap: "0.75rem",
-                  opacity: matchContext?.algaePosession ? 1 : 0.5,
-               }}
-            >
-               <div
-                  className={styles.selectionButton}
-                  style={{
-                     color: matchContext?.selectedAction == "scoreProcessor"
-                        ? "var(--primary)"
-                        : "var(--text-primary)",
-                  }}
-                  onClick={() =>
-                     matchContext?.algaePosession &&
-                     selectAction("scoreProcessor")}
-               >
-                  Processor
-               </div>
-               <div
-                  className={styles.selectionButton}
-                  style={{
-                     color: matchContext?.selectedAction == "scoreNet"
-                        ? "var(--primary)"
-                        : "var(--text-primary)",
-                  }}
-                  onClick={() =>
-                     matchContext?.algaePosession && selectAction("scoreNet")}
-               >
-                  Net
-               </div>
-            </div>
-            <div
-               style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  height: "100%",
-                  width: "100%",
-                  gap: "0.75rem",
-               }}
-            >
-               <div
-                  className={styles.selectionButton}
-                  style={{
-                     color: matchContext?.selectedAction == "algaePickup"
-                        ? "var(--primary)"
-                        : "var(--text-primary)",
-                     opacity: matchContext?.algaePosession ? 0.5 : 1,
-                  }}
-                  onClick={() =>
-                     !matchContext?.algaePosession &&
-                     selectAction("algaePickup")}
-               >
-                  Pickup Algae
-               </div>
-               <div
-                  className={styles.selectionButton}
-                  style={{
-                     color: matchContext?.selectedAction == "algaeMiss"
-                        ? "var(--primary)"
-                        : "var(--text-primary)",
-                     opacity: matchContext?.algaePosession ? 1 : 0.5,
-                  }}
-                  onClick={() =>
-                     matchContext?.algaePosession && selectAction("algaeMiss")}
-               >
-                  Miss Algae
-               </div>
-               <div
-                  className={styles.selectionButton}
-                  style={{
-                     color: matchContext?.selectedAction == "algaeDrop"
-                        ? "var(--primary)"
-                        : "var(--text-primary)",
-                     opacity: matchContext?.algaePosession ? 1 : 0.5,
-                  }}
-                  onClick={() =>
-                     matchContext?.algaePosession && selectAction("algaeDrop")}
-               >
-                  Drop Algae
-               </div>
-            </div>
-         </div>
-         <ReturnComponent selectAction={selectAction} />
-      </div>
-   );
-}
-
-function ClimbSelections(
-   { selectAction }: {
-      selectAction: (
-         action: RobotActions[2025] | ScoreActions[2025],
-         nullify?: boolean,
-      ) => void;
-   },
-) {
-   const matchContext = useContext(MatchContext);
-
-   return (
-      <div className={styles.matchControls}>
-         <div
-            className={styles.selectionButton}
-            style={{
-               color: matchContext?.selectedAction == "climbDeep"
-                  ? "var(--primary)"
-                  : "var(--text-primary)",
-            }}
-            onClick={() => selectAction("climbDeep")}
-         >
-            Deep Climb
-         </div>
-         <div
-            className={styles.selectionButton}
-            style={{
-               color: matchContext?.selectedAction == "climbShallow"
-                  ? "var(--primary)"
-                  : "var(--text-primary)",
-            }}
-            onClick={() => selectAction("climbShallow")}
-         >
-            Shallow Climb
-         </div>
-         <div
-            className={styles.selectionButton}
-            style={{
-               color: matchContext?.selectedAction == "climbPark"
-                  ? "var(--primary)"
-                  : "var(--text-primary)",
-            }}
-            onClick={() => selectAction("climbPark")}
-         >
-            Park
-         </div>
-         <ReturnComponent selectAction={selectAction} />
-      </div>
-   );
-}
-
-function DefenseSelections(
-   { selectAction }: {
-      selectAction: (
-         action: RobotActions[2025] | ScoreActions[2025],
-         nullify?: boolean,
-      ) => void;
-   },
-) {
-   const matchContext = useContext(MatchContext);
-
-   return (
-      <div className={styles.matchControls}>
-         <div
-            className={styles.selectionButton}
-            style={{
-               color: matchContext?.selectedAction == "defend"
-                  ? "var(--primary)"
-                  : "var(--text-primary)",
-            }}
-            onClick={() => selectAction("defend")}
-         >
-            Play defense
-         </div>
-         <div
-            className={styles.selectionButton}
-            style={{
-               color: matchContext?.selectedAction == "beDefended"
-                  ? "var(--primary)"
-                  : "var(--text-primary)",
-            }}
-            onClick={() => selectAction("beDefended")}
-         >
-            Be defended
-         </div>
-         <ReturnComponent selectAction={selectAction} />
+         {label}
       </div>
    );
 }
@@ -1455,4 +1229,18 @@ function parseMatchString(matchString: string) {
    });
 
    return result;
+}
+
+function CoralIcon() {
+   return (
+      <img src="/app/icons/coral.svg">
+      </img>
+   );
+}
+
+function AlgaeIcon() {
+   return (
+      <img src="/app/icons/algae.svg">
+      </img>
+   );
 }

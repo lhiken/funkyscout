@@ -11,7 +11,9 @@ export default function MobileStartPitScouting() {
                <div>
                   <i className="fa-solid fa-chevron-left" />
                </div>
-               Return
+               <p className="font-bold text-xl">
+                  Return
+               </p>
             </div>
             <div className={styles.seperator} />
          </div>
