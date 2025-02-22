@@ -49,7 +49,7 @@ interface StatboticsTeamEPAs {
       unitless: number;
       norm: number;
       conf: number[];
-      breakdown: Record<string, { mean: number; sd: number }>;
+      breakdown: Record<string, number>;
    };
    record: {
       season: {

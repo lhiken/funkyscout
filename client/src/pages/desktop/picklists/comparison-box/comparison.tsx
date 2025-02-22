@@ -416,7 +416,7 @@ function TeamGraphs() {
             {metrics.map((val) => {
                return (
                   <TeamGraphElement
-                     key={val.title}
+                     key={val.title + val.values}
                      metric={val}
                      setMetric={setMetrics}
                   />
@@ -544,6 +544,7 @@ function TeamGraphElement({ metric, setMetric }: {
                   indexByKey="teamKey"
                   keysOfSeries={["value"]}
                   axisTicks={0}
+                  key={metric.title}
                />
             )}
          </div>

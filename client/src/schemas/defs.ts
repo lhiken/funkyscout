@@ -27,10 +27,10 @@ export type DisplayedMetric = {
 // Pit Data
 export interface PitData {
    robotHeightInches: number;
-   robotWeightInches: number;
+   robotWeightPounds: number;
    subjectiveRating: number;
    robotArchetype: string;
-   selfConfidence: number;
+   robotRobustness: number;
    comment: string;
 }
 
@@ -40,6 +40,10 @@ export interface PitData2025 extends PitData {
    canScoreProcessor: boolean;
    canClimbDeep: boolean;
    canClimbShallow: boolean;
+   canGroundAlgae: boolean;
+   canGroundCoral: boolean;
+   canSourceCoral: boolean;
+   canReefAlgae: boolean;
 }
 
 // Database-stored Data Types

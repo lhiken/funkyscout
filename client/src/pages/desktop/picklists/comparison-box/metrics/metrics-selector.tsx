@@ -20,10 +20,9 @@ export function DesktopMetricsSelector(
    const COPRs = useContext(GlobalTeamDataContext).COPRdata;
    const EPAs = useContext(GlobalTeamDataContext).EPAdata;
 
-   const EPABreakdown = Object.keys(() => {
-      const reference = Object.values(EPAs)[0].epa;
-      return reference.breakdown ? reference.breakdown : ["N/A"];
-   })
+   const EPABreakdown = Object.keys(
+      Object.values(EPAs)[0] ? Object.values(EPAs)[0].epa.breakdown : [],
+   )
       .filter((val) => val.toLowerCase() == val).map((val) => {
          return `EPA - ${
             val // Formatting Statbotics' snake case
@@ -85,15 +84,24 @@ export function DesktopMetricsSelector(
 
       const teamValueArray = Object.keys(EPAs).map((val) => {
          if (EPAs[val].epa.total_points) {
-            const finalValue = indexKey == "total_points"
-               ? EPAs[val].epa.total_points.mean
-               : indexKey != "breakdown"
-               ? EPAs[val].epa[indexKey]
-               : EPAs[val].epa // unformatting into snake case
-                  .breakdown[
-                     itemKey.substring(6).toLowerCase().replace(/ /g, "_")
-                  ]
-                  .mean;
+            let finalValue = 0;
+
+            if (indexKey === "total_points") {
+               finalValue = EPAs[val].epa.total_points.mean;
+            } else if (indexKey !== "breakdown") {
+               finalValue = EPAs[val].epa[indexKey] || 0;
+            } else {
+               const breakdownKey = itemKey
+                  .substring(6)
+                  .toLowerCase()
+                  .replace(/ /g, "_");
+
+               console.log(EPAs[val].epa.breakdown);
+               console.log(breakdownKey);
+
+               finalValue = EPAs[val].epa.breakdown?.[breakdownKey] || 0;
+            }
+
             return { teamKey: val, value: finalValue };
          } else {
             return { teamKey: val, value: 0 };

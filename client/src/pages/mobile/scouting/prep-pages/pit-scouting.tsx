@@ -41,7 +41,7 @@ export default function MobileStartPitScouting() {
          selectedTeam
       ) {
          navigate(
-            `/inpit/${/*UgetEventYear()*/ 2025}/${selectedTeam}`,
+            `/inpit/${/*UgetEventYear()*/ 2025}/${selectedTeam.team}`,
          );
       }
    }

@@ -8,6 +8,10 @@ function handleEventChange(event: string) {
    return oldEvent;
 }
 
+/** getEvent
+ * Fetches the eventkey from localstorage
+ * @returns eventKey
+ */
 function getEvent() {
    const event = localStorage.getItem("event");
 
