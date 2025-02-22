@@ -1,6 +1,9 @@
 import { useContext, useEffect, useState } from "react";
 import styles from "./next-match.module.css";
-import { getUserScoutingProgress } from "../../../../../lib/app/user-progression";
+import {
+   getShiftsUntilBreak,
+   getUserScoutingProgress,
+} from "../../../../../lib/app/user-progression";
 import { getNextAssignedMatch } from "../../../../../lib/app/helpers";
 import {
    parseMatchKey,
@@ -14,6 +17,7 @@ import { GlobalTeamDataContext } from "../../../../../app-global-ctx";
 export function MobileNextMatchCard() {
    const [shiftsDone, setShiftsDone] = useState(0);
    const [shiftsLeft, setShiftsLeft] = useState(0);
+   const [shiftsToBreak, setShiftsToBreak] = useState(0);
 
    const globalData = useContext(GlobalTeamDataContext);
 
@@ -30,6 +34,10 @@ export function MobileNextMatchCard() {
       getNextAssignedMatch().then((res) => {
          setNextMatch(res);
       });
+
+      getShiftsUntilBreak().then((res) => {
+         setShiftsToBreak(res);
+      });
    }, []);
 
    const nextMatchDateObject = nextMatch?.time
@@ -41,7 +49,7 @@ export function MobileNextMatchCard() {
          <div className={styles.nextMatchScoutStats}>
             <ScoutingStatCard value={shiftsDone + ""} title="shifts done" />
             <ScoutingStatCard value={shiftsLeft + ""} title="shifts left" />
-            <ScoutingStatCard value={"0" + "m"} title="to break" />
+            <ScoutingStatCard value={shiftsToBreak + ""} title="to break" />
          </div>
          <div className={styles.nextMatchDetails}>
             <div className={styles.nextMatchHeader}>
