@@ -54,4 +54,5 @@
    background-color: var(--surface);
    border: 1rem;
    height: 9rem;
+   width: 100%;
 }

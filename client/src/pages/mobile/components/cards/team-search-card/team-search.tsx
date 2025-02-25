@@ -1,31 +1,21 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import RoundInput from "../../../../../components/app/input/round-input";
 import MobileCardHeader from "../card-universal-components/card-header";
 import styles from "./team-search.module.css";
-import { Tables } from "../../../../../lib/supabase/database.types";
-import {
-   getAllData,
-   getTeamDetailsStoreName,
-} from "../../../../../lib/mobile-cache-handler/init";
 import { GlobalTeamDataContext } from "../../../../../app-global-ctx";
 import { parseTeamKey } from "../../../../../utils/logic/app";
+import { TeamRank } from "../../../../../lib/tba/events";
 
 export default function MobileTeamSearchCard() {
-   const [teams, setTeams] = useState<Tables<"event_team_data">[]>();
+   const [teams] = useState<TeamRank[]>(
+      useContext(GlobalTeamDataContext).TBAdata,
+   );
    const [teamQuery, setTeamQuery] = useState<string>("");
-
-   useEffect(() => {
-      getAllData<Tables<"event_team_data">>(getTeamDetailsStoreName()).then(
-         (res) => {
-            setTeams(res);
-         },
-      );
-   }, []);
 
    const filteredTeams = teamQuery == ""
       ? teams
       : teams?.filter((val) =>
-         val.team.toLowerCase().includes(teamQuery.toLowerCase())
+         (val.name + val.key).toLowerCase().includes(teamQuery.toLowerCase())
       );
 
    return (
@@ -56,9 +46,9 @@ export default function MobileTeamSearchCard() {
    );
 }
 
-function TeamCard({ team }: { team: Tables<"event_team_data"> }) {
+function TeamCard({ team }: { team: TeamRank }) {
    const data = useContext(GlobalTeamDataContext);
-   const teamTBAData = data.TBAdata.find((val) => val.key == team.team);
+   const teamTBAData = data.TBAdata.find((val) => val.key == team.key);
 
    return (
       <div className={styles.teamCard}>
@@ -70,7 +60,7 @@ function TeamCard({ team }: { team: Tables<"event_team_data"> }) {
                   color: "var(--primary)",
                }}
             >
-               {parseTeamKey(team.team)}
+               {parseTeamKey(team.key)}
             </div>
             <div>
                {" | " + teamTBAData?.name}
@@ -82,9 +72,17 @@ function TeamCard({ team }: { team: Tables<"event_team_data"> }) {
                fontSize: "1.15rem",
                lineHeight: "1rem",
                color: "var(--text-secondary)",
+               display: "flex",
+               justifyContent: "space-between",
             }}
          >
-            #{teamTBAData?.rank}
+            Rank #{teamTBAData?.rank}
+            <div>
+               <i
+                  className="fa-solid fa-chevron-right"
+                  style={{ color: "var(--primary)", fontSize: "0.95rem" }}
+               />
+            </div>
          </div>
       </div>
    );
