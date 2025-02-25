@@ -1097,6 +1097,7 @@ function MatchEndingNotes() {
                </div>
                <div
                   className={styles.ratingSlider}
+                  style={{ position: "relative" }}
                >
                   <div
                      style={{
@@ -1127,16 +1128,27 @@ function MatchEndingNotes() {
                      step={0.1}
                      value={driverRating}
                      onChange={handleDriverRatingChange}
-                     style={{ width: "100%", opacity: 0 }}
+                     style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "4rem", // Increased height for easier dragging
+                        opacity: 0,
+                        cursor: "pointer",
+                        pointerEvents: "auto",
+                     }}
                   />
                </div>
             </div>
+
             <div className={styles.notesCategory}>
                <div className={styles.notesHeader}>
                   Robot Rating
                </div>
                <div
                   className={styles.ratingSlider}
+                  style={{ position: "relative" }}
                >
                   <div
                      style={{
@@ -1167,10 +1179,20 @@ function MatchEndingNotes() {
                      step={0.1}
                      value={robotRating}
                      onChange={handleRobotRatingChange}
-                     style={{ width: "100%", opacity: 0 }}
+                     style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "4rem", // Increased height for easier dragging
+                        opacity: 0,
+                        cursor: "pointer",
+                        pointerEvents: "auto",
+                     }}
                   />
                </div>
             </div>
+
             <div className={styles.notesCategory}>
                <div className={styles.notesHeader}>
                   Team Notes

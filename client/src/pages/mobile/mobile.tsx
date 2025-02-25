@@ -13,12 +13,13 @@ import { checkDatabaseInitialization } from "../../lib/mobile-cache-handler/init
 import MobileSetupPage from "./components/setup/setup";
 import ScoutingInmatch from "../scouting/inmatch";
 import ScoutingInpit from "../scouting/inpit";
+import MobileDataViewer from "./data-viewer/data-viewer";
 
 function MobileApp() {
    const [renderNavbar, setRenderNavbar] = useState(false);
    const [topbarText, setTopbarText] = useState("");
    const [location, navigate] = useLocation();
-   const locationArray = ["/", "/scout"];
+   const locationArray = ["/", "/scout", "/data", "/schedule"];
 
    useEffect(() => {
       fetchSession().then((res) => {
@@ -52,6 +53,12 @@ function MobileApp() {
          case "/scout":
             setTopbarText("Scouting");
             break;
+         case "/data":
+            setTopbarText("Data");
+            break;
+         case "/schedule":
+            setTopbarText("Schedule");
+            break;
          default:
             setTopbarText("");
       }
@@ -70,7 +77,7 @@ function MobileApp() {
                   path="/scout/match/:matchNumber"
                   component={MobileStartMatchScouting}
                />
-               <Route path="/data" />
+               <Route path="/data" component={MobileDataViewer} />
                <Route path="/inmatch/" component={ScoutingInmatch} nest />
                <Route path="/inpit/" component={ScoutingInpit} nest />
             </div>

@@ -59,7 +59,7 @@ export default function MobileStartPitScouting() {
          >
             <div
                className={styles.returnHeaderButton}
-               onClick={() => history.back()}
+               onClick={() => navigate("~/m/scout")}
             >
                <div>
                   <i className="fa-solid fa-chevron-left" />

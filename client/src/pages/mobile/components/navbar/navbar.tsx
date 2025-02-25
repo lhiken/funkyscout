@@ -14,17 +14,17 @@ export default function MobileNavbar() {
          </div>
          <div
             className={`${styles.pageIcon} ${
-               location == "/picklist" && styles.active
+               location == "/schedule" && styles.active
             }`}
-            onClick={() => setLocation("/compare")}
+            onClick={() => setLocation("/schedule")}
          >
             <i className="fa-solid fa-bars-staggered" />
          </div>
          <div
             className={`${styles.pageIcon} ${
-               location == "/compare" && styles.active
+               location == "/data" && styles.active
             }`}
-            onClick={() => setLocation("/compare")}
+            onClick={() => setLocation("/data")}
          >
             <i className="fa-solid fa-scale-unbalanced-flip" />
          </div>

@@ -494,6 +494,15 @@ create policy "Enable insert for users based on permissions"
       authorize('profiles.write')
    );
 
+-- select storage.create_bucket('team-images');
+
+-- create policy "Allow authorized update access (team-images)" 
+--    on storage.objects
+--    for UPDATE
+--    to authenticated
+--    using (bucket_id = 'team-images' and authorize('data.write'))
+--    with check (bucket_id = 'team-images' and authorize('data.write'));
+
 -- Populate Permissions Table --
 insert into user_roles (role, permission) values ('admin', 'data.view');
 insert into user_roles (role, permission) values ('admin', 'data.write');

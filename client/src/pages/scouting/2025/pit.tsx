@@ -4,6 +4,7 @@ import { parseTeamKey } from "../../../utils/logic/app";
 import { useContext, useState } from "react";
 import { GlobalTeamDataContext } from "../../../app-global-ctx";
 import { PitData2025 } from "../../../schemas/defs";
+import { uploadPitEntry, uploadRobotImage } from "../../../lib/supabase/data";
 
 export default function Inpit2025() {
    const teamKey = useParams()[0] || "No team selected";
@@ -24,10 +25,12 @@ export default function Inpit2025() {
    const [deepClimb, setDeepClimb] = useState<boolean>(false);
    const [shallowClimb, setShallowClimb] = useState<boolean>(false);
 
-   const [robotArchetype, setRobotArchetype] = useState<string>();
+   const [robotArchetype, setRobotArchetype] = useState<string>("");
 
    const [subjectiveRating, setSubjectiveRating] = useState<number>(3);
    const [robotRobustness, setRobotRobustness] = useState<number>(3);
+
+   const [robotImage, setRobotImage] = useState<File>();
 
    function handleLeftButton() {
       if (page == 1) {
@@ -38,7 +41,7 @@ export default function Inpit2025() {
    function handleRightButton() {
       if (page == 0) {
          setPage(1);
-      } else if (robotArchetype) {
+      } else if (robotArchetype?.length > 0 && robotImage) {
          const newPitData: PitData2025 = {
             canScoreReef: reefCoral,
             canScoreNet: netAlgae,
@@ -57,7 +60,14 @@ export default function Inpit2025() {
             comment: "N/A",
          };
 
-         console.log(newPitData);
+         uploadRobotImage(robotImage, teamKey);
+         uploadPitEntry(teamKey, newPitData);
+      }
+   }
+
+   function handleFileUpload(event: React.ChangeEvent<HTMLInputElement>) {
+      if (event.target.files && event.target.files[0]) {
+         setRobotImage(event.target.files[0]);
       }
    }
 
@@ -271,6 +281,7 @@ export default function Inpit2025() {
                            </div>
                            <div
                               className={styles.ratingSlider}
+                              style={{ position: "relative" }}
                            >
                               <div
                                  style={{
@@ -305,7 +316,16 @@ export default function Inpit2025() {
                                  value={subjectiveRating}
                                  onChange={(e) =>
                                     setSubjectiveRating(Number(e.target.value))}
-                                 style={{ width: "100%", opacity: 0 }}
+                                 style={{
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0,
+                                    width: "100%",
+                                    height: "4rem",
+                                    opacity: 0,
+                                    cursor: "pointer",
+                                    pointerEvents: "auto",
+                                 }}
                               />
                            </div>
                         </div>
@@ -315,6 +335,7 @@ export default function Inpit2025() {
                            </div>
                            <div
                               className={styles.ratingSlider}
+                              style={{ position: "relative" }}
                            >
                               <div
                                  style={{
@@ -349,7 +370,16 @@ export default function Inpit2025() {
                                  value={robotRobustness}
                                  onChange={(e) =>
                                     setRobotRobustness(Number(e.target.value))}
-                                 style={{ width: "100%", opacity: 0 }}
+                                 style={{
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0,
+                                    width: "100%",
+                                    height: "4rem",
+                                    opacity: 0,
+                                    cursor: "pointer",
+                                    pointerEvents: "auto",
+                                 }}
                               />
                            </div>
                         </div>
@@ -366,6 +396,44 @@ export default function Inpit2025() {
                                  setRobotArchetype(e.target.value)}
                            />
                         </div>
+                        <div className={styles.option}>
+                           <div className={styles.optionHeader}>
+                              Robot Description
+                           </div>
+                           <label className={styles.uploadButton}>
+                              {robotImage
+                                 ? "Image uploaded"
+                                 : "Upload a GOOD image of the robot"}
+                              {robotImage
+                                 ? (
+                                    <img
+                                       src={URL.createObjectURL(robotImage)}
+                                       alt="Uploaded"
+                                       style={{
+                                          width: "2rem",
+                                          height: "2rem",
+                                          borderRadius: "1rem",
+                                          marginLeft: "0.5rem",
+                                       }}
+                                    />
+                                 )
+                                 : (
+                                    <i
+                                       style={{
+                                          fontSize: "2rem",
+                                          marginLeft: "0.5rem",
+                                       }}
+                                       className="fa-solid fa-upload"
+                                    />
+                                 )}
+                              <input
+                                 type="file"
+                                 accept="image/*"
+                                 onChange={handleFileUpload}
+                                 style={{ display: "none" }}
+                              />
+                           </label>
+                        </div>
                      </>
                   )}
             </div>
@@ -377,7 +445,16 @@ export default function Inpit2025() {
                >
                   Back
                </div>
-               <div className={styles.navButton} onClick={handleRightButton}>
+               <div
+                  className={styles.navButton}
+                  onClick={handleRightButton}
+                  style={{
+                     opacity: page == 0 ||
+                           (robotImage && (robotArchetype?.length || 0) > 0)
+                        ? 1
+                        : 0.5,
+                  }}
+               >
                   {page == 0 ? "Next" : "Submit"}
                </div>
             </div>

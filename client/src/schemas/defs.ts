@@ -35,7 +35,7 @@ export interface PitData {
 }
 
 export interface PitData2025 extends PitData {
-   canScoreReef: [boolean, boolean, boolean, boolean];
+   canScoreReef: boolean[];
    canScoreNet: boolean;
    canScoreProcessor: boolean;
    canClimbDeep: boolean;
