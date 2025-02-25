@@ -6,7 +6,7 @@
    border-radius: 1rem;
    background-color: var(--surface);
    width: 100%;
-   padding: 1.25rem;
+   padding: 1.5rem;
 }
 
 .header {
@@ -15,4 +15,70 @@
    display: flex;
    flex-direction: row;
    gap: 0.25rem;
+   margin-bottom: 1rem;
+}
+
+.content {
+   display: flex;
+   flex-direction: row;
+   gap: 1rem;
+   width: 100%;
+}
+
+.teams {
+   display: flex;
+   flex-direction: row;
+   gap: 1rem;
+}
+
+.blueAlliance {
+   display: flex;
+   flex-direction: column;
+   gap: 0.5rem;
+   padding-top: 0.5rem;
+   border-top: 3px solid var(--blue-alliance);
+   width: 3.25rem;
+}
+
+.redAlliance {
+   display: flex;
+   flex-direction: column;
+   gap: 0.5rem;
+   padding-top: 0.5rem;
+   border-top: 3px solid var(--red-alliance);
+   width: 3.25rem;
+}
+
+.matchDetails {
+   flex-grow: 1;
+   display: flex;
+   flex-direction: column;
+   justify-content: space-between;
+}
+
+.matchStatus {
+   display: flex;
+   background-color: var(--primary);
+   border-radius: 10rem;
+   padding: 0.15rem 1rem;
+   justify-content: center;
+   color: var(--text-background);
+}
+
+.matchEstimate {
+   display: flex;
+   flex-direction: column;
+   gap: 0.5rem;
+}
+
+.winCard {
+   display: flex;
+   justify-content: space-between;
+}
+
+.loadBox {
+   height: 7.7rem;
+   display: flex;
+   justify-content: center;
+   align-items: center;
 }
