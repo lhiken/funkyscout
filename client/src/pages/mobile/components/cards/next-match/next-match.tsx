@@ -79,7 +79,7 @@ export function MobileNextMatchCard() {
                      "nexus",
                   )}
                </div>
-               <div style={{ display: "flex" }}>
+               <div style={{ display: "flex"}}>
                   {nextMatch?.data.team
                      ? "Team " + parseTeamKey(nextMatch?.data.team || "0")
                      : "Loading..."}&nbsp;

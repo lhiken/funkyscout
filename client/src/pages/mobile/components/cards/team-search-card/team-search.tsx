@@ -1,13 +1,13 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import RoundInput from "../../../../../components/app/input/round-input";
 import MobileCardHeader from "../card-universal-components/card-header";
 import styles from "./team-search.module.css";
 import { GlobalTeamDataContext } from "../../../../../app-global-ctx";
-import { parseTeamKey } from "../../../../../utils/logic/app";
-import { TeamRank } from "../../../../../lib/tba/events";
+import { getEvent, parseTeamKey } from "../../../../../utils/logic/app";
+import { fetchTBAEventTeams, TeamRank } from "../../../../../lib/tba/events";
 
 export default function MobileTeamSearchCard() {
-   const [teams] = useState<TeamRank[]>(
+   const [teams, setTeams] = useState<TeamRank[]>(
       useContext(GlobalTeamDataContext).TBAdata,
    );
    const [teamQuery, setTeamQuery] = useState<string>("");
@@ -17,6 +17,14 @@ export default function MobileTeamSearchCard() {
       : teams?.filter((val) =>
          (val.name + val.key).toLowerCase().includes(teamQuery.toLowerCase())
       );
+
+   useEffect(() => {
+      fetchTBAEventTeams(getEvent() || "").then((res) => {
+         if (res) {
+            setTeams(res);
+         }
+      });
+   }, []);
 
    return (
       <div className={styles.container}>

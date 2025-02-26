@@ -14,6 +14,7 @@ import MobileSetupPage from "./components/setup/setup";
 import ScoutingInmatch from "../scouting/inmatch";
 import ScoutingInpit from "../scouting/inpit";
 import MobileDataViewer from "./data-viewer/data-viewer";
+import MobileScheduleViewer from "./schedule/schedule";
 
 function MobileApp() {
    const [renderNavbar, setRenderNavbar] = useState(false);
@@ -78,6 +79,7 @@ function MobileApp() {
                   component={MobileStartMatchScouting}
                />
                <Route path="/data" component={MobileDataViewer} />
+               <Route path="/schedule" component={MobileScheduleViewer} />
                <Route path="/inmatch/" component={ScoutingInmatch} nest />
                <Route path="/inpit/" component={ScoutingInpit} nest />
             </div>
