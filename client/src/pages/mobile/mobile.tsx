@@ -12,8 +12,6 @@ import { fetchSession, logout } from "../../lib/supabase/auth";
 import {
    checkDatabaseInitialization,
    getAllData,
-   getData,
-   getScheduleStoreName,
    getTeamDetailsStoreName,
 } from "../../lib/mobile-cache-handler/init";
 import MobileSetupPage from "./components/setup/setup";
