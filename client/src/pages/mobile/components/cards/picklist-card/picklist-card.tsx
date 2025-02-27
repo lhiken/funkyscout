@@ -21,7 +21,7 @@ export default function MobilePicklistCard() {
             tooltipText="View picklists you've created"
          />
          <div className={styles.picklistContainer}>
-            {picklists
+            {picklists && picklists.length > 0
                ? (
                   <>
                      <div className={styles.addNew}>
@@ -56,7 +56,7 @@ export default function MobilePicklistCard() {
                )
                : (
                   <div className={styles.loadBox}>
-                     Loading picklists...
+                     You don't have any picklists
                   </div>
                )}
          </div>
