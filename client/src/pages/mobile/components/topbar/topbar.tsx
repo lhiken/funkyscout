@@ -117,6 +117,25 @@ function UserSettingsM({
                      borderColor: "var(--red-alliance)",
                   }}
                   onClick={() => {
+                     if (navigator.onLine) navigate("/setup");
+                     else {throwNotification(
+                           "error",
+                           "You can only reset when there is internet",
+                        );}
+                  }}
+               >
+                  Update cache<i
+                     style={{ color: "var(--text-secondary)" }}
+                     className="fa-solid fa-trash"
+                  />
+               </div>
+               <div
+                  className={styles.signoutButton}
+                  style={{
+                     color: "var(--text-primary)",
+                     borderColor: "var(--red-alliance)",
+                  }}
+                  onClick={() => {
                      performReinstallPWA();
                      handleLogout();
                   }}

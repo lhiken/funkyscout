@@ -40,7 +40,6 @@ function MobileApp() {
 
       if (location == "/") {
          checkDatabaseInitialization().then(() => {
-            navigate("/setup");
          });
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
