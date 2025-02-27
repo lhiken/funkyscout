@@ -154,12 +154,14 @@ export default function Inmatch2025() {
       setAutoActions((prev) => {
          return [...prev, action];
       });
+      throwNotification("info", `${action.action}`);
    }
 
    function addTeleAction(action: TeleopAction<2025>) {
       setTeleopActions((prev) => {
          return [...prev, action];
       });
+      throwNotification("info", `${action.action}`);
    }
 
    async function startMatch() {
