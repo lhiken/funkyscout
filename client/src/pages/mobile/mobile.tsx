@@ -41,16 +41,8 @@ function MobileApp() {
       }
 
       if (location == "/") {
-         checkDatabaseInitialization().then((res) => {
-            if (!res) {
-               navigate("/setup");
-            } else if (res) {
-               getAllData(getTeamDetailsStoreName()).then((res) => {
-                  if (res.length == 0) {
-                     navigate("/setup");
-                  }
-               });
-            }
+         checkDatabaseInitialization().then(() => {
+            navigate("/setup");
          });
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps

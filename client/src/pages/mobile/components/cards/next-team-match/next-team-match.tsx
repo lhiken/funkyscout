@@ -5,6 +5,7 @@ import {
    NexusMatch,
 } from "../../../../../lib/nexus/events";
 import {
+   getEvent,
    getFocusTeam,
    parseTeamKey,
    timeFromNow,
@@ -15,7 +16,7 @@ export function MobileNextTeamMatchCard() {
    const [nextMatch, setNextMatch] = useState<NexusMatch>();
 
    async function getNextMatch() {
-      const data = await getNexusEventStatus("demo9922");
+      const data = await getNexusEventStatus(getEvent() || "");
       if (data) {
          const nextMatch = data.matches.filter((val) =>
             [...val.blueTeams, ...val.redTeams].includes(
