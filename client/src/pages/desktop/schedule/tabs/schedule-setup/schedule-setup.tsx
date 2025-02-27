@@ -12,6 +12,7 @@ import {
    uploadTeamAssignments,
 } from "../../../../../lib/supabase/setup";
 import throwNotification from "../../../../../components/app/toast/toast";
+import { GlobalTeamDataContext } from "../../../../../app-global-ctx";
 
 function SetupPanel() {
    const scheduleData = useContext(ScheduleContext);
@@ -56,9 +57,11 @@ function SetupPanel() {
       }
    }
 
+   const globalData = useContext(GlobalTeamDataContext);
+
    function handleScheduleTeams() {
       if (assignmentData.setVal) {
-         const teamKeys = scheduleData.val?.teamData?.map((team) => team.key) ||
+         const teamKeys = Object.keys(globalData.EPAdata) ||
             [];
          const scouterList = assignmentData.val?.scouterList || [];
          const event = getEvent() || "";
