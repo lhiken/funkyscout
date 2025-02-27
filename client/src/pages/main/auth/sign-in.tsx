@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { loginWithGoogle, loginWithPassword } from "../../../lib/supabase/auth";
+import { loginWithPassword } from "../../../lib/supabase/auth";
 import { useLocation, useRoute } from "wouter";
 import { motion } from "motion/react";
 import styles from "./mode.module.css";
@@ -27,18 +27,8 @@ function SigninPage() {
       });
    }
 
-   function googleLogin() {
-      loginWithGoogle().then((res) => {
-         if (res) {
-            throwNotification(
-               "success",
-               `Signed in with Google`,
-            );
-            setLocation("/events");
-         } else {
-            throwNotification("error", "Incorrect username or password");
-         }
-      });
+   function practice() {
+      setLocation("/practice");
    }
 
    const [verified] = useRoute("/auth/verify");
@@ -64,8 +54,8 @@ function SigninPage() {
             }}
             className={styles.container}
          >
-            <div className={styles.googleButton} onClick={googleLogin}>
-               Login with Google
+            <div className={styles.googleButton} onClick={practice}>
+               Use practice mode
             </div>
             <input
                name="email"

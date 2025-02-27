@@ -27,6 +27,7 @@ import { Tables } from "./lib/supabase/database.types";
 import { GlobalTeamDataContext } from "./app-global-ctx";
 import ForgotPassword from "./pages/main/auth/forgot-password";
 import ResetPassword from "./pages/main/auth/reset-password";
+import PracticeMode from "./practice";
 
 export interface GlobalTeamData {
    EPAdata: Record<string, StatboticsTeamEPAs>;
@@ -182,6 +183,7 @@ export default function App() {
                      component={ForgotPassword}
                   />
                   <Route path="/reset-page-link" component={ResetPassword} />
+                  <Route path="/practice" component={PracticeMode} nest />
                   <Route>
                      <ErrorPage />
                   </Route>

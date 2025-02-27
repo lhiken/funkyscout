@@ -162,3 +162,41 @@ html {
    user-select: none; /* Non-prefixed version, currently
    supported by Chrome, Edge, Opera and Firefox */
 }
+
+.practiceContainer {
+   display: flex;
+   height: 100vh;
+   width: 100vw;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   flex-direction: column;
+   gap: 1rem;
+}
+
+.practiceHeader {
+   color: var(--primary);
+   font-size: 1.5rem;
+   margin-bottom: 2rem;
+}
+
+.practiceButton {
+   width: 8rem;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   border: 2px solid var(--text-background);
+   border-radius: 1rem;
+   height: 3rem;
+}
+
+.returnButton {
+   margin-top: 1rem;
+   width: 8rem;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   border: 2px solid var(--error);
+   border-radius: 1rem;
+   height: 3rem;
+}

@@ -27,19 +27,21 @@ function MobileApp() {
    const locationArray = ["/", "/scout", "/data", "/schedule"];
 
    useEffect(() => {
-      fetchSession().then((res) => {
-         if (res?.session == null) {
-            logout();
-            navigate("~/auth");
-         }
-      });
-
-      if (location == "/") {
-         checkDatabaseInitialization().then((res) => {
-            if (!res) {
-               navigate("/setup");
+      if (location != "/practice") {
+         fetchSession().then((res) => {
+            if (res?.session == null) {
+               logout();
+               navigate("~/auth");
             }
          });
+
+         if (location == "/") {
+            checkDatabaseInitialization().then((res) => {
+               if (!res) {
+                  navigate("/setup");
+               }
+            });
+         }
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, []);
