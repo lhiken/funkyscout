@@ -11,8 +11,6 @@ import MobileStartMatchScouting from "./scouting/prep-pages/match-scouting";
 import { fetchSession, logout } from "../../lib/supabase/auth";
 import {
    checkDatabaseInitialization,
-   getAllData,
-   getTeamDetailsStoreName,
 } from "../../lib/mobile-cache-handler/init";
 import MobileSetupPage from "./components/setup/setup";
 import ScoutingInmatch from "../scouting/inmatch";
