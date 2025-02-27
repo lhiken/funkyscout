@@ -259,6 +259,23 @@ async function changeName(name: string, userID: string) {
    }
 }
 
+async function loginWithGoogle() {
+   try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+         provider: "google",
+      });
+
+      if (error) {
+         throw new Error(error.message);
+      }
+
+      return data;
+   } catch (err) {
+      handleError(err);
+      return false;
+   }
+}
+
 export {
    applyInviteCode,
    changeName,
@@ -266,6 +283,7 @@ export {
    fetchUserDetails,
    getAuthStatus,
    getLocalUserData,
+   loginWithGoogle,
    loginWithPassword,
    logout,
    sendEmail,

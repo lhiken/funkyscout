@@ -6,10 +6,11 @@ import InvitationCard from "../../../../components/app/user-settings/invitation-
 import throwNotification from "../../../../components/app/toast/toast";
 import { navigate } from "wouter/use-browser-location";
 import { AnimatePresence, motion } from "motion/react";
+import { toggleTheme } from "../../../../utils/theme";
+import performReinstallPWA from "../../../../utils/logic/reinstall";
 
 export default function MobileTopbar({ text }: { text: string }) {
    const [showUserSettings, setShowUserSettings] = useState(false);
-   const [showAppSettings, setShowAppSettings] = useState(false);
 
    return (
       <div className={styles.container}>
@@ -25,22 +26,18 @@ export default function MobileTopbar({ text }: { text: string }) {
                className={styles.settingsIcon}
                onClick={() => setShowUserSettings(true)}
             >
-               <i className="fa-solid fa-user-large" />
+               <i className="fa-solid fa-gear" />
             </div>
             <div
                className={styles.settingsIcon}
-               onClick={() => setShowAppSettings(true)}
+               onClick={toggleTheme}
             >
-               <i className="fa-solid fa-gear" />
+               <i className="fa-solid fa-moon" />
             </div>
          </div>
          <AnimatePresence>
             {showUserSettings &&
                <UserSettingsM stopShowing={() => setShowUserSettings(false)} />}
-         </AnimatePresence>
-         <AnimatePresence>
-            {showAppSettings &&
-               <AppSettingsM stopShowing={() => setShowAppSettings(false)} />}
          </AnimatePresence>
       </div>
    );
@@ -96,7 +93,12 @@ function UserSettingsM({
             <div
                style={{ display: "flex", gap: "1rem", flexDirection: "column" }}
             >
-               <div className={styles.signoutButton} onClick={handleLogout}>
+               <div
+                  className={styles.signoutButton}
+                  onClick={() => {
+                     navigate("/events/new");
+                  }}
+               >
                   Change Events<i
                      style={{ color: "var(--text-secondary)" }}
                      className="fa-solid fa-calendar"
@@ -108,42 +110,22 @@ function UserSettingsM({
                      className="fa-solid fa-right-from-bracket"
                   />
                </div>
-            </div>
-         </div>
-      </motion.div>
-   );
-}
-
-function AppSettingsM({
-   stopShowing,
-}: { stopShowing: () => void }) {
-   return (
-      <motion.div
-         initial={{ opacity: 0, y: 10 }}
-         animate={{ opacity: 1, y: 0 }}
-         exit={{ opacity: 0, y: -10 }}
-         transition={{ duration: 0.2 }}
-         className={styles.settingContainer}
-      >
-         <div className={styles.settingHeaderBox}>
-            <div className={styles.settingHeader}>
-               User Settings
                <div
-                  style={{ fontSize: "1.25rem", lineHeight: "1rem" }}
-                  onClick={stopShowing}
+                  className={styles.signoutButton}
+                  style={{
+                     color: "var(--text-primary)",
+                     borderColor: "var(--red-alliance)",
+                  }}
+                  onClick={() => {
+                     performReinstallPWA();
+                     handleLogout();
+                  }}
                >
-                  <i className="fa-solid fa-xmark" />
+                  Reinstall App<i
+                     style={{ color: "var(--text-secondary)" }}
+                     className="fa-solid fa-trash"
+                  />
                </div>
-            </div>
-            {getLocalUserData().email}
-         </div>
-         <div className={styles.seperator} />
-         <div className={styles.settingsContent}>
-            <div
-               style={{ display: "flex", gap: "1rem", flexDirection: "column" }}
-            >
-               <UsernameChangeCard />
-               <InvitationCard />
             </div>
          </div>
       </motion.div>

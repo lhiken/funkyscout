@@ -15,6 +15,10 @@ import ScoutingInmatch from "../scouting/inmatch";
 import ScoutingInpit from "../scouting/inpit";
 import MobileDataViewer from "./data-viewer/data-viewer";
 import MobileScheduleViewer from "./schedule/schedule";
+import {
+   uploadAllOfflineMatches,
+   uploadOfflinePitEntries,
+} from "../../lib/supabase/data";
 
 function MobileApp() {
    const [renderNavbar, setRenderNavbar] = useState(false);
@@ -39,6 +43,11 @@ function MobileApp() {
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, []);
+
+   useEffect(() => {
+      uploadOfflinePitEntries();
+      uploadAllOfflineMatches();
+   }, [location]);
 
    useEffect(() => {
       if (locationArray.includes(location)) {

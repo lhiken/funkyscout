@@ -13,6 +13,7 @@ import {
    timeFromNow,
 } from "../../../utils/logic/app";
 import Checkbox from "../../../components/app/buttons/checkbox";
+import { motion } from "motion/react";
 
 export default function MobileScheduleViewer() {
    const [schedule, setSchedule] = useState<Tables<"event_schedule">[]>();
@@ -40,7 +41,12 @@ export default function MobileScheduleViewer() {
    let lastTime = 0;
 
    return (
-      <div className={styles.container}>
+      <motion.div
+         className={styles.container}
+         initial={{ opacity: 0, y: 10 }}
+         animate={{ opacity: 1, y: 0 }}
+         transition={{ type: "spring", duration: 0.5 }}
+      >
          <div className={styles.setting}>
             Show past matches{" "}
             <Checkbox enabled={showAll} setEnabled={setShowAll} />
@@ -83,7 +89,7 @@ export default function MobileScheduleViewer() {
                   </div>
                )}
          </div>
-      </div>
+      </motion.div>
    );
 }
 

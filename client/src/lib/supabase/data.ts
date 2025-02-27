@@ -204,11 +204,33 @@ async function uploadMatch(matchData: Tables<"event_match_data">) {
             matchData.team,
          ]);
          upsertData(getServerMatchesStoreName(), matchData);
+         uploadAllOfflineMatches();
 
          return true;
       }
    } catch (error) {
       handleError(error);
+      return false;
+   }
+}
+
+async function uploadAllOfflineMatches() {
+   const offlineMatches = await getAllData<Tables<"event_match_data">>(
+      getScoutedMatchesStoreName(),
+   );
+
+   try {
+      const { error } = await supabase
+         .from("event_match_data")
+         .upsert(offlineMatches);
+
+      if (error) {
+         throw new Error(error.message);
+      }
+
+      return true;
+   } catch (err) {
+      handleError(err);
       return false;
    }
 }
@@ -390,6 +412,7 @@ export {
    fetchTeamsByEvent,
    updatePicklist,
    uploadAllImagesToSupabase,
+   uploadAllOfflineMatches,
    uploadMatch,
    uploadOfflinePitEntries,
    uploadPitEntry,
