@@ -117,7 +117,7 @@ function UserSettingsM({
                      borderColor: "var(--red-alliance)",
                   }}
                   onClick={() => {
-                     if (navigator.onLine) navigate("/setup");
+                     if (navigator.onLine) navigate("/m/setup");
                      else {throwNotification(
                            "error",
                            "You can only reset when there is internet",

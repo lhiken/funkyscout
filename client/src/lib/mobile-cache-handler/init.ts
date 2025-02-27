@@ -14,7 +14,8 @@ import {
 
 export const DB_VERSION = 4;
 
-export const idbName = () => `cacheDB_${getLocalUserData()?.uid || "NOUSER"}`;
+export const idbName = () =>
+   `cacheDB_${getLocalUserData()?.uid || "NOUSER"}_${getEvent()}`;
 export const getScheduleStoreName = () =>
    `localSchedule_${getEvent() || "NOEVENT"}`;
 export const getScoutedMatchesStoreName = () =>

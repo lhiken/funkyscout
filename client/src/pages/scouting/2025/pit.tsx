@@ -62,6 +62,8 @@ export default function Inpit2025() {
 
          uploadRobotImage(robotImage, teamKey);
          uploadPitEntry(teamKey, newPitData);
+
+         navigate("~/m/scout");
       }
    }
 
