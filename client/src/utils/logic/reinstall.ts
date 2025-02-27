@@ -11,6 +11,7 @@ export default function performReinstallPWA() {
                   );
                }).then(() => {
                   window.location.reload();
+                  setTimeout("1000");
                });
             });
          }
