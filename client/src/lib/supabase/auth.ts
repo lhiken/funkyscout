@@ -263,6 +263,9 @@ async function loginWithGoogle() {
    try {
       const { data, error } = await supabase.auth.signInWithOAuth({
          provider: "google",
+         options: {
+            redirectTo: `https://funkyscout.vercel.app/events`,
+         },
       });
 
       if (error) {
