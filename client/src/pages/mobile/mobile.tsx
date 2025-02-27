@@ -9,7 +9,13 @@ import styles from "./mobile.module.css";
 import MobileStartPitScouting from "./scouting/prep-pages/pit-scouting";
 import MobileStartMatchScouting from "./scouting/prep-pages/match-scouting";
 import { fetchSession, logout } from "../../lib/supabase/auth";
-import { checkDatabaseInitialization } from "../../lib/mobile-cache-handler/init";
+import {
+   checkDatabaseInitialization,
+   getAllData,
+   getData,
+   getScheduleStoreName,
+   getTeamDetailsStoreName,
+} from "../../lib/mobile-cache-handler/init";
 import MobileSetupPage from "./components/setup/setup";
 import ScoutingInmatch from "../scouting/inmatch";
 import ScoutingInpit from "../scouting/inpit";
@@ -34,17 +40,23 @@ function MobileApp() {
                navigate("~/auth");
             }
          });
+      }
 
-         if (location == "/") {
-            checkDatabaseInitialization().then((res) => {
-               if (!res) {
-                  navigate("/setup");
-               }
-            });
-         }
+      if (location == "/") {
+         checkDatabaseInitialization().then((res) => {
+            if (!res) {
+               navigate("/setup");
+            } else if (res) {
+               getAllData(getTeamDetailsStoreName()).then((res) => {
+                  if (res.length == 0) {
+                     navigate("/setup");
+                  }
+               });
+            }
+         });
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, []);
+   }, [location]);
 
    useEffect(() => {
       uploadOfflinePitEntries();

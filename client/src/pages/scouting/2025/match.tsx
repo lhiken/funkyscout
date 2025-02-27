@@ -526,6 +526,11 @@ function FieldMap() {
 
          const svgPoint = point.matrixTransform(svg.getScreenCTM()!.inverse());
 
+         throwNotification(
+            "info",
+            `x: ${point.x.toString()}, y: ${point.y.toString()}`,
+         );
+
          if (matchContext.gameState === "auto") {
             matchContext.addAutoAction({
                timestamp: Date.now(),
@@ -627,6 +632,11 @@ function FieldMap() {
       ...matchContext?.autoActions || [],
       ...matchContext?.teleopActions || [],
    ];
+
+   useEffect(() => {
+      throwNotification("error", allActions.length.toString());
+   }, [allActions.length]);
+
    const pathData = computeHermitePath(allActions);
 
    // Compute gradient endpoints based on the first and last point.
