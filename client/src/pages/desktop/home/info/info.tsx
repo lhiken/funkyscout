@@ -10,7 +10,7 @@ import { getNexusEventStatus } from "../../../../lib/nexus/events";
 import { GlobalTeamDataContext } from "../../../../app-global-ctx";
 
 function InfoTab() {
-   const teamData = useContext(GlobalTeamDataContext).EPAdata;
+   const teamData = useContext(GlobalTeamDataContext)?.EPAdata || {};
 
    const [teamStatusResult, eventStatusResult] = useQueries({
       queries: [
@@ -19,7 +19,7 @@ function InfoTab() {
             queryFn: () =>
                fetchTeamEventStatus(
                   getEvent() || "",
-                  "frc" + getFocusTeam() || "",
+                  "frc" + (getFocusTeam() || ""),
                ),
             refetchInterval: 120 * 1000,
             refetchOnWindowFocus: false,
@@ -33,14 +33,13 @@ function InfoTab() {
       ],
    });
 
-   const teamStatus = teamStatusResult.data;
-   const eventStatus = eventStatusResult.data;
-   const eventIsPending = eventStatusResult.isPending;
-   const eventError = eventStatusResult.error;
+   const teamStatus = teamStatusResult?.data || null;
+   const eventStatus = eventStatusResult?.data || null;
+   const eventIsPending = eventStatusResult?.isPending || false;
+   const eventError = eventStatusResult?.error || null;
 
    function formatTime(time: number) {
-      const diffInMs = Date.now() - time; // Get the difference in milliseconds
-
+      const diffInMs = Date.now() - time;
       const seconds = Math.floor(diffInMs / 1000);
       const minutes = Math.floor(seconds / 60);
       const hours = Math.floor(minutes / 60);
@@ -73,26 +72,18 @@ function InfoTab() {
                   contents={[
                      {
                         title: "Rank",
-                        content: teamStatus &&
-                              teamStatus?.rank
-                                 ?.toString() || "N/A",
+                        content: teamStatus?.rank?.toString() || "N/A",
                      },
                      {
                         title: "EPA",
-                        content: teamData
-                           ? teamData["frc" + getFocusTeam()]
-                              ? teamData["frc" + getFocusTeam()].epa
-                                 .total_points
-                                 .mean.toFixed(1)
-                              : "N/A"
-                           : "N/A",
+                        content: teamData?.["frc" + getFocusTeam()]?.epa
+                           ?.total_points?.mean?.toFixed(1) || "N/A",
                      },
                      {
                         title: "RP",
-                        content: teamStatus &&
-                              (teamStatus.orders[0] * 10)
-                                 .toFixed(0) ||
-                           "N/A",
+                        content: teamStatus?.orders?.[0] != null
+                           ? (teamStatus.orders[0] * 10).toFixed(0)
+                           : "N/A",
                      },
                   ]}
                   icon={<i className="fa-solid fa-gauge-high" />}
@@ -102,21 +93,16 @@ function InfoTab() {
                   contents={[
                      {
                         title: "Wins",
-                        content: teamStatus
-                           ? teamStatus.record.wins.toString()
-                           : "N/A",
+                        content: teamStatus?.record?.wins?.toString() || "N/A",
                      },
                      {
                         title: "Ties",
-                        content: teamStatus
-                           ? teamStatus.record.ties.toString()
-                           : "N/A",
+                        content: teamStatus?.record?.ties?.toString() || "N/A",
                      },
                      {
                         title: "Loss",
-                        content: teamStatus
-                           ? teamStatus.record.losses.toString()
-                           : "N/A",
+                        content: teamStatus?.record?.losses?.toString() ||
+                           "N/A",
                      },
                   ]}
                   icon={<i className="fa-solid fa-scroll" />}
@@ -129,45 +115,45 @@ function InfoTab() {
                      </div>
                   </div>
                   <div className={styles.announcementContainer}>
-                     {eventStatus &&
-                        eventStatus.announcements.length > 0 &&
-                        eventStatus.announcements.sort((a, b) =>
-                           b.postedTime - a.postedTime
-                        ).map((announcement, index) => (
-                           <div
-                              key={index}
-                              className={styles.announcement}
-                           >
-                              <div
-                                 className={styles.announcementTime}
-                                 style={{
-                                    color: "var(--text-secondary)",
-                                 }}
-                              >
-                                 {formatTime(
-                                    announcement.postedTime,
-                                 )}
-                              </div>
-                              {announcement.announcement}
+                     {eventStatus?.announcements?.length || 0 > 0
+                        ? (
+                           eventStatus?.announcements
+                              .sort((a, b) => b.postedTime - a.postedTime)
+                              .map((announcement, index) => (
+                                 <div
+                                    key={index}
+                                    className={styles.announcement}
+                                 >
+                                    <div
+                                       className={styles.announcementTime}
+                                       style={{
+                                          color: "var(--text-secondary)",
+                                       }}
+                                    >
+                                       {formatTime(announcement.postedTime)}
+                                    </div>
+                                    {announcement.announcement}
+                                 </div>
+                              ))
+                        )
+                        : eventIsPending
+                        ? (
+                           <div className={styles.announcementsInfoBox}>
+                              Loading announcements...
                            </div>
-                        ))}
-                     {eventIsPending && (
-                        <div className={styles.announcementsInfoBox}>
-                           Loading announcements...
-                        </div>
-                     )}
-                     {((!eventStatus && !eventIsPending) ||
-                        eventError) && (
-                        <div className={styles.announcementsInfoBox}>
-                           Couldn't load announcements
-                        </div>
-                     )}
-                     {!eventIsPending && !eventError && eventStatus &&
-                        eventStatus.announcements.length == 0 && (
-                        <div className={styles.announcementsInfoBox}>
-                           There are no announcements!
-                        </div>
-                     )}
+                        )
+                        : eventError || eventStatus === null ||
+                              eventStatus === undefined
+                        ? (
+                           <div className={styles.announcementsInfoBox}>
+                              Couldn't load announcements
+                           </div>
+                        )
+                        : (
+                           <div className={styles.announcementsInfoBox}>
+                              There are no announcements!
+                           </div>
+                        )}
                   </div>
                </div>
             </div>

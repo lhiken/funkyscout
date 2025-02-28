@@ -12,6 +12,8 @@ function InfoCard({
    }[];
    icon: JSX.Element;
 }) {
+   console.log(contents);
+
    return (
       <div
          className={`${styles.teamCard} ${
@@ -27,10 +29,10 @@ function InfoCard({
          <div className={styles.cardContent}>
             <div className={styles.cardValue}>
                <div style={{ color: "var(--text-secondary)" }}>
-                  {contents[0].title}
+                  {contents[0]?.title || ""}
                </div>
                <div style={{ fontSize: "1.2rem" }}>
-                  {contents[0].content}
+                  {contents[0]?.content || ""}
                </div>
             </div>
             <div
@@ -41,10 +43,10 @@ function InfoCard({
                      color: "var(--text-secondary)",
                   }}
                >
-                  {contents[1].title}
+                  {contents[1]?.title || ""}
                </div>
                <div style={{ fontSize: "1.2rem" }}>
-                  {contents[1].content}
+                  {contents[1]?.content || ""}
                </div>
             </div>
             <div
@@ -52,10 +54,10 @@ function InfoCard({
                style={{ width: "unset" }}
             >
                <div style={{ color: "var(--text-secondary)" }}>
-                  {contents[2].title}
+                  {contents[2]?.title || ""}
                </div>
                <div style={{ fontSize: "1.2rem" }}>
-                  {contents[2].content}
+                  {contents[2]?.content || ""}
                </div>
             </div>
          </div>

@@ -29,7 +29,7 @@ function RankingCard({
             <div className={styles.cardHeader}>
                <div className={styles.cardLeft}>
                   <div className={styles.cardRank}>
-                     #{team.rank.toString().padStart(2, "0")}
+                     #{team.rank?.toString()?.padStart(2, "0") || 0}
                   </div>
                   <div style={{ color: "var(--text-background)" }}>
                      |
