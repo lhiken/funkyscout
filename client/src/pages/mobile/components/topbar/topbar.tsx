@@ -18,7 +18,10 @@ export default function MobileTopbar({ text }: { text: string }) {
             {text}
          </div>
          <div className={styles.controlButtons}>
-            <div className={styles.permissionBreadcrumb}>
+            <div
+               className={styles.permissionBreadcrumb}
+               onClick={() => setShowUserSettings(true)}
+            >
                {getLocalUserData().role[0].toUpperCase() +
                   getLocalUserData().role.substring(1)}
             </div>
@@ -126,7 +129,7 @@ function UserSettingsM({
                >
                   Update cache<i
                      style={{ color: "var(--text-secondary)" }}
-                     className="fa-solid fa-trash"
+                     className="fa-solid fa-arrows-rotate"
                   />
                </div>
                <div

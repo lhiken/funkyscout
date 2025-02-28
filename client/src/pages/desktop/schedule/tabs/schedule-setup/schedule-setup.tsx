@@ -38,7 +38,7 @@ function SetupPanel() {
             scheduleData.val?.matchData || {},
             assignmentData.val?.priorityTeams || [],
             assignmentData.val?.lowPriorityTeams || [],
-            assignmentData.val?.scouterList || [],
+            assignmentData.val?.scouterList.reverse() || [],
             Number(maxConsecShifts),
             Number(breakLength),
             getEvent() || "",
@@ -63,7 +63,7 @@ function SetupPanel() {
       if (assignmentData.setVal) {
          const teamKeys = Object.keys(globalData.EPAdata) ||
             [];
-         const scouterList = assignmentData.val?.scouterList || [];
+         const scouterList = assignmentData.val?.scouterList.reverse() || [];
          const event = getEvent() || "";
 
          const updatedTeamData = assignUsersToTeams(
