@@ -87,3 +87,46 @@
 .capabilityHeader {
    color: var(--primary);
 }
+
+.bigImageContainer {
+   border-radius: 1rem;
+   top: 0rem;
+   left: 0rem;
+   height: calc(100vh);
+   width: calc(100vw);
+   padding: 2rem;
+   position: absolute;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   background-color: rgba(0, 0, 0, 0.5);
+}
+
+.bigImage {
+   width: 100%;
+   object-fit: contain;
+   border-radius: 1rem;
+}
+
+.perfContainer {
+   display: flex;
+   flex-direction: row;
+   justify-content: space-between;
+   gap: 0.75rem;
+   margin-top: 1rem;
+}
+
+.perfCard {
+   color: var(--text-primary);
+   width: 100%;
+   aspect-ratio: 1;
+   padding: 0.75rem;
+   justify-content: center;
+   align-items: center;
+   background-color: var(--text-background);
+   border-radius: 0.5rem;
+   font-size: 0.9rem;
+   display: flex;
+   flex-direction: column;
+   gap: 0.5rem;
+}

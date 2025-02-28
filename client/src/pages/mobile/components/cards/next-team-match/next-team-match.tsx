@@ -11,6 +11,7 @@ import {
    timeFromNow,
 } from "../../../../../utils/logic/app";
 import { GlobalTeamDataContext } from "../../../../../app-global-ctx";
+import { navigate } from "wouter/use-browser-location";
 
 export function MobileNextTeamMatchCard() {
    const [nextMatch, setNextMatch] = useState<NexusMatch>();
@@ -142,6 +143,7 @@ function TeamButton({ teamNumber }: { teamNumber: string | undefined }) {
                ? "var(--primary)"
                : "var(--text-primary)",
          }}
+         onClick={() => navigate(`/m/data/team/frc${teamNumber}`)}
       >
          {teamNumber}
       </div>

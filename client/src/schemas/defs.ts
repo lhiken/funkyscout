@@ -128,7 +128,10 @@ export type PointValuesType = {
  */
 export type RequiredFunctions = {
    getMatchTotalPoints: (matchKey: string) => number;
-   getMatchTeamPoints: (matchKey: string, teamKey: string) => number;
+   getMatchTeamPoints: (matchKey: string, teamKey: string) => {
+      tele: number;
+      auto: number;
+   };
 };
 
 export class DataParser<T extends keyof (MatchMetrics | TeamMetrics)> {

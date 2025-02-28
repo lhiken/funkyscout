@@ -27,7 +27,10 @@ export class DataParser2024 extends DataParser<2024>
 
    getMatchTeamPoints(matchKey: string, teamKey: string) {
       console.log(matchKey + teamKey);
-      return 0;
+      return {
+         auto: 0,
+         tele: 0,
+      };
    }
 }
 
@@ -42,11 +45,57 @@ export class DataParser2025 extends DataParser<2025>
    }
 
    getMatchTeamPoints(matchKey: string, teamKey: string) {
-      console.log(matchKey + teamKey);
+      const fullData = this.getParserCombinedData();
+      const teamData = fullData.find((val) =>
+         val.matchKey == matchKey && val.teamKey == teamKey
+      );
 
-      /* TODO */
+      const autoL1 =
+         teamData?.autoActions.filter((val) => val.action == "scoreL1")
+            .length || 0;
+      const autoL2 =
+         teamData?.autoActions.filter((val) => val.action == "scoreL2")
+            .length || 0;
+      const autoL3 =
+         teamData?.autoActions.filter((val) => val.action == "scoreL3")
+            .length || 0;
+      const autoL4 =
+         teamData?.autoActions.filter((val) => val.action == "scoreL4")
+            .length || 0;
+      const autoNet =
+         teamData?.autoActions.filter((val) => val.action == "scoreNet")
+            .length || 0;
+      const autoProc =
+         teamData?.autoActions.filter((val) => val.action == "scoreProcessor")
+            .length || 0;
 
-      return 0;
+      const teleL1 =
+         teamData?.teleActions.filter((val) => val.action == "scoreL1")
+            .length || 0;
+      const teleL2 =
+         teamData?.teleActions.filter((val) => val.action == "scoreL2")
+            .length || 0;
+      const teleL3 =
+         teamData?.teleActions.filter((val) => val.action == "scoreL3")
+            .length || 0;
+      const teleL4 =
+         teamData?.teleActions.filter((val) => val.action == "scoreL4")
+            .length || 0;
+      const teleNet =
+         teamData?.teleActions.filter((val) => val.action == "scoreNet")
+            .length || 0;
+      const teleProc =
+         teamData?.teleActions.filter((val) => val.action == "scoreProcessor")
+            .length || 0;
+
+      return {
+         tele: teleL1 * 2 + teleL2 * 3 + teleL3 * 4 + teleL4 * 5 +
+            teleProc * 2 + teleNet * 4 +
+            (teamData?.metrics.climbShallow ? 6 : 0) +
+            (teamData?.metrics.climbDeep ? 12 : 0),
+         auto: autoL1 * 3 + autoL2 * 4 + autoL3 * 6 + autoL4 * 7 + autoNet * 4 +
+            autoProc * 2,
+      };
    }
 
    /* Might delete later?
