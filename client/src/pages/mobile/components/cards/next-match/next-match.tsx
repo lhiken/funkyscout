@@ -41,7 +41,7 @@ export function MobileNextMatchCard() {
    }, []);
 
    const nextMatchDateObject = nextMatch?.time
-      ? new Date(nextMatch?.time * 1000)
+      ? new Date(nextMatch?.time)
       : new Date();
 
    return (

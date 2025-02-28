@@ -490,7 +490,6 @@ function HelperSidebar() {
             </svg>
          </div>
          <div className={styles.helperSidebarControls}>
-            <i className="fa-solid fa-gear" />
             <i
                className="fa-solid fa-rotate-left"
                onClick={matchCtx?.gameState != "unstarted"
@@ -634,10 +633,6 @@ function FieldMap() {
       ...matchContext?.autoActions || [],
       ...matchContext?.teleopActions || [],
    ];
-
-   useEffect(() => {
-      throwNotification("error", allActions.length.toString());
-   }, [allActions.length]);
 
    const pathData = computeHermitePath(allActions);
 

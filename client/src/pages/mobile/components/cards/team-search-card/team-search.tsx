@@ -5,6 +5,7 @@ import styles from "./team-search.module.css";
 import { GlobalTeamDataContext } from "../../../../../app-global-ctx";
 import { getEvent, parseTeamKey } from "../../../../../utils/logic/app";
 import { fetchTBAEventTeams, TeamRank } from "../../../../../lib/tba/events";
+import { useLocation } from "wouter";
 
 export default function MobileTeamSearchCard() {
    const [teams, setTeams] = useState<TeamRank[]>(
@@ -58,8 +59,14 @@ function TeamCard({ team }: { team: TeamRank }) {
    const data = useContext(GlobalTeamDataContext);
    const teamTBAData = data.TBAdata.find((val) => val.key == team.key);
 
+   const [, navigate] = useLocation();
+
+   function handleTeamClick() {
+      navigate(`/data/team/${team.key}`);
+   }
+
    return (
-      <div className={styles.teamCard}>
+      <div className={styles.teamCard} onClick={handleTeamClick}>
          <div className={styles.teamCardHeader}>
             <div
                style={{

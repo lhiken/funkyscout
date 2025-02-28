@@ -400,6 +400,66 @@ function base64ToBlob(base64: string): Blob {
    return new Blob([byteArray]);
 }
 
+async function fetchSpecificTeamDataByEvent(teamKey: string, event: string) {
+   try {
+      const { data: event_team_data, error } = await supabase
+         .from("event_team_data")
+         .select("*")
+         .eq("event", event)
+         .eq("team", teamKey);
+
+      if (error) {
+         throw new Error(error.message);
+      }
+
+      return event_team_data[0];
+   } catch (error) {
+      handleError(error);
+   }
+}
+
+async function fetchTeamImage(teamKey: string, eventKey: string) {
+   try {
+      const imageList = await fetchTeamImageList(teamKey, eventKey);
+
+      if (imageList && imageList?.length || 0 > 0) {
+         const { data } = await supabase
+            .storage
+            .from("team-images")
+            .getPublicUrl(
+               `/team-${teamKey}/${eventKey}/${
+                  imageList && imageList[0] ? imageList[0]?.name : ""
+               }`,
+            );
+
+         return data;
+      } else {
+         throw new Error();
+      }
+   } catch (error) {
+      handleError(error);
+   }
+}
+
+async function fetchTeamImageList(teamKey: string, eventKey: string) {
+   console.log(`team-${teamKey}/${eventKey}`);
+   try {
+      const { data, error } = await supabase
+         .storage
+         .from("team-images")
+         .list(`team-${teamKey}/${eventKey}`);
+
+      if (error) {
+         throw new Error(error.message);
+      }
+
+      console.log(data);
+      return data;
+   } catch (error) {
+      handleError(error);
+   }
+}
+
 export {
    deletePicklist,
    fetchEventByKey,
@@ -407,8 +467,10 @@ export {
    fetchMatchAssignments,
    fetchMatchDataByEvent,
    fetchPicklists,
+   fetchSpecificTeamDataByEvent,
    fetchTeamAssignments,
    fetchTeamDataByEvent,
+   fetchTeamImage,
    fetchTeamsByEvent,
    updatePicklist,
    uploadAllImagesToSupabase,

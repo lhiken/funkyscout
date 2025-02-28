@@ -21,6 +21,7 @@ import {
    uploadAllOfflineMatches,
    uploadOfflinePitEntries,
 } from "../../lib/supabase/data";
+import TeamDataViewer from "./data-viewer/pages/team/team";
 
 function MobileApp() {
    const [renderNavbar, setRenderNavbar] = useState(false);
@@ -89,6 +90,7 @@ function MobileApp() {
                   component={MobileStartMatchScouting}
                />
                <Route path="/data" component={MobileDataViewer} />
+               <Route path="/data/team/:team" component={TeamDataViewer} />
                <Route path="/schedule" component={MobileScheduleViewer} />
                <Route path="/inmatch/" component={ScoutingInmatch} nest />
                <Route path="/inpit/" component={ScoutingInpit} nest />
