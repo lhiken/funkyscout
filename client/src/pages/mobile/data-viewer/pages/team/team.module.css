@@ -40,7 +40,7 @@
    display: flex;
    justify-content: center;
    align-items: center;
-   height: 100%;
+   height: 4rem;
    border-radius: 1rem;
    border: 2px solid var(--text-background);
 }
@@ -129,4 +129,35 @@
    display: flex;
    flex-direction: column;
    gap: 0.5rem;
+}
+
+.reviews {
+   display: flex;
+   flex-direction: row;
+   overflow-x: scroll;
+   gap: 1rem;
+   flex-shrink: 0;
+   height: 10rem;
+}
+
+.reviews::-webkit-scrollbar {
+   display: none;
+}
+
+.reviewCard {
+   background-color: var(--surface);
+   max-width: 16rem;
+   flex-shrink: 0;
+   padding: 1.25rem 1.5rem;
+   overflow: hidden;
+   border-radius: 1rem;
+   display: flex;
+   flex-direction: column;
+   gap: 0.5rem;
+   line-height: 1.4rem;
+   overflow-y: scroll;
+}
+
+.reviewCardHeader {
+   color: var(--primary);
 }

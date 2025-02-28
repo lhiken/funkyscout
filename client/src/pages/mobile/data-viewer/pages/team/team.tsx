@@ -10,11 +10,10 @@ import { GlobalTeamDataContext } from "../../../../../app-global-ctx";
 import {
    fetchMatchDataByEvent,
    fetchSpecificTeamDataByEvent,
-   fetchTeamDataByEvent,
    fetchTeamImage,
 } from "../../../../../lib/supabase/data";
 import { Tables } from "../../../../../lib/supabase/database.types";
-import { PitData2025 } from "../../../../../schemas/defs";
+import { CombinedMatchMetrics, PitData2025 } from "../../../../../schemas/defs";
 import { DataParser2025 } from "../../../../../schemas/parser";
 
 const TeamDataContext = createContext<Tables<"event_team_data"> | undefined>(
@@ -80,7 +79,7 @@ function TeamDataCard() {
       fetchMatchDataByEvent(getEvent() || "").then((res) => {
          if (res) {
             setParser(new DataParser2025(res, teamKey));
-            setTeamMatches(res);
+            setTeamMatches(res.filter((val) => val.team == teamKey));
          }
       });
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -149,7 +148,7 @@ function TeamDataCard() {
                      </div>
                      <div className={styles.capabilities}>
                         <div className={styles.capabilityHeader}>
-                           Stats
+                           Scouted {teamMatches?.length || 0}/10
                         </div>
                         <div className={styles.capEntry}>
                            Rank #{tbaTeam?.rank}
@@ -204,31 +203,7 @@ function TeamDataCard() {
                         )}
                      </div>
                   </div>
-                  <div className={styles.teamReview}>
-                     <div className={styles.reviewHeader}>
-                        Overall Performance
-                        <div className={styles.perfContainer}>
-                           <div className={styles.perfCard}>
-                              Total Avg.
-                              <div style={{ fontSize: "1.5rem" }}>
-                                 {(autoAvg + teleAvg).toFixed(1)}
-                              </div>
-                           </div>
-                           <div className={styles.perfCard}>
-                              Tele Avg.
-                              <div style={{ fontSize: "1.5rem" }}>
-                                 {teleAvg.toFixed(1)}
-                              </div>
-                           </div>
-                           <div className={styles.perfCard}>
-                              Auto Avg.
-                              <div style={{ fontSize: "1.5rem" }}>
-                                 {autoAvg.toFixed(1)}
-                              </div>
-                           </div>
-                        </div>
-                     </div>
-                  </div>
+
                   <div className={styles.teamReview}>
                      <div className={styles.reviewHeader}>
                         {teamRawData?.name}'s Review
@@ -237,7 +212,44 @@ function TeamDataCard() {
                   </div>
                </>
             )
-            : <div className={styles.loadBox}>No data found</div>}
+            : <div className={styles.loadBox}>No pit data found</div>}
+         <div className={styles.teamReview}>
+            <div className={styles.reviewHeader}>
+               Overall Performance
+               <div className={styles.perfContainer}>
+                  <div className={styles.perfCard}>
+                     Total Avg.
+                     <div style={{ fontSize: "1.5rem" }}>
+                        {(autoAvg + teleAvg).toFixed(1)}
+                     </div>
+                  </div>
+                  <div className={styles.perfCard}>
+                     Tele Avg.
+                     <div style={{ fontSize: "1.5rem" }}>
+                        {teleAvg.toFixed(1)}
+                     </div>
+                  </div>
+                  <div className={styles.perfCard}>
+                     Auto Avg.
+                     <div style={{ fontSize: "1.5rem" }}>
+                        {autoAvg.toFixed(1)}
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div className={styles.reviews}>
+            {teamMatches?.map((val, index) => {
+               return (
+                  <div key={index} className={styles.reviewCard}>
+                     <div className={styles.reviewCardHeader}>
+                        {parseMatchKey(val.match, "short")} | {val.name}
+                     </div>
+                     {(val.data as CombinedMatchMetrics<2025>).comment}
+                  </div>
+               );
+            })}
+         </div>
       </>
    );
 }
