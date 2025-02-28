@@ -5,6 +5,7 @@ import {
    getMatchDetailsStoreName,
    getScheduleStoreName,
    getScoutedMatchesStoreName,
+   getServerMatchesStoreName,
 } from "../mobile-cache-handler/init";
 import { getLocalUserData } from "../supabase/auth";
 import { Tables } from "../supabase/database.types";
@@ -54,9 +55,14 @@ export async function getNextAssignedMatch() {
       (await getAllData<Tables<"event_schedule">>(getScheduleStoreName()))
          .filter((val) => val.uid === userId);
    const tbaData = getLocalTBAData() ?? {};
-   const scoutedMatches = await getAllData<Tables<"event_match_data">>(
-      getScoutedMatchesStoreName(),
-   );
+   const scoutedMatches = [
+      ...await getAllData<Tables<"event_match_data">>(
+         getScoutedMatchesStoreName(),
+      ),
+      ...(await getAllData<Tables<"event_match_data">>(
+         getServerMatchesStoreName(),
+      )).filter((val) => val.data != null && val.uid == getLocalUserData().uid),
+   ];
 
    if (assignedMatches.length === 0) {
       return null;
@@ -103,9 +109,14 @@ export async function getNextNearAssignedMatches() {
       (await getAllData<Tables<"event_schedule">>(getScheduleStoreName()))
          .filter((val) => val.uid === userId);
    const tbaData = getLocalTBAData();
-   const scoutedMatches = await getAllData<Tables<"event_match_data">>(
-      getScoutedMatchesStoreName(),
-   );
+   const scoutedMatches = [
+      ...await getAllData<Tables<"event_match_data">>(
+         getScoutedMatchesStoreName(),
+      ),
+      ...(await getAllData<Tables<"event_match_data">>(
+         getServerMatchesStoreName(),
+      )).filter((val) => val.data != null && val.uid == getLocalUserData().uid),
+   ];
 
    if (assignedMatches.length === 0) return [];
 
