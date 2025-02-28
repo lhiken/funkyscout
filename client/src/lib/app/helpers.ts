@@ -17,96 +17,80 @@ export async function getNextMatch() {
    const scoutedMatches = await getAllData<Tables<"event_match_data">>(
       getScoutedMatchesStoreName(),
    );
-   const lastScoutedMatch = scoutedMatches.length &&
-      scoutedMatches.reduce((latest, current) => {
-         const latestDate = new Date(latest.timestamp);
-         const currentDate = new Date(current.timestamp);
-         return currentDate > latestDate ? current : latest;
-      });
+
+   // Get the last scouted match timestamp if any
+   const lastScoutedMatch = scoutedMatches.length
+      ? scoutedMatches.reduce((latest, current) =>
+         new Date(current.timestamp).getTime() >
+               new Date(latest.timestamp).getTime()
+            ? current
+            : latest
+      )
+      : null;
+   const lastScoutedTimestamp = lastScoutedMatch
+      ? new Date(lastScoutedMatch.timestamp).getTime()
+      : 0;
 
    const currentTime = Date.now();
-   let min = data[0].estTime - currentTime;
-   let minIndex = 0;
-   for (let i = 1; i < data.length; i++) {
-      if (
-         data[i].estTime < min &&
-         data[i].estTime >
-            (new Date(lastScoutedMatch != 0 ? lastScoutedMatch.timestamp : 0))
-               .getTime()
-      ) {
-         min = data[i].estTime - currentTime;
-         minIndex = i;
+   let minDiff = Infinity;
+   let nextMatch: EventScheduleEntry | null = null;
+
+   for (const match of data) {
+      // Only consider matches that are in the future and after the last scouted match
+      if (match.estTime > Math.max(currentTime, lastScoutedTimestamp)) {
+         const diff = match.estTime - currentTime;
+         if (diff < minDiff) {
+            minDiff = diff;
+            nextMatch = match;
+         }
       }
    }
-
-   return data[minIndex];
+   return nextMatch;
 }
 
 export async function getNextAssignedMatch() {
    const userId = getLocalUserData().uid;
    const assignedMatches =
       (await getAllData<Tables<"event_schedule">>(getScheduleStoreName()))
-         .filter((val) => val.uid == userId);
-   const tbaData = getLocalTBAData() ?? {}; // Default to empty object if null
+         .filter((val) => val.uid === userId);
+   const tbaData = getLocalTBAData() ?? {};
    const scoutedMatches = await getAllData<Tables<"event_match_data">>(
       getScoutedMatchesStoreName(),
    );
 
-   // Early return if no assigned matches
    if (assignedMatches.length === 0) {
       return null;
    }
 
-   // Get the latest scouted match time
    const lastScoutedTime = scoutedMatches.length > 0
       ? Math.max(
          ...scoutedMatches.map((match) => new Date(match.timestamp).getTime()),
       )
       : 0;
 
-   // Current time for comparisons
    const currentTime = Date.now();
-
-   // Find the next unassigned match
    let nextMatch = null;
    let smallestDiff = Infinity;
 
    for (const match of assignedMatches) {
-      // Safely access TBA data, handling potential nulls
       const matchData = tbaData[match.match];
       const matchTime = matchData?.est_time ?? null;
 
-      // Skip already scouted matches
-      const isScoutedMatch = scoutedMatches.some((m) =>
-         m.match === match.match
-      );
-      if (isScoutedMatch) continue;
+      // Skip if already scouted
+      if (scoutedMatches.some((m) => m.match === match.match)) continue;
 
-      // If we have valid TBA data with a timestamp, use time-based comparison
-      if (matchTime !== null && !isNaN(matchTime)) {
-         // Only consider matches after the last scouted match
-         if (matchTime > lastScoutedTime) {
-            const timeDiff = Math.abs(matchTime - currentTime);
-            if (timeDiff < smallestDiff) {
-               smallestDiff = timeDiff;
-               nextMatch = {
-                  data: match,
-                  time: matchTime,
-               };
-            }
+      if (
+         matchTime !== null && !isNaN(matchTime) &&
+         matchTime > Math.max(currentTime, lastScoutedTime)
+      ) {
+         const diff = matchTime - currentTime;
+         if (diff < smallestDiff) {
+            smallestDiff = diff;
+            nextMatch = { data: match, time: matchTime };
          }
-      } else {
-         // No valid TBA data - take the first unassigned match we find
-         if (nextMatch === null) {
-            throwNotification(
-               "info",
-               "No TBA data found",
-            );
-            nextMatch = {
-               data: match,
-               time: (new Date()).getTime(),
-            };
-         }
+      } else if (nextMatch === null) {
+         throwNotification("info", "No TBA data found");
+         nextMatch = { data: match, time: currentTime };
       }
    }
 
@@ -117,75 +101,60 @@ export async function getNextNearAssignedMatches() {
    const userId = getLocalUserData().uid;
    const assignedMatches =
       (await getAllData<Tables<"event_schedule">>(getScheduleStoreName()))
-         .filter((val) => val.uid == userId);
+         .filter((val) => val.uid === userId);
    const tbaData = getLocalTBAData();
    const scoutedMatches = await getAllData<Tables<"event_match_data">>(
       getScoutedMatchesStoreName(),
    );
 
-   // Early return if no assigned matches
    if (assignedMatches.length === 0) return [];
 
-   // Create a Set of scouted match IDs for O(1) lookup
    const scoutedMatchIds = new Set(scoutedMatches.map((m) => m.match));
-
-   // Get current timestamp once
    const currentTime = Date.now();
 
-   // Create a sorted array of matches with their metadata
    const matchesWithMetadata = assignedMatches
       .map((match) => {
-         // Extract match number from match key (e.g., "qm123" -> 123)
          const matchNumber = parseInt(match.match.replace(/\D/g, "")) || 0;
-
-         // Get TBA time if available, otherwise use match number for ordering
          const tbaTime = tbaData[match.match]?.est_time;
-
+         // Only use a valid, future tbaTime; otherwise, use Infinity.
+         const diff = tbaTime && tbaTime > currentTime
+            ? tbaTime - currentTime
+            : Infinity;
          return {
             match,
             matchNumber,
-            // If TBA time exists, use it for difference calculation
-            timeDiff: tbaTime ? Math.abs(tbaTime - currentTime) : Infinity,
+            timeDiff: diff,
             scouted: scoutedMatchIds.has(match.match),
          };
       })
-      // Sort primarily by TBA time difference if available, fall back to match number
       .sort((a, b) => {
-         // If neither has TBA time, sort by match number
          if (a.timeDiff === Infinity && b.timeDiff === Infinity) {
             return a.matchNumber - b.matchNumber;
          }
-         // If only one has TBA time, prioritize the one with TBA time
          if (a.timeDiff === Infinity) return 1;
          if (b.timeDiff === Infinity) return -1;
-         // If both have TBA time, sort by time difference
          return a.timeDiff - b.timeDiff;
       });
 
-   // Find first unscouted match
    const nextMatchIndex = matchesWithMetadata.findIndex((m) => !m.scouted);
-
-   // Handle case where no unscouted matches exist
    if (nextMatchIndex === -1) return [];
 
-   // Pre-calculate array length for bounds checking
    const arrayLength = matchesWithMetadata.length;
    const result: {
       data: Tables<"event_schedule">;
       time: number | null;
       scouted: boolean;
-   }[] = new Array(5).fill(null);
+   }[] = [];
 
-   // Fill in matches centered around the next match
    for (let i = -2; i <= 2; i++) {
       const targetIndex = nextMatchIndex + i;
       if (targetIndex >= 0 && targetIndex < arrayLength) {
          const matchData = matchesWithMetadata[targetIndex];
-         result[i + 2] = {
+         result.push({
             data: matchData.match,
             time: tbaData[matchData.match.match]?.est_time || null,
             scouted: matchData.scouted,
-         };
+         });
       }
    }
 
@@ -200,34 +169,31 @@ export async function getNearNextMatches() {
    const data = await getAllData<EventScheduleEntry>(
       getMatchDetailsStoreName(),
    );
-
-   // Early return if no matches
    if (data.length === 0) return [];
 
    const currentTime = Date.now();
+   // Filter to only future matches
+   const futureMatches = data.filter((match) => match.estTime >= currentTime);
+   if (futureMatches.length === 0) return [];
 
-   // Find match closest to current time
-   let minDiff = Math.abs(data[0].estTime - currentTime);
+   let minDiff = Infinity;
    let minIndex = 0;
 
-   for (let i = 1; i < data.length; i++) {
-      const timeDiff = Math.abs(data[i].estTime - currentTime);
-      if (timeDiff < minDiff) {
-         minDiff = timeDiff;
+   for (let i = 0; i < futureMatches.length; i++) {
+      const diff = futureMatches[i].estTime - currentTime;
+      if (diff < minDiff) {
+         minDiff = diff;
          minIndex = i;
       }
    }
 
-   // Pre-calculate array bounds
-   const maxIndex = data.length - 1;
-
-   // Create result array with desired order
+   const maxIndex = futureMatches.length - 1;
    const result = [
-      data[minIndex], // nextMatch
-      minIndex + 1 <= maxIndex ? data[minIndex + 1] : null, // nextMatch + 1
-      minIndex + 2 <= maxIndex ? data[minIndex + 2] : null, // nextMatch + 2
-      minIndex - 1 >= 0 ? data[minIndex - 1] : null, // nextMatch - 1
-      minIndex - 2 >= 0 ? data[minIndex - 2] : null, // nextMatch - 2
+      futureMatches[minIndex], // nextMatch
+      minIndex + 1 <= maxIndex ? futureMatches[minIndex + 1] : null, // nextMatch + 1
+      minIndex + 2 <= maxIndex ? futureMatches[minIndex + 2] : null, // nextMatch + 2
+      minIndex - 1 >= 0 ? futureMatches[minIndex - 1] : null, // previous match
+      minIndex - 2 >= 0 ? futureMatches[minIndex - 2] : null, // match before previous
    ];
 
    return result;

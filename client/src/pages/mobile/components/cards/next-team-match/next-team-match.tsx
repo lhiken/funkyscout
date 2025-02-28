@@ -70,7 +70,7 @@ export function MobileNextTeamMatchCard() {
             ? (
                <>
                   <div className={styles.header}>
-                     Next Match{" "}
+                     Next Match {"(846)"}
                      <div style={{ color: "var(--text-background)" }}>|</div>
                      {" "}
                      <div style={{ color: "var(--text-primary)" }}>
