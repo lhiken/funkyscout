@@ -35,6 +35,9 @@ async function fetchTBAEventTeams(event: string) {
 
    const teams: TeamRank[] = [];
 
+   console.log(teamsStatuses);
+   console.log(teamsData[0].key);
+
    if (teamsStatuses[teamsData[0].key] == null) {
       for (const team of teamsData) {
          teams.push({
@@ -54,25 +57,31 @@ async function fetchTBAEventTeams(event: string) {
          });
       }
 
+      console.log("i hate ");
+      console.log(teams);
+
       return teams;
    }
 
-   for (const team of teamsData) {
+   for (let i = 0; i < teamsData.length; i++) {
+      const team = teamsData[i];
       const teamStatus = teamsStatuses[team.key];
 
       teams.push({
          key: team.key,
          team: team.team_number,
          name: team.nickname,
-         rank: teamStatus.qual.ranking.rank,
-         record: teamStatus.qual.ranking.record,
-         nextMatch: teamStatus.next_match_key,
-         lastMatch: teamStatus.last_match_key,
-         matches: teamStatus.qual.ranking.matches_played,
-         orders: teamStatus.qual.ranking.sort_orders,
+         rank: teamStatus.qual?.ranking?.rank ?? 0,
+         record: teamStatus.qual?.ranking?.record ??
+            { losses: 0, ties: 0, wins: 0 },
+         nextMatch: teamStatus.next_match_key ?? "",
+         lastMatch: teamStatus.last_match_key ?? "",
+         matches: teamStatus.qual?.ranking?.matches_played ?? 0,
+         orders: teamStatus.qual?.ranking?.sort_orders ?? [],
       });
    }
 
+   console.log("what the sigma");
    return teams;
 }
 

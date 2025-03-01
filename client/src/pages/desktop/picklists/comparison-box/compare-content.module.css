@@ -49,3 +49,129 @@
    flex-direction: row;
    height: 13rem;
 }
+
+.image {
+   height: 10rem;
+   width: 10rem;
+   border-radius: 1rem;
+   object-fit: cover;
+   border: 2px solid var(--text-background);
+}
+
+.teamInfoBox {
+   display: flex;
+   flex-direction: row;
+   gap: 1rem;
+   height: 10rem;
+}
+
+.abilitiesBox {
+   display: flex;
+   flex-direction: column;
+   color: var(--text-primary);
+   width: 1rem;
+   flex-grow: 1;
+   overflow-y: scroll;
+   gap: 0.5rem;
+}
+
+.abilitiesBox::-webkit-scrollbar {
+   display: none;
+}
+
+.archetype {
+   padding: 0.75rem;
+   border: 2px solid var(--text-background);
+   border-radius: 0.5rem;
+   display: flex;
+   flex-grow: 1;
+   overflow-y: scroll;
+   line-height: 1.4rem;
+}
+
+.archetype::-webkit-scrollbar {
+   display: none;
+}
+
+.abilitiesList {
+   display: flex;
+   flex-direction: row;
+   justify-content: space-between;
+   border-radius: 1rem;
+   border: 2px solid var(--text-background);
+   padding: 1.25rem 1.5rem;
+}
+
+.abilityCategory {
+   display: flex;
+   flex-direction: column;
+   gap: 0.25rem;
+}
+
+.abilityHeader {
+   color: var(--primary);
+}
+
+.coralReef {
+   display: flex;
+   gap: 0.25rem;
+}
+
+.performanceCardContainer {
+   display: flex;
+   justify-content: space-between;
+   gap: 0.5rem;
+}
+
+.perfCard {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   flex-grow: 1;
+   aspect-ratio: 1;
+   background-color: var(--text-background);
+   border-radius: 1rem;
+   color: var(--text-primary);
+   flex-direction: column;
+}
+
+.commentsBox {
+   display: flex;
+   flex-direction: row;
+   gap: 1rem;
+   flex-grow: 1;
+   overflow-x: scroll;
+   position: relative;
+   width: 100%;
+}
+
+.commentsBox::-webkit-scrollbar {
+   display: none;
+}
+
+.commentsWrapper {
+   width: 1rem;
+   display: flex;
+   gap: 1rem;
+}
+
+.comment {
+   display: flex;
+   flex-direction: column;
+   flex-shrink: 0;
+   width: 16rem;
+   border-radius: 1rem;
+   padding: 1rem;
+   height: 10rem;
+   text-wrap: ;
+   overflow-y: scroll;
+   line-height: 1.4rem;
+   border: 2px solid var(--text-background);
+   gap: 0.5rem;
+   color: var(--text-primary);
+   position: relative;
+}
+
+.comment::-webkit-scrollbar {
+   display: none;
+}

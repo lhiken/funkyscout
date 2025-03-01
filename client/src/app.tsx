@@ -137,6 +137,9 @@ export default function App() {
       const [EPAdata, TBAdata, InternalMatchData, InternalTeamData, COPRdata] =
          results;
 
+      console.log("i like men");
+      console.log(TBAdata.data);
+
       setTeamData({
          EPAdata: EPAdata.data || {},
          TBAdata: TBAdata.data || [],

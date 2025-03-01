@@ -120,9 +120,9 @@ function ComparedTeamElement(
    const picklistCommands = useContext(PicklistCommandContext);
    const controls = useDragControls();
 
-   const teamData = useContext(GlobalTeamDataContext).TBAdata.find((val) =>
-      val.key == team.teamKey
-   );
+   const teamName =
+      useContext(GlobalTeamDataContext).EPAdata[team.teamKey]?.team_name ||
+      "N/A";
 
    function handleMinimizeToggle() {
       if (focusTeams.setVal && focusTeams.val) {
@@ -226,7 +226,7 @@ function ComparedTeamElement(
                            flexShrink: "0",
                         }}
                      >
-                        {teamData ? teamData.name : "N/A"}
+                        {teamName}
                      </div>
                   </div>
                </div>
@@ -295,9 +295,7 @@ function ComparedTeamElement(
                   className={styles.minimizedContainer}
                >
                   <Tippy
-                     content={`${parseTeamKey(team.teamKey)} | ${
-                        teamData ? teamData.name : "N/A"
-                     }`}
+                     content={`${parseTeamKey(team.teamKey)} | ${teamName}`}
                      placement="left"
                   >
                      <div
@@ -318,7 +316,7 @@ function ComparedTeamElement(
                               height: "20vh",
                            }}
                         >
-                           {teamData ? teamData.name : "N/A"}
+                           {teamName}
                         </div>
                      </div>
                   </Tippy>

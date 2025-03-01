@@ -202,6 +202,9 @@ export class DataParser<T extends keyof (MatchMetrics | TeamMetrics)> {
             .metrics[metricKey as keyof typeof entry.metrics] as T;
 
          if (value) {
+            if (!returnData[entry.teamKey]) {
+               returnData[entry.teamKey] = [];
+            }
             returnData[entry.teamKey].push(
                value,
             );
