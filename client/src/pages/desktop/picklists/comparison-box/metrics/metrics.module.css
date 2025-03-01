@@ -87,7 +87,3 @@
 .metricEntry:hover {
    color: var(--text-primary);
 }
-
-.infoHeader {
-   display: flex;
-}
