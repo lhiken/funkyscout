@@ -19,11 +19,12 @@ export function MobileNextTeamMatchCard() {
    async function getNextMatch() {
       const data = await getNexusEventStatus(getEvent() || "");
       if (data) {
-         const nextMatch = data.matches.filter((val) =>
-            [...val.blueTeams, ...val.redTeams].includes(
+         const nextMatch = data.matches.filter((val) => {
+            if (!val?.blueTeams || !val?.redTeams) return false;
+            return [...val.blueTeams, ...val.redTeams].includes(
                parseTeamKey(getFocusTeam() || "846"),
-            )
-         )
+            );
+         })
             .reduce((closest, current) => {
                const currentTime = Date.now();
                const currentStartTime = new Date(
@@ -41,6 +42,7 @@ export function MobileNextTeamMatchCard() {
                   : closest;
             });
 
+         console.log(nextMatch);
          setNextMatch(nextMatch);
       } else {
          return false;

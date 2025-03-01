@@ -163,7 +163,6 @@
    border-radius: 1rem;
    padding: 1rem;
    height: 10rem;
-   text-wrap: ;
    overflow-y: scroll;
    line-height: 1.4rem;
    border: 2px solid var(--text-background);
@@ -174,4 +173,8 @@
 
 .comment::-webkit-scrollbar {
    display: none;
+}
+
+.infoHeader {
+   color: var(--primary);
 }

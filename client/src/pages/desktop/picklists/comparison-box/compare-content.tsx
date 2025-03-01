@@ -145,7 +145,7 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
                            </img>
                            <div className={styles.abilitiesBox}>
                               <div className={styles.infoHeader}>
-                                 Robot Description | {teamData?.name}
+                                 Desc. | {teamData?.name}
                               </div>
                               <div className={styles.archetype}>
                                  {pitData.robotArchetype}
