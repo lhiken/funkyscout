@@ -259,6 +259,39 @@ export class DataParser<T extends keyof (MatchMetrics | TeamMetrics)> {
       return commentArray;
    }
 
+   getDisplayMetricRecord<Year extends keyof MatchMetrics>(
+      metricKey: keyof MatchMetrics[Year],
+      title: string,
+   ): DisplayedMetric {
+      const record: Record<string, number> = {};
+      const teamCount: Record<string, number> = {};
+
+      for (const match of this.combinedData) {
+         const newVal = (match.metrics as MatchMetrics[Year])[metricKey];
+         if (newVal == null) continue; // Ensures newVal is neither null nor undefined
+
+         const teamKey = match.teamKey;
+         teamCount[teamKey] = (teamCount[teamKey] || 0) + 1;
+
+         // Correct running average formula
+         if (teamKey in record) {
+            record[teamKey] += (newVal as number - record[teamKey]) /
+               teamCount[teamKey];
+         } else {
+            record[teamKey] = newVal as number;
+         }
+      }
+
+      return {
+         title,
+         values: Object.entries(record).map(([teamKey, value]) => ({
+            teamKey,
+            value,
+         })),
+         type: "bar",
+      };
+   }
+
    getParserData() {
       return this.data;
    }

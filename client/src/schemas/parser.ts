@@ -154,3 +154,8 @@ export class DataParser2025 extends DataParser<2025>
       return this.getTeamMetricRecord<number, 2025>("drivingScore", teamKey);
    }
 }
+
+export function average(val: Record<string, number[]>): number {
+   const values = Object.values(val).flat(1);
+   return values.length ? values.reduce((a, b) => a + b, 0) / values.length : 0;
+}

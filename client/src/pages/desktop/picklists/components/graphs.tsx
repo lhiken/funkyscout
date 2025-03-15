@@ -7,7 +7,11 @@
 import { Dispatch, SetStateAction, useContext, useState } from "react";
 import { DisplayedMetric } from "../../../../schemas/defs";
 import { DataParser2024, DataParser2025 } from "../../../../schemas/parser";
-import { MetricDescriptions } from "../../../../schemas/schema";
+import {
+   MatchMetrics,
+   MetricDescriptions,
+   TeamMetrics,
+} from "../../../../schemas/schema";
 import styles from "../comparison-box/metrics/metrics.module.css";
 import { GlobalTeamDataContext } from "../../../../app-global-ctx";
 
@@ -76,8 +80,14 @@ export function MetricCategory2025(
    const metricDescriptions = MetricDescriptions[2025]; // Get the descriptions for the year
    const parser = new DataParser2025(collectedData);
 
-   console.log(parser);
-   console.log(addMetric);
+   function addScoutingMetric(key: keyof MatchMetrics[2025]) {
+      addMetric(
+         parser.getDisplayMetricRecord<2025>(
+            key,
+            metricDescriptions[key].title,
+         ),
+      );
+   }
 
    return (
       <div className={styles.metricCategory}>
@@ -88,11 +98,19 @@ export function MetricCategory2025(
          />
          {showAll && (
             <div className={styles.metricsList}>
-               <MetricEntry
-                  entryName={metricDescriptions.L1Scored.title}
-                  fn={() => {}}
-                  active={entryIsActive(metricDescriptions.L1Scored.title)}
-               />
+               {Object.entries(MetricDescriptions[2025]).map((
+                  [key, { title, queryHint }],
+               ) => (
+                  <MetricEntry
+                     key={key}
+                     entryName={title}
+                     fn={() =>
+                        addScoutingMetric(
+                           (queryHint ?? key) as keyof TeamMetrics[2025],
+                        )}
+                     active={entryIsActive(title)}
+                  />
+               ))}
             </div>
          )}
       </div>
