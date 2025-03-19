@@ -36,7 +36,7 @@ function PracticeInfo() {
          >
             Red Alliance
          </div>
-         <div className="returnButton">
+         <div className="returnButton" onClick={() => navigate("~/")}>
             Return
          </div>
       </div>

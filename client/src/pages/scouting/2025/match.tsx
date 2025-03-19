@@ -154,14 +154,14 @@ export default function Inmatch2025() {
       setAutoActions((prev) => {
          return [...prev, action];
       });
-      throwNotification("info", `${action.action}`);
+      throwNotification("info", `Performed action`);
    }
 
    function addTeleAction(action: TeleopAction<2025>) {
       setTeleopActions((prev) => {
          return [...prev, action];
       });
-      throwNotification("info", `${action.action}`);
+      throwNotification("info", `Performed action`);
    }
 
    async function startMatch() {
@@ -809,7 +809,15 @@ function MatchControls() {
          {matchContext?.gameState == "unstarted" &&
             (
                <div className={styles.previewStage}>
-                  Define starting configuration
+                  <div
+                     style={{
+                        display: "flex",
+                        paddingInline: "1.75rem",
+                        textAlign: "center",
+                     }}
+                  >
+                     Press on the map to define the robot's starting position
+                  </div>
                   <div
                      className={styles.startingButton}
                      onClick={() =>
