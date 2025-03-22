@@ -105,11 +105,9 @@ export function ScheduleCard(
          className={styles.scheduleCard}
          onClick={() => {
             navigate(
-               `/m/inmatch/${
-                  getEventYear() || ""
-               }/m=${schedule.match}&t=${schedule.team}&a=${
-                  schedule.alliance[0]
-               }`,
+               `/m/inmatch/${getEventYear() || ""}/m=${schedule.match}&t=${
+                  schedule.alliance[0].toUpperCase() + schedule.team
+               }&a=${schedule.alliance[0]}`,
             );
          }}
       >

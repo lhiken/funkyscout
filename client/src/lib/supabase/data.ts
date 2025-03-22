@@ -188,7 +188,7 @@ async function fetchTeamDataByEvent(event: string) {
 }
 
 async function uploadMatch(matchData: Tables<"event_match_data">) {
-   if (matchData.team[0] != "f") matchData.team = "frc" + matchData.team;
+   if (matchData.team[0] != "f") matchData.team = matchData.team.substring(1);
 
    upsertData(getScoutedMatchesStoreName(), matchData);
 
@@ -223,7 +223,7 @@ async function uploadAllOfflineMatches() {
 
    try {
       for (const match of offlineMatches) {
-         if (match.team[0] != "f") match.team = "frc" + match.team;
+         if (match.team[0] != "f") match.team = match.team.substring(1);
       }
 
       const { error } = await supabase
