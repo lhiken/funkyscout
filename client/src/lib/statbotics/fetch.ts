@@ -12,6 +12,8 @@ async function fetchStatboticsData(param: string) {
       }
 
       const data = await response.json();
+
+      console.log(data);
       return data;
    } catch (error) {
       handleError(error);

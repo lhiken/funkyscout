@@ -13,6 +13,7 @@ import {
 } from "../../../../../utils/logic/app";
 import { Tables } from "../../../../../lib/supabase/database.types";
 import { GlobalTeamDataContext } from "../../../../../app-global-ctx";
+import { navigate } from "wouter/use-browser-location";
 
 export function MobileNextMatchCard() {
    const [shiftsDone, setShiftsDone] = useState(0);
@@ -103,7 +104,12 @@ export function MobileNextMatchCard() {
                            </div>
                         </div>
                      </div>
-                     <div className={styles.nextMatchTeamStats}>
+                     <div
+                        className={styles.nextMatchTeamStats}
+                        onClick={() => {
+                           navigate(`/m/data/team/${nextMatch?.data.team}`);
+                        }}
+                     >
                         <div className={styles.teamHeader}>
                            {nextMatch?.data.team
                               ? parseTeamKey(nextMatch?.data.team || "0")

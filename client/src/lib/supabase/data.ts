@@ -246,6 +246,8 @@ async function uploadPitEntry(teamKey: string, pitData: PitData2025) {
       team: teamKey,
    };
 
+   upsertData(getTeamDetailsStoreName(), newTeam);
+
    try {
       const { error } = await supabase
          .from("event_team_data")

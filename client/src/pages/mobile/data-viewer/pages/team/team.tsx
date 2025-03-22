@@ -80,6 +80,8 @@ function TeamDataCard() {
          if (res) {
             setParser(new DataParser2025(res, teamKey));
             setTeamMatches(res.filter((val) => val.team == teamKey));
+            console.log(res);
+            console.log(res.filter((val) => val.team == teamKey));
          }
       });
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -96,10 +98,8 @@ function TeamDataCard() {
    const [showBigImage, setShowBigImage] = useState<boolean>(false);
 
    const getAvg = () => {
-      const matches =
-         teamMatches?.filter((val) => val.team == teamKey).map((val) =>
-            val.match
-         ) || [];
+      const matches = teamMatches?.map((val) => val.match) || [];
+      console.log(matches);
       let teleAvg = 0;
       let autoAvg = 0;
       for (const match of matches) {

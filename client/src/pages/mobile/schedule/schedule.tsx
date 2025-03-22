@@ -8,12 +8,14 @@ import { Tables } from "../../../lib/supabase/database.types";
 import styles from "./schedule.module.css";
 import { getLocalUserData } from "../../../lib/supabase/auth";
 import {
+   getEventYear,
    parseMatchKey,
    parseTeamKey,
    timeFromNow,
 } from "../../../utils/logic/app";
 import Checkbox from "../../../components/app/buttons/checkbox";
 import { motion } from "motion/react";
+import { navigate } from "wouter/use-browser-location";
 
 export default function MobileScheduleViewer() {
    const [schedule, setSchedule] = useState<Tables<"event_schedule">[]>();
@@ -99,7 +101,18 @@ export function ScheduleCard(
    const t = timeFromNow(new Date(time * 1000));
 
    return (
-      <div className={styles.scheduleCard}>
+      <div
+         className={styles.scheduleCard}
+         onClick={() => {
+            navigate(
+               `/m/inmatch/${
+                  getEventYear() || ""
+               }/m=${schedule.match}&t=${schedule.team}&a=${
+                  schedule.alliance[0]
+               }`,
+            );
+         }}
+      >
          <div className={styles.matchInfo}>
             {parseMatchKey(schedule.match, "nexus")}
             <div className={styles.timeInfo}>

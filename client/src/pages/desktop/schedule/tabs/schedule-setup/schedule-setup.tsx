@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import styles from "./styles.module.css";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, Reorder } from "motion/react";
 import { AssignmentContext, ScheduleContext } from "../../schedule-context";
 import { Tables } from "../../../../../lib/supabase/database.types";
 import Checkbox from "../../../../../components/app/buttons/checkbox";
@@ -8,6 +8,7 @@ import RoundInput from "../../../../../components/app/input/round-input";
 import { assignUsersToMatches, assignUsersToTeams } from "./scheduler";
 import { getEvent } from "../../../../../utils/logic/app";
 import {
+   setupEventTeamList,
    uploadMatchAssignments,
    uploadTeamAssignments,
 } from "../../../../../lib/supabase/setup";
@@ -54,6 +55,8 @@ function SetupPanel() {
             ...prev,
             matchData: updatedMatchData,
          }));
+
+         setupEventTeamList(getEvent() || "");
       }
    }
 
@@ -63,14 +66,16 @@ function SetupPanel() {
       if (assignmentData.setVal) {
          const teamKeys = Object.keys(globalData.EPAdata) ||
             [];
-         const scouterList = assignmentData.val?.scouterList.reverse() || [];
+         const scouterList = assignmentData.val?.scouterList || [];
          const event = getEvent() || "";
+         console.log(teamKeys);
 
          const updatedTeamData = assignUsersToTeams(
             teamKeys,
             scouterList,
             event,
          );
+
          assignmentData.setVal((prev) => ({
             ...prev,
             teamData: updatedTeamData,
@@ -184,6 +189,38 @@ function SetupPanel() {
    const [maxConsecShifts, setMaxConsecShifts] = useState("6");
    const [breakLength, setBreakLength] = useState("4");
 
+   // New state to track the order of scouters
+   const [scouterOrder, setScouterOrder] = useState<{
+      name: string;
+      uid: string;
+   }[]>([]);
+
+   // Update the scouter order when assignmentData changes
+   useEffect(() => {
+      if (
+         assignmentData.val?.scouterList &&
+         assignmentData.val.scouterList.length > 0
+      ) {
+         setScouterOrder(assignmentData.val.scouterList);
+      }
+   }, [assignmentData.val?.scouterList]);
+
+   // Handle reordering of scouters
+   const handleReorder = (newOrder: {
+      name: string;
+      uid: string;
+   }[]) => {
+      setScouterOrder(newOrder);
+
+      // Update the context with the new order
+      if (assignmentData.setVal) {
+         assignmentData.setVal((prev) => ({
+            ...prev,
+            scouterList: newOrder,
+         }));
+      }
+   };
+
    const optionsPage = (
       <div className={styles.content}>
          <div className={styles.assignSettings}>
@@ -260,22 +297,43 @@ function SetupPanel() {
                      T
                   </div>
                </div>
-               {assignmentData.val?.scouterList.map((user, index) => {
-                  return (
-                     <div key={index} className={styles.scouterEntry}>
-                        <div>{user.name}</div>
-                        <div className={styles.scouterMatches}>
-                           {assignmentData.val?.matchData.filter((val) =>
-                              val.uid == user.uid
-                           ).length}
-                           <div>|</div>
-                           {assignmentData.val?.teamData.filter((val) =>
-                              val.assigned == user.uid
-                           ).length}
+               <Reorder.Group
+                  as="div"
+                  axis="y"
+                  values={scouterOrder}
+                  onReorder={handleReorder}
+                  style={{
+                     width: "100%",
+                     listStyle: "none",
+                     padding: 0,
+                     margin: 0,
+                  }}
+               >
+                  {scouterOrder.map((user) => (
+                     <Reorder.Item
+                        key={user.uid}
+                        value={user}
+                        style={{
+                           cursor: "grab",
+                           width: "100%",
+                           touchAction: "none",
+                        }}
+                     >
+                        <div className={styles.scouterEntry}>
+                           <div>{user.name}</div>
+                           <div className={styles.scouterMatches}>
+                              {assignmentData.val?.matchData.filter((val) =>
+                                 val.uid == user.uid
+                              ).length}
+                              <div>|</div>
+                              {assignmentData.val?.teamData.filter((val) =>
+                                 val.assigned == user.uid
+                              ).length}
+                           </div>
                         </div>
-                     </div>
-                  );
-               })}
+                     </Reorder.Item>
+                  ))}
+               </Reorder.Group>
             </div>
          </div>
          <div className={styles.buttons}>

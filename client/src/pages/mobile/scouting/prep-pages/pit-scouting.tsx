@@ -112,7 +112,7 @@ export default function MobileStartPitScouting() {
                {teamData.filter((val) => val.assigned == getLocalUserData().uid)
                      .length > 0
                   ? teamData.filter((val) =>
-                     val.assigned == getLocalUserData().uid
+                     val.assigned == getLocalUserData().uid && !val.name
                   )
                      .map((val) => {
                         return (
