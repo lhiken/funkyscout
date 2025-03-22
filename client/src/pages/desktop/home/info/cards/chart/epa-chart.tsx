@@ -59,7 +59,7 @@ function TeamEPAChart() {
                         indexScale={{ type: "band", round: true }}
                         colors={(d) =>
                            focusOnOwnTeam
-                              ? d.data.team === getFocusTeam()
+                              ? d.data.team == getFocusTeam()
                                  ? "var(--primary)"
                                  : "#CDA74544"
                               : "var(--primary)"}
