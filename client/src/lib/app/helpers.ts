@@ -63,44 +63,50 @@ export async function getNextAssignedMatch() {
          getServerMatchesStoreName(),
       )).filter((val) => val.data != null && val.uid == getLocalUserData().uid),
    ];
+   let noTimedata: boolean = false;
 
    if (assignedMatches.length === 0) {
       return null;
    }
 
-   const lastScoutedTime = scoutedMatches.length > 0
-      ? Math.max(
-         ...scoutedMatches.map((match) => new Date(match.timestamp).getTime()),
-      )
-      : 0;
+   const scoutedMatchIds = new Set(scoutedMatches.map((m) => m.match));
 
-   const currentTime = Date.now();
-   let nextMatch = null;
-   let smallestDiff = Infinity;
+   // Helper function to extract match number from match key
+   const getMatchNumber = (matchKey: string) => {
+      // Extract number from format like "2025casf_qm22"
+      const match = matchKey.split("_")[1] || "";
+      const num = match.replace(/\D/g, ""); // Remove non-digits
+      return parseInt(num) || 0;
+   };
 
-   for (const match of assignedMatches) {
-      const matchData = tbaData[match.match];
-      const matchTime = matchData?.est_time ?? null;
+   // Filter unscounted matches and map with time data
+   const eligibleMatches = assignedMatches
+      .filter((match) => !scoutedMatchIds.has(match.match))
+      .map((match) => {
+         // If no time data, use midnight (00:00) of the current day
+         const midnight = new Date();
+         midnight.setHours(0, 0, 0, 0);
 
-      // Skip if already scouted
-      if (scoutedMatches.some((m) => m.match === match.match)) continue;
+         const matchTime = tbaData[match.match]?.est_time ?? midnight.getTime();
+         if (matchTime == midnight.getTime()) noTimedata = true;
+         return {
+            data: match,
+            time: matchTime * 1000,
+            matchNumber: getMatchNumber(match.match),
+         };
+      })
+      .sort((a, b) => a.matchNumber - b.matchNumber); // Sort by match number first
 
-      if (
-         matchTime !== null && !isNaN(matchTime) &&
-         matchTime > Math.max(currentTime, lastScoutedTime)
-      ) {
-         const diff = matchTime - currentTime;
-         if (diff < smallestDiff) {
-            smallestDiff = diff;
-            nextMatch = { data: match, time: matchTime };
-         }
-      } else if (nextMatch === null) {
-         throwNotification("info", "No TBA data found");
-         nextMatch = { data: match, time: currentTime };
-      }
+   if (noTimedata) throwNotification("info", "No TBA time data");
+
+   // Return the first match
+   if (eligibleMatches.length > 0) {
+      return { data: eligibleMatches[0].data, time: eligibleMatches[0].time };
    }
 
-   return nextMatch;
+   if (noTimedata) {
+      return null;
+   }
 }
 
 export async function getNextNearAssignedMatches() {
@@ -108,7 +114,7 @@ export async function getNextNearAssignedMatches() {
    const assignedMatches =
       (await getAllData<Tables<"event_schedule">>(getScheduleStoreName()))
          .filter((val) => val.uid === userId);
-   const tbaData = getLocalTBAData();
+   const tbaData = getLocalTBAData() ?? {};
    const scoutedMatches = [
       ...await getAllData<Tables<"event_match_data">>(
          getScoutedMatchesStoreName(),
@@ -120,51 +126,49 @@ export async function getNextNearAssignedMatches() {
 
    if (assignedMatches.length === 0) return [];
 
+   // First get the next match using the previous function
+   const nextMatch = await getNextAssignedMatch();
+   if (!nextMatch) return [];
+
    const scoutedMatchIds = new Set(scoutedMatches.map((m) => m.match));
-   const currentTime = Date.now();
 
-   const matchesWithMetadata = assignedMatches
-      .map((match) => {
-         const matchNumber = parseInt(match.match.replace(/\D/g, "")) || 0;
-         const tbaTime = tbaData[match.match]?.est_time;
-         // Only use a valid, future tbaTime; otherwise, use Infinity.
-         const diff = tbaTime && tbaTime > currentTime
-            ? tbaTime - currentTime
-            : Infinity;
-         return {
-            match,
-            matchNumber,
-            timeDiff: diff,
-            scouted: scoutedMatchIds.has(match.match),
-         };
-      })
-      .sort((a, b) => {
-         if (a.timeDiff === Infinity && b.timeDiff === Infinity) {
-            return a.matchNumber - b.matchNumber;
-         }
-         if (a.timeDiff === Infinity) return 1;
-         if (b.timeDiff === Infinity) return -1;
-         return a.timeDiff - b.timeDiff;
-      });
+   // Helper function to extract match number
+   const getMatchNumber = (matchKey: string) => {
+      const match = matchKey.split("_")[1] || "";
+      const num = match.replace(/\D/g, "");
+      return parseInt(num) || 0;
+   };
 
-   const nextMatchIndex = matchesWithMetadata.findIndex((m) => !m.scouted);
+   // Sort all matches by match number
+   const sortedMatches = [...assignedMatches].sort((a, b) => {
+      return getMatchNumber(a.match) - getMatchNumber(b.match);
+   });
+
+   // Find the index of the next match in our sorted array
+   const nextMatchIndex = sortedMatches.findIndex(
+      (match) => match.match === nextMatch.data.match,
+   );
+
    if (nextMatchIndex === -1) return [];
 
-   const arrayLength = matchesWithMetadata.length;
    const result: {
       data: Tables<"event_schedule">;
       time: number | null;
       scouted: boolean;
    }[] = [];
 
+   // Get 2 matches before and 2 matches after the next match
    for (let i = -2; i <= 2; i++) {
       const targetIndex = nextMatchIndex + i;
-      if (targetIndex >= 0 && targetIndex < arrayLength) {
-         const matchData = matchesWithMetadata[targetIndex];
+      if (targetIndex >= 0 && targetIndex < sortedMatches.length) {
+         const matchData = sortedMatches[targetIndex];
+         const matchTime = tbaData[matchData.match]?.est_time;
+
          result.push({
-            data: matchData.match,
-            time: tbaData[matchData.match.match]?.est_time || null,
-            scouted: matchData.scouted,
+            data: matchData,
+            // Convert time to milliseconds if available
+            time: matchTime ? matchTime * 1000 : null,
+            scouted: scoutedMatchIds.has(matchData.match),
          });
       }
    }
