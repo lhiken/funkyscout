@@ -131,7 +131,7 @@ export default function MobileStartMatchScouting() {
             transition={{ duration: 0.2 }}
             className={styles.matchSelectionBox}
          >
-            <MobileCardHeader titleText="Match Scouting" />
+            <MobileCardHeader titleText="Match Scouting!" />
             <motion.div
                initial={{ opacity: 0, y: -20 }}
                animate={{ opacity: 1, y: 0 }}
