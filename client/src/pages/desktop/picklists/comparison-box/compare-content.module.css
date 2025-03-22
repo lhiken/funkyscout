@@ -178,3 +178,18 @@
 .infoHeader {
    color: var(--primary);
 }
+
+.performanceGraphHeader {
+   display: flex;
+   justify-content: space-between;
+   padding: 0.5rem 1.25rem;
+   background-color: var(--text-background);
+   border-radius: 1rem;
+   color: var(--text-primary);
+}
+
+.graphInput {
+   color: var(--primary);
+   border-bottom: 2px solid var(--text-secondary);
+   width: 5rem;
+}

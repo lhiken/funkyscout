@@ -18,8 +18,8 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
    const [teamMatches, setTeamMatches] = useState<
       Tables<"event_match_data">[]
    >();
-   const [teleAvg, setTeleAvg] = useState(-1);
-   const [autoAvg, setAutoAvg] = useState(-1);
+   const [/*teleAvg*/, setTeleAvg] = useState(-1);
+   const [/*autoAvg*/, setAutoAvg] = useState(-1);
 
    useEffect(() => {
       fetchTeamImage(teamKey || "", getEvent() || "").then((res) => {
@@ -64,10 +64,10 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
       };
    };
 
-   const [coralL4, setCoralL4] = useState<number>(-1);
-   const [coralL3, setCoralL3] = useState<number>(-1);
-   const [coralL2, setCoralL2] = useState<number>(-1);
-   const [coralL1, setCoralL1] = useState<number>(-1);
+   const [/*coralL4*/, setCoralL4] = useState<number>(-1);
+   const [/*coralL3*/, setCoralL3] = useState<number>(-1);
+   const [/*coralL2*/, setCoralL2] = useState<number>(-1);
+   const [/*coralL1*/, setCoralL1] = useState<number>(-1);
    // const [algaeNet, setAlgaeNet] = useState<number>(-1);
    // const [algaeProc, setAlgaeProc] = useState<number>(-1);
    const [comments, setComments] = useState<
@@ -132,6 +132,8 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
 
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [parser]);
+
+   const [metricOption, setMetricOption] = useState("");
 
    return (
       <>
@@ -287,7 +289,31 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
                {teamMatches && teamMatches?.length > 0
                   ? (
                      <>
-                        <div className={styles.performanceCardContainer}>
+                        <div className={styles.performanceGraphHeader}>
+                           <div>
+                              Graph{" "}
+                              <input
+                                 className={styles.graphInput}
+                                 value={metricOption}
+                                 placeholder="metric..."
+                                 onChange={(e) =>
+                                    setMetricOption(e.target.value)}
+                              />
+                           </div>
+                           <div className={styles.graphButton}>
+                              graph
+                           </div>
+                        </div>
+                        <div className={styles.metricGraph}>
+                           <div className={styles.metricGraphDetails}>
+                              <div>
+                              </div>
+                           </div>
+                           <div className={styles.metricGraph}>
+                           </div>
+                        </div>
+                        {
+                           /* <div className={styles.performanceCardContainer}>
                            <div className={styles.perfCard}>
                               Total Avg.
                               <div style={{ fontSize: "1.5rem" }}>
@@ -339,7 +365,8 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
                                  {coralL1.toFixed(1)}
                               </div>
                            </div>
-                        </div>
+                        </div> */
+                        }
                         <div className={styles.commentsBox}>
                            <div className={styles.commentsWrapper}>
                               {comments.map((val, index) => {
