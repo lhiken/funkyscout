@@ -44,6 +44,24 @@ export class DataParser2025 extends DataParser<2025>
       return 0;
    }
 
+   getTotalTeamPoints(teamKey: string) {
+      const matchKeys = this.getParserCombinedData()
+         .filter((val) => val.teamKey == teamKey)
+         .map((val) => val.matchKey);
+
+      const vals = matchKeys.map((val) =>
+         this.getMatchTeamPoints(val, teamKey)
+      );
+
+      // Calculate the averages for 'auto' and 'tele'
+      const autoAvg = vals.reduce((acc, { auto }) => acc + auto, 0) /
+         vals.length;
+      const teleAvg = vals.reduce((acc, { tele }) => acc + tele, 0) /
+         vals.length;
+
+      return { auto: autoAvg, tele: teleAvg };
+   }
+
    getMatchTeamPoints(matchKey: string, teamKey: string) {
       const fullData = this.getParserCombinedData();
       const teamData = fullData.find((val) =>

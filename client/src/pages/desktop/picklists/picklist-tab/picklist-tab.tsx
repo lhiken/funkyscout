@@ -12,6 +12,7 @@ import Tippy from "@tippyjs/react";
 import { getLocalUserData } from "../../../../lib/supabase/auth";
 import { getEvent, parseTeamKey } from "../../../../utils/logic/app";
 import {
+   fetchMatchDataByEvent,
    fetchTeamsByEvent,
    updatePicklist,
 } from "../../../../lib/supabase/data";
@@ -22,6 +23,8 @@ import { GlobalTeamDataContext } from "../../../../app-global-ctx";
 import { Reorder } from "motion/react";
 import Checkbox from "../../../../components/app/buttons/checkbox";
 import { setCurrentPicklist } from "../picklist-state-handler";
+import { MetricDescriptions, TeamMetrics } from "../../../../schemas/schema";
+import { DataParser2025 } from "../../../../schemas/parser";
 
 function PicklistTab() {
    const targetPicklist = useContext(TargetPicklistContext);
@@ -231,6 +234,49 @@ function PicklistEditingTab({ showSettings }: { showSettings: boolean }) {
 
    const [showDropdown, setShowDropdown] = useState(false);
 
+   const [sortQuery, setSortQuery] = useState("");
+
+   async function sortValues() {
+      if (
+         sortQuery != "total" && sortQuery != "auto" && sortQuery != "tele" &&
+         !MetricDescriptions[2025][sortQuery as keyof TeamMetrics[2025]]
+      ) {
+         throwNotification("error", "No such query key");
+         return;
+      }
+
+      const parser = new DataParser2025(
+         await fetchMatchDataByEvent(getEvent() || "") || [],
+      );
+
+      const metricAverage = (teamKey: string) => {
+         if (!MetricDescriptions[2025][sortQuery as keyof TeamMetrics[2025]]) {
+            const vals = parser.getTotalTeamPoints(teamKey);
+
+            if (sortQuery == "tele") return vals.tele;
+            if (sortQuery == "auto") return vals.auto;
+            return vals.auto + vals.tele;
+         }
+
+         const record = parser.getTeamMetricRecord(
+            sortQuery as never,
+            teamKey,
+         ) as Record<string, number[]>;
+         const allValues = Object.values(record).flat(); // Flatten all arrays into one
+
+         const sum = allValues.reduce((acc, value) => acc + value, 0);
+         return sum / allValues.length;
+      };
+
+      setPicklist(
+         picklist.sort((a, b) =>
+            metricAverage(b.teamKey) - metricAverage(a.teamKey)
+         ),
+      );
+
+      throwNotification("success", `Sorted by ${sortQuery}`);
+   }
+
    return (
       <div className={styles.editTabContainer}>
          <AnimatePresence>
@@ -239,7 +285,7 @@ function PicklistEditingTab({ showSettings }: { showSettings: boolean }) {
                   <motion.div
                      initial={{ height: 0, opacity: 0 }}
                      animate={{
-                        height: "7.75rem",
+                        height: "8.75rem",
                         opacity: 1,
                         marginBottom: "1.15rem",
                      }}
@@ -324,6 +370,21 @@ function PicklistEditingTab({ showSettings }: { showSettings: boolean }) {
                            enabled={saveOnEdit}
                            setEnabled={setSaveOnEdit}
                         />
+                     </div>
+                     <div className={styles.singleOption}>
+                        <div className={styles.inlineInput}>
+                           Sort by{" "}
+                           <input
+                              className={styles.inlineInputElement}
+                              onChange={(e) => setSortQuery(e.target.value)}
+                              value={sortQuery}
+                              placeholder="query..."
+                           >
+                           </input>
+                        </div>
+                        <div className={styles.sortButton} onClick={sortValues}>
+                           sort!
+                        </div>
                      </div>
                   </motion.div>
                )}

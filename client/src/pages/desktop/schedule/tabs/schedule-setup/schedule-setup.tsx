@@ -399,7 +399,7 @@ function ScouterCard({ user }: { user: Tables<"user_profiles"> }) {
          <Checkbox
             enabled={assignmentData.val?.scouterList.some(
                (scouter) =>
-                  scouter.name === user.name && scouter.uid === user.uid,
+                  scouter.name == user.name || scouter.uid === user.uid,
             ) || false}
          />
       </div>

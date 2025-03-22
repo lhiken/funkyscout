@@ -362,3 +362,25 @@
 .teamCardContainer.active {
    border-color: var(--primary-dark);
 }
+
+.inlineInput {
+   display: flex;
+   flex-direction: row;
+   gap: 0.25rem;
+}
+
+.inlineInputElement {
+   display: flex;
+   flex-direction: row;
+   width: 5rem;
+   border-bottom: 2px solid var(--text-background);
+   color: var(--primary);
+}
+
+.sortButton {
+   font-size: 0.9rem;
+   background-color: var(--text-background);
+   padding-inline: 1rem;
+   border-radius: 2rem;
+   cursor: pointer;
+}
