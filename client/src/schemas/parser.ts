@@ -110,7 +110,8 @@ export class DataParser2025 extends DataParser<2025>
          tele: teleL1 * 2 + teleL2 * 3 + teleL3 * 4 + teleL4 * 5 +
             teleProc * 2 + teleNet * 4 +
             (teamData?.metrics.climbShallow ? 6 : 0) +
-            (teamData?.metrics.climbDeep ? 12 : 0),
+            (teamData?.metrics.climbDeep ? 12 : 0) +
+            ((teamData?.metrics?.climbTime || -1) != -1 ? 12 : 0),
          auto: autoL1 * 3 + autoL2 * 4 + autoL3 * 6 + autoL4 * 7 + autoNet * 4 +
             autoProc * 2,
       };
