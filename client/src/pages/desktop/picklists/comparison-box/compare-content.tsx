@@ -139,8 +139,8 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
 
    const [graphedValues, setGraphedValues] = useState<number[]>([]);
    const [metricSelected, setMetricSelected] = useState<string>("total");
-
    const [metricOption, setMetricOption] = useState<string>("total");
+   const [isLoading, setIsLoading] = useState<boolean>(false);
 
    useEffect(() => {
       setValues();
@@ -148,53 +148,73 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
    }, []);
 
    async function setValues() {
+      setIsLoading(true);
+
+      // First set the selected metric immediately
+      setMetricSelected(metricOption);
+
       if (
          metricOption != "total" && metricOption != "auto" &&
          metricOption != "tele" &&
          !MetricDescriptions[2025][metricOption as keyof TeamMetrics[2025]]
       ) {
          throwNotification("error", "No such query key");
+         setIsLoading(false);
          return;
       }
 
-      setMetricSelected(metricOption);
-
-      const parser = new DataParser2025(
-         await fetchMatchDataByEvent(getEvent() || "") || [],
-      );
-
-      const getMetric = (teamKey: string) => {
-         if (
-            !MetricDescriptions[2025][metricSelected as keyof TeamMetrics[2025]]
-         ) {
-            const newArr: number[] = [];
-            parser.getParserData().filter((val) => val.team == teamKey).forEach(
-               (val) => {
-                  const vals = parser.getMatchTeamPoints(val.match, teamKey);
-
-                  console.log(vals);
-
-                  if (metricSelected == "tele") newArr.push(vals.tele);
-                  else if (metricSelected == "auto") newArr.push(vals.auto);
-                  else if (metricSelected == "total") {
-                     newArr.push(vals.auto + vals.tele);
-                  }
-               },
-            );
-
-            return newArr;
+      try {
+         const matchData = await fetchMatchDataByEvent(getEvent() || "");
+         if (!matchData) {
+            setIsLoading(false);
+            return;
          }
 
-         const record = parser.getTeamMetricRecord(
-            metricOption as never,
-            teamKey,
-         ) as Record<string, number[]>;
-         return Object.values(record).flat(); // Flatten all arrays into one
-      };
+         const parser = new DataParser2025(matchData);
+         const currentMetric = metricOption; // Use the current value
 
-      console.log(getMetric(teamKey));
+         const getMetric = (teamKey: string) => {
+            if (
+               !MetricDescriptions[2025][
+                  currentMetric as keyof TeamMetrics[2025]
+               ]
+            ) {
+               const newArr: number[] = [];
+               parser.getParserData().filter((val) => val.team == teamKey)
+                  .forEach(
+                     (val) => {
+                        const vals = parser.getMatchTeamPoints(
+                           val.match,
+                           teamKey,
+                        );
 
-      setGraphedValues(getMetric(teamKey) || [0]);
+                        if (currentMetric == "tele") newArr.push(vals.tele);
+                        else if (currentMetric == "auto") {
+                           newArr.push(vals.auto);
+                        } else if (currentMetric == "total") {
+                           newArr.push(vals.auto + vals.tele);
+                        }
+                     },
+                  );
+
+               return newArr;
+            }
+
+            const record = parser.getTeamMetricRecord(
+               currentMetric as never,
+               teamKey,
+            ) as Record<string, number[]>;
+            return Object.values(record).flat(); // Flatten all arrays into one
+         };
+
+         const metricValues = getMetric(teamKey) || [0];
+         setGraphedValues(metricValues);
+      } catch (error) {
+         console.error("Error fetching data:", error);
+         throwNotification("error", "Failed to fetch match data");
+      } finally {
+         setIsLoading(false);
+      }
    }
 
    return (
@@ -364,10 +384,12 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
                               />
                            </div>
                            <div
-                              className={styles.graphButton}
+                              className={`${styles.graphButton} ${
+                                 isLoading ? styles.loading : ""
+                              }`}
                               onClick={setValues}
                            >
-                              graph
+                              {isLoading ? "loading..." : "graph"}
                            </div>
                         </div>
                         <div className={styles.metricGraph}>
@@ -421,7 +443,9 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
                               >
                                  <div style={{ fontSize: "1rem" }}>Max</div>
                                  <div style={{ fontSize: "1.2rem" }}>
-                                    {Math.max(...graphedValues).toFixed(1)}
+                                    {graphedValues.length > 0
+                                       ? Math.max(...graphedValues).toFixed(1)
+                                       : "0.0"}
                                  </div>
                               </div>
 
@@ -434,7 +458,9 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
                               >
                                  <div style={{ fontSize: "1rem" }}>Min</div>
                                  <div style={{ fontSize: "1.2rem" }}>
-                                    {Math.min(...graphedValues).toFixed(1)}
+                                    {graphedValues.length > 0
+                                       ? Math.min(...graphedValues).toFixed(1)
+                                       : "0.0"}
                                  </div>
                               </div>
 
@@ -447,10 +473,12 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
                               >
                                  <div style={{ fontSize: "1rem" }}>Avg</div>
                                  <div style={{ fontSize: "1.2rem" }}>
-                                    {(graphedValues.reduce(
-                                       (sum, val) => sum + val,
-                                       0,
-                                    ) / graphedValues.length).toFixed(1)}
+                                    {graphedValues.length > 0
+                                       ? (graphedValues.reduce(
+                                          (sum, val) => sum + val,
+                                          0,
+                                       ) / graphedValues.length).toFixed(1)
+                                       : "0.0"}
                                  </div>
                               </div>
                            </div>
