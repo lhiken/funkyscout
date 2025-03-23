@@ -9,6 +9,10 @@ import { getEvent, parseMatchKey } from "../../../../utils/logic/app";
 import { DataParser2025 } from "../../../../schemas/parser";
 import { PitData2025 } from "../../../../schemas/defs";
 import { Tables } from "../../../../lib/supabase/database.types";
+import PicklistLineGraph from "./graphs/line";
+import { MetricDescriptions, TeamMetrics } from "../../../../schemas/schema";
+import throwNotification from "../../../../components/app/toast/toast";
+import Tippy from "@tippyjs/react";
 
 export default function ComparisonContent({ teamKey }: { teamKey: string }) {
    const [teamData, setTeamData] = useState<Tables<"event_team_data">>();
@@ -18,8 +22,8 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
    const [teamMatches, setTeamMatches] = useState<
       Tables<"event_match_data">[]
    >();
-   const [/*teleAvg*/, setTeleAvg] = useState(-1);
-   const [/*autoAvg*/, setAutoAvg] = useState(-1);
+   const [teleAvg, setTeleAvg] = useState(-1);
+   const [autoAvg, setAutoAvg] = useState(-1);
 
    useEffect(() => {
       fetchTeamImage(teamKey || "", getEvent() || "").then((res) => {
@@ -64,12 +68,12 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
       };
    };
 
-   const [/*coralL4*/, setCoralL4] = useState<number>(-1);
-   const [/*coralL3*/, setCoralL3] = useState<number>(-1);
-   const [/*coralL2*/, setCoralL2] = useState<number>(-1);
-   const [/*coralL1*/, setCoralL1] = useState<number>(-1);
-   // const [algaeNet, setAlgaeNet] = useState<number>(-1);
-   // const [algaeProc, setAlgaeProc] = useState<number>(-1);
+   const [coralL4, setCoralL4] = useState<number>(-1);
+   const [coralL3, setCoralL3] = useState<number>(-1);
+   const [coralL2, setCoralL2] = useState<number>(-1);
+   const [coralL1, setCoralL1] = useState<number>(-1);
+   const [, setAlgaeNet] = useState<number>(-1);
+   const [, setAlgaeProc] = useState<number>(-1);
    const [comments, setComments] = useState<
       { matchKey: string; comment: string }[]
    >([]);
@@ -111,29 +115,87 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
             ((parser?.getTeamL1Scored(teamKey)[teamKey] ?? []).length || 1),
       );
 
-      // setAlgaeNet(
-      //    (parser?.getTeamNetScored(teamKey)[teamKey] ?? []).reduce(
-      //       (sum, val) => sum + val,
-      //       0,
-      //    ) /
-      //       ((parser?.getTeamNetScored(teamKey)[teamKey] ?? []).length || 1),
-      // );
+      setAlgaeNet(
+         (parser?.getTeamNetScored(teamKey)[teamKey] ?? []).reduce(
+            (sum, val) => sum + val,
+            0,
+         ) /
+            ((parser?.getTeamNetScored(teamKey)[teamKey] ?? []).length || 1),
+      );
 
-      // setAlgaeProc(
-      //    (parser?.getTeamProcessorScored(teamKey)[teamKey] ?? []).reduce(
-      //       (sum, val) => sum + val,
-      //       0,
-      //    ) /
-      //       ((parser?.getTeamProcessorScored(teamKey)[teamKey] ?? []).length ||
-      //          1),
-      // );
+      setAlgaeProc(
+         (parser?.getTeamProcessorScored(teamKey)[teamKey] ?? []).reduce(
+            (sum, val) => sum + val,
+            0,
+         ) /
+            ((parser?.getTeamProcessorScored(teamKey)[teamKey] ?? []).length ||
+               1),
+      );
 
       setComments(parser?.getTeamComments() || []);
 
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [parser]);
 
-   const [metricOption, setMetricOption] = useState("");
+   const [graphedValues, setGraphedValues] = useState<number[]>([]);
+   const [metricSelected, setMetricSelected] = useState<string>("total");
+
+   const [metricOption, setMetricOption] = useState<string>("total");
+
+   useEffect(() => {
+      setValues();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, []);
+
+   async function setValues() {
+      if (
+         metricOption != "total" && metricOption != "auto" &&
+         metricOption != "tele" &&
+         !MetricDescriptions[2025][metricOption as keyof TeamMetrics[2025]]
+      ) {
+         throwNotification("error", "No such query key");
+         return;
+      }
+
+      setMetricSelected(metricOption);
+
+      const parser = new DataParser2025(
+         await fetchMatchDataByEvent(getEvent() || "") || [],
+      );
+
+      const getMetric = (teamKey: string) => {
+         if (
+            !MetricDescriptions[2025][metricSelected as keyof TeamMetrics[2025]]
+         ) {
+            const newArr: number[] = [];
+            parser.getParserData().filter((val) => val.team == teamKey).forEach(
+               (val) => {
+                  const vals = parser.getMatchTeamPoints(val.match, teamKey);
+
+                  console.log(vals);
+
+                  if (metricSelected == "tele") newArr.push(vals.tele);
+                  else if (metricSelected == "auto") newArr.push(vals.auto);
+                  else if (metricSelected == "total") {
+                     newArr.push(vals.auto + vals.tele);
+                  }
+               },
+            );
+
+            return newArr;
+         }
+
+         const record = parser.getTeamMetricRecord(
+            metricOption as never,
+            teamKey,
+         ) as Record<string, number[]>;
+         return Object.values(record).flat(); // Flatten all arrays into one
+      };
+
+      console.log(getMetric(teamKey));
+
+      setGraphedValues(getMetric(teamKey) || [0]);
+   }
 
    return (
       <>
@@ -296,77 +358,114 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
                                  className={styles.graphInput}
                                  value={metricOption}
                                  placeholder="metric..."
-                                 onChange={(e) =>
-                                    setMetricOption(e.target.value)}
+                                 onChange={(e) => {
+                                    setMetricOption(e.target.value);
+                                 }}
                               />
                            </div>
-                           <div className={styles.graphButton}>
+                           <div
+                              className={styles.graphButton}
+                              onClick={setValues}
+                           >
                               graph
                            </div>
                         </div>
                         <div className={styles.metricGraph}>
                            <div className={styles.metricGraphDetails}>
-                              <div>
+                              <Tippy
+                                 content={MetricDescriptions[2025][
+                                       metricSelected as keyof TeamMetrics[2025]
+                                    ]
+                                    ? MetricDescriptions[2025][
+                                       metricSelected as keyof TeamMetrics[2025]
+                                    ].title
+                                    : metricSelected == "auto"
+                                    ? "Auto Points"
+                                    : metricSelected == "tele"
+                                    ? "Teleop Points"
+                                    : "Total Points"}
+                              >
+                                 <div
+                                    style={{
+                                       whiteSpace: "nowrap",
+                                       overflow: "hidden",
+                                       textOverflow: "ellipsis",
+                                       maxWidth: "6rem",
+                                       color: "var(--primary)",
+                                    }}
+                                 >
+                                    {MetricDescriptions[2025][
+                                          metricSelected as keyof TeamMetrics[
+                                             2025
+                                          ]
+                                       ]
+                                       ? MetricDescriptions[2025][
+                                          metricSelected as keyof TeamMetrics[
+                                             2025
+                                          ]
+                                       ].title
+                                       : metricSelected == "auto"
+                                       ? "Auto Points"
+                                       : metricSelected == "tele"
+                                       ? "Teleop Points"
+                                       : "Total Points"}
+                                 </div>
+                              </Tippy>
+
+                              <div
+                                 style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                 }}
+                              >
+                                 <div style={{ fontSize: "1rem" }}>Max</div>
+                                 <div style={{ fontSize: "1.2rem" }}>
+                                    {Math.max(...graphedValues).toFixed(1)}
+                                 </div>
+                              </div>
+
+                              <div
+                                 style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                 }}
+                              >
+                                 <div style={{ fontSize: "1rem" }}>Min</div>
+                                 <div style={{ fontSize: "1.2rem" }}>
+                                    {Math.min(...graphedValues).toFixed(1)}
+                                 </div>
+                              </div>
+
+                              <div
+                                 style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                 }}
+                              >
+                                 <div style={{ fontSize: "1rem" }}>Avg</div>
+                                 <div style={{ fontSize: "1.2rem" }}>
+                                    {(graphedValues.reduce(
+                                       (sum, val) => sum + val,
+                                       0,
+                                    ) / graphedValues.length).toFixed(1)}
+                                 </div>
                               </div>
                            </div>
-                           <div className={styles.metricGraph}>
+                           <div
+                              style={{
+                                 flexGrow: 1,
+                                 width: "1rem",
+                              }}
+                           >
+                              <PicklistLineGraph
+                                 valueArray={graphedValues}
+                                 axisTicks={3}
+                              />
                            </div>
                         </div>
-                        {
-                           /* <div className={styles.performanceCardContainer}>
-                           <div className={styles.perfCard}>
-                              Total Avg.
-                              <div style={{ fontSize: "1.5rem" }}>
-                                 {(teleAvg + autoAvg).toFixed(1)}
-                              </div>
-                           </div>
-                           <div className={styles.perfCard}>
-                              Tele Avg.
-                              <div style={{ fontSize: "1.5rem" }}>
-                                 {teleAvg.toFixed(1)}
-                              </div>
-                           </div>
-                           <div className={styles.perfCard}>
-                              Auto Avg.
-                              <div style={{ fontSize: "1.5rem" }}>
-                                 {autoAvg.toFixed(1)}
-                              </div>
-                           </div>
-                           <div className={styles.perfCard}>
-                              Coral Avg.
-                              <div style={{ fontSize: "1.5rem" }}>
-                                 {(coralL4 + coralL3 + coralL2 + coralL1)
-                                    .toFixed(1)}
-                              </div>
-                           </div>
-                        </div>
-                        <div className={styles.performanceCardContainer}>
-                           <div className={styles.perfCard}>
-                              Coral L4
-                              <div style={{ fontSize: "1.5rem" }}>
-                                 {coralL4.toFixed(1)}
-                              </div>
-                           </div>
-                           <div className={styles.perfCard}>
-                              Coral L3
-                              <div style={{ fontSize: "1.5rem" }}>
-                                 {coralL3.toFixed(1)}
-                              </div>
-                           </div>
-                           <div className={styles.perfCard}>
-                              Coral L2
-                              <div style={{ fontSize: "1.5rem" }}>
-                                 {coralL2.toFixed(1)}
-                              </div>
-                           </div>
-                           <div className={styles.perfCard}>
-                              Coral L1
-                              <div style={{ fontSize: "1.5rem" }}>
-                                 {coralL1.toFixed(1)}
-                              </div>
-                           </div>
-                        </div> */
-                        }
                         <div className={styles.commentsBox}>
                            <div className={styles.commentsWrapper}>
                               {comments.map((val, index) => {
@@ -388,6 +487,61 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
                         <FallbackBox title="No data found" />
                      </div>
                   )}
+            </ComparisonBox>
+            <ComparisonBox title="Stats Overview">
+               <div className={styles.performanceCardContainer}>
+                  <div className={styles.perfCard}>
+                     Total Avg.
+                     <div style={{ fontSize: "1.5rem" }}>
+                        {(teleAvg + autoAvg).toFixed(1)}
+                     </div>
+                  </div>
+                  <div className={styles.perfCard}>
+                     Tele Avg.
+                     <div style={{ fontSize: "1.5rem" }}>
+                        {teleAvg.toFixed(1)}
+                     </div>
+                  </div>
+                  <div className={styles.perfCard}>
+                     Auto Avg.
+                     <div style={{ fontSize: "1.5rem" }}>
+                        {autoAvg.toFixed(1)}
+                     </div>
+                  </div>
+                  <div className={styles.perfCard}>
+                     Coral Avg.
+                     <div style={{ fontSize: "1.5rem" }}>
+                        {(coralL4 + coralL3 + coralL2 + coralL1)
+                           .toFixed(1)}
+                     </div>
+                  </div>
+               </div>
+               <div className={styles.performanceCardContainer}>
+                  <div className={styles.perfCard}>
+                     Coral L4
+                     <div style={{ fontSize: "1.5rem" }}>
+                        {coralL4.toFixed(1)}
+                     </div>
+                  </div>
+                  <div className={styles.perfCard}>
+                     Coral L3
+                     <div style={{ fontSize: "1.5rem" }}>
+                        {coralL3.toFixed(1)}
+                     </div>
+                  </div>
+                  <div className={styles.perfCard}>
+                     Coral L2
+                     <div style={{ fontSize: "1.5rem" }}>
+                        {coralL2.toFixed(1)}
+                     </div>
+                  </div>
+                  <div className={styles.perfCard}>
+                     Coral L1
+                     <div style={{ fontSize: "1.5rem" }}>
+                        {coralL1.toFixed(1)}
+                     </div>
+                  </div>
+               </div>
             </ComparisonBox>
          </div>
       </>

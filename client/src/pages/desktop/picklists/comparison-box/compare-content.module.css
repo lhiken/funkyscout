@@ -193,3 +193,21 @@
    border-bottom: 2px solid var(--text-secondary);
    width: 5rem;
 }
+
+.metricGraph {
+   display: flex;
+   flex-direction: row;
+   height: 10rem;
+   gap: 1rem;
+}
+
+.metricGraphDetails {
+   width: 8rem;
+   display: flex;
+   flex-direction: column;
+   gap: 0.5rem;
+   color: var(--text-primary);
+   padding: 1rem 1rem;
+   background-color: var(--text-background);
+   border-radius: 1rem;
+}
