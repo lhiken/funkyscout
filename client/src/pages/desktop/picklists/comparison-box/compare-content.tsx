@@ -75,7 +75,7 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
    const [, setAlgaeNet] = useState<number>(-1);
    const [, setAlgaeProc] = useState<number>(-1);
    const [comments, setComments] = useState<
-      { matchKey: string; comment: string }[]
+      { matchKey: string; comment: string; author: string }[]
    >([]);
 
    useEffect(() => {
@@ -496,16 +496,43 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
                         </div>
                         <div className={styles.commentsBox}>
                            <div className={styles.commentsWrapper}>
-                              {comments.map((val, index) => {
-                                 return (
+                              {comments
+                                 .sort((a, b) => {
+                                    const getMatchNumber = (key: string) =>
+                                       parseInt(
+                                          key.split("_")[1].replace(/\D/g, ""),
+                                          10,
+                                       );
+                                    return getMatchNumber(b.matchKey) -
+                                       getMatchNumber(a.matchKey);
+                                 })
+                                 .map((val, index) => (
                                     <div key={index} className={styles.comment}>
-                                       <div style={{ color: "var(--primary)" }}>
+                                       <div
+                                          style={{
+                                             color: "var(--primary)",
+                                             display: "flex",
+                                             gap: "0.25rem",
+                                          }}
+                                       >
                                           {parseMatchKey(val.matchKey, "short")}
+                                          {" "}
+                                          |{" "}
+                                          <div
+                                             style={{
+                                                whiteSpace: "nowrap",
+                                                overflow: "hidden",
+                                                textOverflow: "ellipsis",
+                                                maxWidth: "6rem",
+                                                color: "var(--primary)",
+                                             }}
+                                          >
+                                             {val.author}
+                                          </div>
                                        </div>
                                        {val.comment}
                                     </div>
-                                 );
-                              })}
+                                 ))}
                            </div>
                         </div>
                      </>

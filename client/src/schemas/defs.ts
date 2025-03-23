@@ -144,6 +144,7 @@ export class DataParser<T extends keyof (MatchMetrics | TeamMetrics)> {
       metrics: MatchMetrics[T];
       autoActions: AutoAction<T>[];
       teleActions: TeleopAction<T>[];
+      author: string;
    }[] = [];
    private teamKey: string;
 
@@ -167,6 +168,7 @@ export class DataParser<T extends keyof (MatchMetrics | TeamMetrics)> {
             metrics: combinedMetrics.metrics,
             autoActions: combinedActions.autoActions,
             teleActions: combinedActions.teleopActions,
+            author: entry.name,
          });
       }
    }
@@ -243,6 +245,7 @@ export class DataParser<T extends keyof (MatchMetrics | TeamMetrics)> {
       const commentArray: {
          matchKey: string;
          comment: string;
+         author: string;
       }[] = [];
 
       for (const entry of this.combinedData) {
@@ -252,6 +255,7 @@ export class DataParser<T extends keyof (MatchMetrics | TeamMetrics)> {
             commentArray.push({
                matchKey: entry.matchKey,
                comment: entry.comment,
+               author: entry.author,
             });
          }
       }
