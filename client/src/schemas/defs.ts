@@ -156,6 +156,12 @@ export class DataParser<T extends keyof (MatchMetrics | TeamMetrics)> {
          this.data = data.filter((val) => val.team == teamKey);
       }
 
+      this.data.sort((a, b) => {
+         const getMatchNumber = (key: string) =>
+            parseInt(key.split("_")[1].replace(/\D/g, ""), 10);
+         return getMatchNumber(a.match) - getMatchNumber(b.match);
+      });
+
       for (const entry of data) {
          const combinedMetrics = entry.data as CombinedMatchMetrics<T>;
          const combinedActions = entry.data_raw as CombinedMatchActions<T>;
@@ -194,9 +200,14 @@ export class DataParser<T extends keyof (MatchMetrics | TeamMetrics)> {
       metricKey: keyof MatchMetrics[Year],
       teamKey?: string,
    ) {
-      const data = this.getParserCombinedData().filter((val) =>
-         teamKey ? val.teamKey == teamKey : true
-      );
+      const data = this.getParserCombinedData()
+         .filter((val) => (teamKey ? val.teamKey == teamKey : true))
+         .sort((a, b) => {
+            const getMatchNumber = (key: string) =>
+               parseInt(key.split("_")[1].replace(/\D/g, ""), 10);
+            return getMatchNumber(a.matchKey) - getMatchNumber(b.matchKey);
+         });
+
       const returnData: Record<string, T[]> = {};
 
       for (const entry of data) {
@@ -207,9 +218,7 @@ export class DataParser<T extends keyof (MatchMetrics | TeamMetrics)> {
             if (!returnData[entry.teamKey]) {
                returnData[entry.teamKey] = [];
             }
-            returnData[entry.teamKey].push(
-               value,
-            );
+            returnData[entry.teamKey].push(value);
          }
       }
 
@@ -239,6 +248,28 @@ export class DataParser<T extends keyof (MatchMetrics | TeamMetrics)> {
       }
 
       return returnData;
+   }
+
+   getTeamMatchMetricRecord<T, Year extends keyof MatchMetrics>(
+      metricKey: keyof MatchMetrics[Year],
+      teamKey: string,
+   ) {
+      const newArr: {
+         matchKey: string;
+         value: T;
+      }[] = [];
+
+      for (const matchEntry of this.combinedData) {
+         if (matchEntry.teamKey == teamKey) {
+            newArr.push({
+               matchKey: matchEntry.matchKey,
+               value: matchEntry
+                  .metrics[metricKey as keyof typeof matchEntry.metrics] as T,
+            });
+         }
+      }
+
+      return newArr;
    }
 
    getTeamComments(teamKey?: string) {

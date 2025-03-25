@@ -3,6 +3,7 @@ const NivoChartTheme = {
    text: {
       fontSize: 12,
       fill: "var(--text-primary)",
+      fontFamily: "Outfit",
       outlineWidth: 0,
       outlineColor: "transparent",
    },
@@ -17,6 +18,7 @@ const NivoChartTheme = {
          text: {
             fontSize: 12,
             fill: "var(--text-primary)",
+            fontFamily: "Outfit",
             outlineWidth: 0,
             outlineColor: "transparent",
          },
@@ -47,6 +49,7 @@ const NivoChartTheme = {
             fontSize: 11,
             fill: "var(--text-secondary)",
             outlineWidth: 0,
+            fontFamily: "Outfit",
             outlineColor: "transparent",
          },
       },
@@ -54,6 +57,7 @@ const NivoChartTheme = {
          fontSize: 11,
          fill: "var(--text-secondary)",
          outlineWidth: 0,
+         fontFamily: "Outfit",
          outlineColor: "transparent",
       },
       ticks: {

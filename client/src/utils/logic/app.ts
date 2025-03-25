@@ -59,17 +59,21 @@ function getFocusTeam() {
  * as "Qual 23." Long includes the event key, so
  * "2024casf Qual 23"
  *
+ * Shorter returns a letter Q or M depending on
+ * qualification or anything else and the number
+ * with no space.
+ *
  * @param key
  * @param mode
  * @returns string such as "Qualification"
  */
 function parseMatchKey(
    key: string,
-   mode: "nexus" | "short" | "long" | "number",
+   mode: "nexus" | "short" | "long" | "number" | "shorter",
 ) {
    let returnKey = "";
 
-   if (mode == "number") return key.substring(key.indexOf("_") + 2);
+   if (mode == "number") return key.substring(key.indexOf("_") + 3);
 
    if (mode == "long") returnKey += key.substring(0, key.indexOf("_")) + " ";
 
@@ -83,6 +87,13 @@ function parseMatchKey(
       }
       if (key.substring(0, 1) == "f") {
          returnKey += `Finals ${key.substring(1, key.indexOf("m"))}`;
+      }
+   } else if (mode == "shorter") {
+      key = key.substring(key.indexOf("_") + 1);
+      if (key.substring(0, 2) == "qm") {
+         returnKey += `Q${key.substring(2)}`;
+      } else {
+         returnKey += `M${key.substring(key.indexOf("m") + 1)}`;
       }
    } else {
       key = key.substring(key.indexOf("_") + 1);

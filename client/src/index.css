@@ -16,6 +16,16 @@
    --rt-transition-closing-delay: 0.1s;
 }
 
+@media (min-width: 768px) {
+   :root {
+      --min-rem: 11px;
+      --max-rem: 14px;
+      --scaling-factor: 5vw;
+
+      font-size: clamp(var(--min-rem), var(--scaling-factor), var(--max-rem));
+   }
+}
+
 .tooltip {
    background-color: white !important;
 }
