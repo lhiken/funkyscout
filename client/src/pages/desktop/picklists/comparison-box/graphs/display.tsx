@@ -40,8 +40,12 @@ function MatchReplayFieldMap({
 
             const newTele = data.teleopActions.map((val) => ({
                location: {
-                  x: Math.abs(val.location?.y || 0),
-                  y: Math.abs(val.location?.x || 0),
+                  x: val.action == "climbPark"
+                     ? 500
+                     : Math.abs(val.location?.y || 0),
+                  y: val.action == "climbPark"
+                     ? matchData.alliance == "blue" ? 130 : 370
+                     : Math.abs(val.location?.x || 0),
                },
                timestamp: val.timestamp,
                action: val.action,
@@ -95,7 +99,7 @@ function MatchReplayFieldMap({
 
    // Smooth easing function (ease in out cubic)
    const easeInOutCubic = (t: number) => {
-      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
    };
 
    // Dynamic color generation function

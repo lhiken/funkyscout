@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import styles from "./compare-content.module.css";
 import {
    fetchMatchDataByEvent,
@@ -24,6 +24,7 @@ import {
    ListboxOption,
    ListboxOptions,
 } from "@headlessui/react";
+import { GlobalTeamDataContext } from "../../../../app-global-ctx";
 
 const UniversalDropdown: React.FC<{
    options: { key: string; title: string }[];
@@ -104,6 +105,8 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
    const [isLoading, setIsLoading] = useState<boolean>(false);
    const latestRequestIdRef = useRef<number>(0);
 
+   const globData = useContext(GlobalTeamDataContext);
+
    // Prepare dropdown options: defaults plus any extra keys from MetricDescriptions
    const defaultMetrics = [
       { key: "total", title: "Total Points" },
@@ -133,7 +136,15 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
       fetchMatchDataByEvent(getEvent() || "").then((res) => {
          if (res) {
             setParser(new DataParser2025(res, teamKey));
-            setTeamMatches(res.filter((val) => val.team === teamKey));
+            const teamMatches = res.filter((val) => val.team === teamKey).sort(
+               (a, b) => {
+                  const getMatchNumber = (key: string) =>
+                     parseInt(key.split("_")[1].replace(/\D/g, ""), 10);
+                  return getMatchNumber(a.match) - getMatchNumber(b.match);
+               },
+            );
+            setTeamMatches(teamMatches);
+            setCurrentReplay(teamMatches[0]);
          }
       });
 
@@ -283,15 +294,13 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
    const matchOptions = teamMatches?.map((match) => ({
       key: match.match,
       title: parseMatchKey(match.match, "nexus"),
-   })).sort((a, b) => {
-      const getMatchNumber = (key: string) =>
-         parseInt(key.split("_")[1].replace(/\D/g, ""), 10);
-      return getMatchNumber(a.key) - getMatchNumber(b.key);
-   }) || [];
+   })) || [];
 
    const [currentReplay, setCurrentReplay] = useState<
       Tables<"event_match_data">
    >();
+
+   const TBAData = globData.TBAdata.find((val) => val.key == teamKey);
 
    return (
       <div className={styles.container}>
@@ -328,16 +337,78 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
                                  No image
                               </div>
                            )}
-                        <div className={styles.abilitiesBox}>
-                           <div className={styles.infoHeader}>
-                              Desc. | {teamData?.name}
+                        <div className={styles.statsBox}>
+                           <div className={styles.header}>
+                              Scouted by {teamData?.name}
                            </div>
-                           <div className={styles.archetype}>
-                              {pitData.robotArchetype}
+                           <div
+                              style={{
+                                 width: "100%",
+                                 height: "0.15rem",
+                                 margin: "0.15rem 0",
+                                 background: "var(--text-background)",
+                                 borderRadius: "1rem",
+                                 flexShrink: 0,
+                              }}
+                           />
+                           <div className={styles.infoEntry}>
+                              Event Ranking
+                              <div>
+                                 {TBAData?.rank ? "#" + TBAData.rank : "N/A"}
+                              </div>
+                           </div>
+                           <div className={styles.infoEntry}>
+                              Next Match
+                              <div>
+                                 {TBAData?.nextMatch
+                                    ? parseMatchKey(
+                                       TBAData.nextMatch,
+                                       "shorter",
+                                    )
+                                    : "N/A"}
+                              </div>
+                           </div>
+                           <div
+                              style={{
+                                 width: "100%",
+                                 height: "0.15rem",
+                                 margin: "0.15rem 0",
+                                 background: "var(--text-background)",
+                                 borderRadius: "1rem",
+                                 flexShrink: 0,
+                              }}
+                           />
+                           <div className={styles.infoEntry}>
+                              Statbotics EPA{" "}
+                              <div>
+                                 {globData.EPAdata[teamKey]?.epa?.total_points
+                                    .mean || 0}
+                              </div>
+                           </div>
+                           <div className={styles.infoEntry}>
+                              Point Contribution<div>
+                                 {(teleAvg + autoAvg).toFixed(2)}
+                              </div>
                            </div>
                         </div>
                      </div>
                      <div style={{ display: "flex", gap: "0.5rem" }}>
+                        <div className={styles.archetype}>
+                           <div className={styles.infoHeader}>
+                              Description
+                           </div>
+                           <div
+                              style={{
+                                 width: "100%",
+                                 height: "0.15rem",
+                                 margin: "0.15rem 0",
+                                 background: "var(--text-background)",
+                                 borderRadius: "1rem",
+                                 flexShrink: 0,
+                              }}
+                           />
+                           {pitData.robotArchetype}
+                        </div>
                         <div className={styles.abilitiesList}>
                            <div className={styles.abilityCategory}>
                               <div className={styles.abilityHeader}>Algae</div>
@@ -444,7 +515,6 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
                               </div>
                            </div>
                         </div>
-                        <div className={styles.pitRating}>no</div>
                      </div>
                   </>
                )

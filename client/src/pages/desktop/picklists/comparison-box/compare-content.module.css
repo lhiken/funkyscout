@@ -51,8 +51,8 @@
 }
 
 .image {
-   height: 10rem;
-   width: 10rem;
+   height: 11.25rem;
+   width: 11.25rem;
    border-radius: 1rem;
    object-fit: cover;
    border: 2px solid var(--text-background);
@@ -62,7 +62,7 @@
    display: flex;
    flex-direction: row;
    gap: 1rem;
-   height: 10rem;
+   height: 11.25rem;
 }
 
 .abilitiesBox {
@@ -80,12 +80,16 @@
 }
 
 .archetype {
-   padding: 0.75rem;
+   padding: 1rem;
+   color: var(--text-primary);
    border: 2px solid var(--text-background);
-   border-radius: 0.5rem;
+   border-radius: 1rem;
    display: flex;
-   flex-grow: 1;
+   width: 14rem;
    overflow-y: scroll;
+   display: flex;
+   flex-direction: column;
+   height: 10rem;
    line-height: 1.4rem;
 }
 
@@ -98,18 +102,29 @@
    flex-direction: row;
    justify-content: space-between;
    border-radius: 1rem;
+   overflow-y: scroll;
+   flex-shrink: 0;
+   width: 1rem;
+   flex-grow: 1;
    border: 2px solid var(--text-background);
    padding: 1.25rem 1.5rem;
+   height: 10rem;
+}
+
+.abilitiesList::-webkit-scrollbar {
+   display: none;
 }
 
 .abilityCategory {
    display: flex;
    flex-direction: column;
    gap: 0.25rem;
+   flex-shrink: 0;
 }
 
 .abilityHeader {
    color: var(--primary);
+   flex-shrink: 0;
 }
 
 .coralReef {
@@ -366,4 +381,26 @@
 .selectedOption {
    background-color: var(--primary-light);
    color: var(--primary);
+}
+
+.statsBox {
+   display: flex;
+   flex-direction: column;
+   border: 2px solid var(--text-background);
+   border-radius: 1rem;
+   width: 1rem;
+   flex-grow: 1;
+   padding: 1rem;
+   color: var(--text-primary);
+   gap: 0.3rem;
+}
+
+.header {
+   color: var(--primary);
+}
+
+.infoEntry {
+   width: 100%;
+   display: flex;
+   justify-content: space-between;
 }
