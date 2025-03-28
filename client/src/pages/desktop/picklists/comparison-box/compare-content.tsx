@@ -17,30 +17,64 @@ import {
 } from "../../../../schemas/schema";
 import throwNotification from "../../../../components/app/toast/toast";
 import Tippy from "@tippyjs/react";
-// A simple styled dropdown component that you can further customize
-const StyledDropdown: React.FC<{
+import MatchReplayFieldMap from "./graphs/display";
+import {
+   Listbox,
+   ListboxButton,
+   ListboxOption,
+   ListboxOptions,
+} from "@headlessui/react";
+
+const UniversalDropdown: React.FC<{
    options: { key: string; title: string }[];
    value: string;
-   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-}> = ({ options, value, onChange }) => {
+   onChange: (key: string) => void;
+   className?: string;
+}> = ({ options, value, onChange, className }) => {
+   // Ensure options array is not empty
+   const safeOptions = options.length > 0
+      ? options
+      : [{ key: "", title: "No options" }];
+
+   const selectedOption = safeOptions.find((option) => option.key === value) ||
+      safeOptions[0];
+
    return (
-      <div className={styles.styledDropdown}>
-         <select
-            value={value}
-            onChange={onChange}
-            className={styles.graphInput}
-         >
-            {options.map((option) => (
-               <option
-                  key={option.key}
-                  value={option.key}
-                  className={styles.graphOption}
-               >
-                  {option.title}
-               </option>
-            ))}
-         </select>
-      </div>
+      <Listbox value={value} onChange={onChange}>
+         {({ open }) => (
+            <div className={`${styles.dropdownContainer} ${className || ""}`}>
+               <ListboxButton className={styles.graphInput}>
+                  <i
+                     className={`${styles.chevron} fa-solid ${
+                        open ? "fa-chevron-up" : "fa-chevron-down"
+                     }`}
+                  />
+                  <span className={styles.buttonText}>
+                     {selectedOption?.title || "Select option"}
+                  </span>
+               </ListboxButton>
+               <ListboxOptions className={styles.options}>
+                  {safeOptions.map((option) => (
+                     <ListboxOption
+                        key={option.key}
+                        value={option.key}
+                        className={styles.option}
+                     >
+                        {({ selected, active }) => (
+                           <div
+                              className={`${styles.optionText} ${
+                                 active ? styles.activeOption : ""
+                              } ${selected ? styles.selectedOption : ""}`}
+                           >
+                              {option.title}
+                           </div>
+                        )}
+                     </ListboxOption>
+                  ))}
+               </ListboxOptions>
+            </div>
+         )}
+      </Listbox>
    );
 };
 
@@ -246,6 +280,19 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [metricOption]);
 
+   const matchOptions = teamMatches?.map((match) => ({
+      key: match.match,
+      title: parseMatchKey(match.match, "nexus"),
+   })).sort((a, b) => {
+      const getMatchNumber = (key: string) =>
+         parseInt(key.split("_")[1].replace(/\D/g, ""), 10);
+      return getMatchNumber(a.key) - getMatchNumber(b.key);
+   }) || [];
+
+   const [currentReplay, setCurrentReplay] = useState<
+      Tables<"event_match_data">
+   >();
+
    return (
       <div className={styles.container}>
          <ComparisonBox title="Team Information">
@@ -253,11 +300,34 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
                ? (
                   <>
                      <div className={styles.teamInfoBox}>
-                        <img
-                           className={styles.image}
-                           src={teamImageUrl}
-                           alt="Team"
-                        />
+                        {teamImageUrl
+                           ? (
+                              <img
+                                 className={styles.image}
+                                 src={teamImageUrl}
+                                 alt="Team"
+                              />
+                           )
+                           : (
+                              <div
+                                 className={styles.image}
+                                 style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    color: "var(--text-background)",
+                                    flexDirection: "column",
+                                    gap: "0.5rem",
+                                 }}
+                              >
+                                 <i
+                                    className="fa-solid fa-robot"
+                                    style={{ fontSize: "3.5rem" }}
+                                 >
+                                 </i>
+                                 No image
+                              </div>
+                           )}
                         <div className={styles.abilitiesBox}>
                            <div className={styles.infoHeader}>
                               Desc. | {teamData?.name}
@@ -390,16 +460,13 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
                ? (
                   <>
                      <div className={styles.performanceGraphHeader}>
-                        <div style={{ display: "flex" }}>
-                           Graph{" "}
-                           <StyledDropdown
-                              options={allMetrics}
-                              value={metricOption}
-                              onChange={(e) => setMetricOption(e.target.value)}
-                           />
-                        </div>
+                        <UniversalDropdown
+                           options={allMetrics}
+                           value={metricOption}
+                           onChange={(key) => setMetricOption(key)}
+                        />
                         {isLoading && (
-                           <span className={styles.loading}>loading...</span>
+                           <div className={styles.loading}>loading...</div>
                         )}
                      </div>
                      <div className={styles.metricGraph}>
@@ -563,46 +630,67 @@ export default function ComparisonContent({ teamKey }: { teamKey: string }) {
                   </div>
                )}
          </ComparisonBox>
-
+         <ComparisonBox title="Match Replays">
+            <div className={styles.performanceGraphHeader}>
+               <UniversalDropdown
+                  options={matchOptions}
+                  value={currentReplay?.match || ""}
+                  onChange={(key) => {
+                     const selectedMatch = teamMatches?.find(
+                        (match) => match.match === key,
+                     );
+                     if (selectedMatch) setCurrentReplay(selectedMatch);
+                  }}
+               />
+            </div>
+            {currentReplay && <MatchReplayFieldMap matchData={currentReplay} />}
+         </ComparisonBox>
          <ComparisonBox title="Stats Overview">
             <div className={styles.performanceCardContainer}>
-               <div className={styles.perfCard}>
-                  Total Avg.
-                  <div style={{ fontSize: "1.5rem" }}>
-                     {(teleAvg + autoAvg).toFixed(1)}
+               <div className={styles.performanceCardContainer}>
+                  <div className={styles.perfCard}>
+                     <div className={styles.perfCardText}>
+                        Total Avg.
+                        <div
+                           className={styles.perfCardText}
+                           style={{ fontSize: "1.5rem" }}
+                        >
+                           {(teleAvg + autoAvg).toFixed(1)}
+                        </div>
+                     </div>
                   </div>
-               </div>
-               <div className={styles.perfCard}>
-                  Tele Avg.
-                  <div style={{ fontSize: "1.5rem" }}>{teleAvg.toFixed(1)}</div>
-               </div>
-               <div className={styles.perfCard}>
-                  Auto Avg.
-                  <div style={{ fontSize: "1.5rem" }}>{autoAvg.toFixed(1)}</div>
-               </div>
-               <div className={styles.perfCard}>
-                  Coral Avg.
-                  <div style={{ fontSize: "1.5rem" }}>
-                     {(coralL4 + coralL3 + coralL2 + coralL1).toFixed(1)}
+                  <div className={styles.perfCard}>
+                     <div className={styles.perfCardText}>
+                        Tele Avg.
+                        <div
+                           className={styles.perfCardText}
+                           style={{ fontSize: "1.5rem" }}
+                        >
+                           {teleAvg.toFixed(1)}
+                        </div>
+                     </div>
                   </div>
-               </div>
-            </div>
-            <div className={styles.performanceCardContainer}>
-               <div className={styles.perfCard}>
-                  Coral L4
-                  <div style={{ fontSize: "1.5rem" }}>{coralL4.toFixed(1)}</div>
-               </div>
-               <div className={styles.perfCard}>
-                  Coral L3
-                  <div style={{ fontSize: "1.5rem" }}>{coralL3.toFixed(1)}</div>
-               </div>
-               <div className={styles.perfCard}>
-                  Coral L2
-                  <div style={{ fontSize: "1.5rem" }}>{coralL2.toFixed(1)}</div>
-               </div>
-               <div className={styles.perfCard}>
-                  Coral L1
-                  <div style={{ fontSize: "1.5rem" }}>{coralL1.toFixed(1)}</div>
+                  <div className={styles.perfCard}>
+                     <div className={styles.perfCardText}>
+                        Auto Avg.
+                        <div
+                           style={{ fontSize: "1.5rem" }}
+                        >
+                           {autoAvg.toFixed(1)}
+                        </div>
+                     </div>
+                  </div>
+                  <div className={styles.perfCard}>
+                     <div className={styles.perfCardText}>
+                        Coral Avg.
+                        <div
+                           className={styles.perfCardText}
+                           style={{ fontSize: "1.5rem" }}
+                        >
+                           {(coralL4 + coralL3 + coralL2 + coralL1).toFixed(1)}
+                        </div>
+                     </div>
+                  </div>
                </div>
             </div>
          </ComparisonBox>

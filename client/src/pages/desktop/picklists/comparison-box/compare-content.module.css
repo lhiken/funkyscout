@@ -121,6 +121,7 @@
    display: flex;
    justify-content: space-between;
    gap: 0.5rem;
+   width: 100%;
 }
 
 .perfCard {
@@ -133,6 +134,15 @@
    border-radius: 1rem;
    color: var(--text-primary);
    flex-direction: column;
+   box-sizing: border-box;
+}
+
+.perfCardText {
+   width: 5rem;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
 }
 
 .commentsBox {
@@ -182,9 +192,9 @@
 .performanceGraphHeader {
    display: flex;
    justify-content: space-between;
-   padding: 0.5rem 1.25rem;
    background-color: var(--text-background);
    border-radius: 1rem;
+   padding: 0.1rem 0.5rem;
    color: var(--text-primary);
 }
 
@@ -240,6 +250,120 @@
 .loading {
    opacity: 0.7;
    cursor: wait;
-   width: 4rem;
-   text-align: right;
+   align-self: center;
+   margin-right: 0.75rem;
+}
+
+.matchReplayOptions {
+   display: flex;
+   flex-direction: row;
+   justify-content: center;
+   background-color: var(--text-background);
+   border-radius: 1rem;
+   padding: 0.5rem 1rem;
+   color: var(--text-primary);
+}
+
+.chevron {
+   color: var(--text-secondary);
+}
+
+/* WebKit Scrollbar Styles */
+.options::-webkit-scrollbar {
+   width: 0.25rem;
+   border-radius: 1rem;
+}
+
+.options::-webkit-scrollbar-track {
+   background: var(--text-background);
+   border-radius: 1rem;
+}
+
+.options::-webkit-scrollbar-thumb {
+   background: var(--text-secondary);
+   border-radius: 4px;
+}
+
+.options::-webkit-scrollbar-thumb:hover {
+   background: var(--primary-variant);
+}
+
+.optionText {
+   display: block;
+   white-space: nowrap;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   color: var(--text-primary);
+   font-weight: 400;
+}
+
+.activeOption {
+   color: var(--primary-variant);
+}
+
+.selectedOption {
+   font-weight: 500;
+   color: var(--primary);
+}
+
+.dropdownContainer {
+   position: relative;
+   width: 100%;
+   max-width: 12rem;
+}
+
+.graphInput {
+   display: flex;
+   align-items: center;
+   width: 100%;
+   padding: 0.5rem;
+   border-radius: 0.375rem;
+   background-color: var(--background-secondary);
+   cursor: pointer;
+   gap: 0.5rem;
+}
+
+.buttonText {
+   white-space: nowrap;
+   overflow: hidden;
+   text-overflow: ellipsis;
+}
+
+.chevron {
+   color: var(--text-secondary);
+}
+
+.options {
+   position: absolute;
+   z-index: 10;
+   width: 100%;
+   max-height: 15rem;
+   overflow-y: auto;
+   border-top: none;
+   border-radius: 0 0 0.375rem 0.375rem;
+   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+   background-color: var(--surface);
+   margin-top: 0.5rem;
+   border: 2px solid var(--text-background);
+   border-radius: 1rem;
+   padding: 0.5rem 0.25rem;
+   font-size: 0.95rem;
+}
+
+.option {
+   padding: 0.25rem;
+   cursor: pointer;
+}
+
+.optionText {
+   padding: 0.25rem;
+}
+
+.activeOption {
+   background-color: var(--background-hover);
+}
+
+.selectedOption {
+   background-color: var(--primary-light);
+   color: var(--primary);
 }
