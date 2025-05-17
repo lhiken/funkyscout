@@ -64,7 +64,7 @@ function SetupPanel() {
 
    function handleScheduleTeams() {
       if (assignmentData.setVal) {
-         const teamKeys = Object.keys(globalData.EPAdata) ||
+         const teamKeys = globalData.TBAdata.map((val) => val.key) ||
             [];
          const scouterList = assignmentData.val?.scouterList || [];
          const event = getEvent() || "";
